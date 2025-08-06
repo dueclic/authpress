@@ -6,12 +6,7 @@ if (isset($_GET['tab'])) {
 }
 
 // Get current provider settings
-$providers = get_option('wp_factor_providers', array(
-    'authenticator' => array('enabled' => false),
-    'telegram' => array('enabled' => false, 'bot_token' => '', 'failed_login_reports' => false)
-));
-
-$telegram_settings = get_option('tg_col', array());
+$providers = authpress_providers();
 ?>
 
 <div id="wft-wrap" class="wrap">
@@ -211,6 +206,30 @@ $telegram_settings = get_option('tg_col', array());
                             <?php } ?>
                         </div>
                     </div>
+                </div>
+
+                <div class="default-provider-section">
+                    <h3><?php _e("Default Provider Settings", "two-factor-login-telegram"); ?></h3>
+                    <table class="form-table">
+                        <tr>
+                            <th scope="row">
+                                <label for="default_provider"><?php _e("Default 2FA Method", "two-factor-login-telegram"); ?></label>
+                            </th>
+                            <td>
+                                <select name="wp_factor_providers[default_provider]" id="default_provider">
+                                    <option value="telegram" <?php selected($providers['default_provider'] ?? 'telegram', 'telegram'); ?>>
+                                        <?php _e("Telegram", "two-factor-login-telegram"); ?>
+                                    </option>
+                                    <option value="authenticator" <?php selected($providers['default_provider'] ?? 'telegram', 'authenticator'); ?>>
+                                        <?php _e("Authenticator App", "two-factor-login-telegram"); ?>
+                                    </option>
+                                </select>
+                                <p class="description">
+                                    <?php _e("Choose which 2FA method will be selected by default during login. Users can still switch between available methods.", "two-factor-login-telegram"); ?>
+                                </p>
+                            </td>
+                        </tr>
+                    </table>
                 </div>
 
                 <p class="submit">
@@ -685,11 +704,85 @@ input:checked + .slider:before {
     color: #666;
 }
 
+.default-provider-section {
+    background: #f0f6fc;
+    border: 1px solid #c7d2fe;
+    border-radius: 8px;
+    padding: 20px;
+    margin: 20px 0;
+}
+
+.default-provider-section h3 {
+    margin: 0 0 20px 0;
+    color: #1e40af;
+    display: flex;
+    align-items: center;
+}
+
+.default-provider-section h3:before {
+    content: "⚙️";
+    margin-right: 8px;
+    font-size: 1.2em;
+}
+
+.default-provider-section .form-table th {
+    padding: 15px 10px 15px 0;
+    color: #1f2937;
+    font-weight: 600;
+}
+
+.default-provider-section select {
+    min-width: 200px;
+    padding: 6px 12px;
+    border-radius: 4px;
+    border: 1px solid #d1d5db;
+}
+
+.default-provider-section .description {
+    font-style: italic;
+    color: #6b7280;
+    margin-top: 8px;
+}
+
 @media (max-width: 768px) {
     .providers-container {
         grid-template-columns: 1fr;
     }
 }
 </style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const telegramToggle = document.querySelector('input[name="wp_factor_providers[telegram][enabled]"]');
+    const authenticatorToggle = document.querySelector('input[name="wp_factor_providers[authenticator][enabled]"]');
+    const defaultProviderSection = document.querySelector('.default-provider-section');
+    const defaultProviderSelect = document.querySelector('#default_provider');
+
+    function updateDefaultProviderVisibility() {
+        const telegramEnabled = telegramToggle.checked;
+        const authenticatorEnabled = authenticatorToggle.checked;
+
+        if (telegramEnabled && authenticatorEnabled) {
+            defaultProviderSection.style.display = 'block';
+        } else {
+            defaultProviderSection.style.display = 'none';
+
+            // Set default based on which provider is enabled
+            if (telegramEnabled && !authenticatorEnabled) {
+                defaultProviderSelect.value = 'telegram';
+            } else if (!telegramEnabled && authenticatorEnabled) {
+                defaultProviderSelect.value = 'authenticator';
+            }
+        }
+    }
+
+    // Initial check
+    updateDefaultProviderVisibility();
+
+    // Listen for changes
+    telegramToggle.addEventListener('change', updateDefaultProviderVisibility);
+    authenticatorToggle.addEventListener('change', updateDefaultProviderVisibility);
+});
+</script>
 
 <?php do_action("tft_copyright"); ?>

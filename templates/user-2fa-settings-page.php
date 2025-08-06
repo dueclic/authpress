@@ -7,13 +7,22 @@ $current_user_id = get_current_user_id();
 $plugin = WP_Factor_Telegram_Plugin::get_instance();
 
 // Check if providers are available
-$providers = get_option('wp_factor_providers', array(
-        'authenticator' => array('enabled' => false),
-        'telegram' => array('enabled' => false, 'bot_token' => '', 'failed_login_reports' => false)
-));
+$providers = authpress_providers();
 
-$bot_token = get_option('wp_factor_bot_token', '');
-$telegram_available = $providers['telegram']['enabled'] && !empty($bot_token) && preg_match('/^\d+:[A-Za-z0-9_-]+$/', $bot_token);
+function is_bot_token_valid($bot_token)
+{
+    if (empty($bot_token)) {
+        return false;
+    }
+
+    // Check if token has the expected Telegram bot token format
+    // Telegram bot tokens are typically in format: 123456789:ABCdefGHIjklMNOpqrsTUVwxyz
+    return preg_match('/^\d+:[A-Za-z0-9_-]+$/', $bot_token);
+}
+
+
+$bot_token = $providers['telegram']['bot_token'];
+$telegram_available = $providers['telegram']['enabled'] && is_bot_token_valid($bot_token);
 $authenticator_enabled = $providers['authenticator']['enabled'];
 
 $has_providers = $authenticator_enabled || $telegram_available;
@@ -38,6 +47,18 @@ if ($has_providers) {
             $recovery_codes = $existing_codes;
         }
     }
+}
+
+// Check which methods are actually available for this user
+$user_has_telegram = $telegram_user_enabled && $telegram_available && $plugin->is_valid_bot();
+$user_has_totp = $totp_enabled && $authenticator_enabled;
+$user_has_active_methods = $user_has_telegram || $user_has_totp;
+
+// Get user's preferred default provider
+$user_default_provider = get_user_meta($current_user_id, 'wp_factor_user_default_provider', true);
+if (empty($user_default_provider)) {
+    // Fall back to system default if user hasn't set one
+    $user_default_provider = $plugin->get_default_provider();
 }
 
 wp_enqueue_script('wp-factor-telegram-plugin');
@@ -152,6 +173,47 @@ wp_enqueue_style('wp-factor-telegram-plugin');
                         </form>
                     </div>
                 <?php endif; ?>
+            </div>
+            <?php endif; ?>
+
+            <?php if ($user_has_active_methods): ?>
+            <!-- Default Provider Selection Section -->
+            <div class="wp-factor-section">
+                <h2><?php _e('Default 2FA Method', 'two-factor-login-telegram'); ?></h2>
+                <p><?php _e('Choose which 2FA method to use by default when you log in. You can always switch to another method during login.', 'two-factor-login-telegram'); ?></p>
+
+                <form method="post" action="" class="wp-factor-default-provider-form">
+                    <?php wp_nonce_field('wp_factor_set_default_provider', 'wp_factor_default_provider_nonce'); ?>
+                    <input type="hidden" name="wp_factor_action" value="set_default_provider">
+
+                    <div class="wp-factor-provider-options">
+                        <?php if ($user_has_telegram): ?>
+                            <label class="wp-factor-provider-option">
+                                <input type="radio" name="default_provider" value="telegram"
+                                       <?php checked($user_default_provider, 'telegram'); ?>>
+                                <span class="provider-icon">📱</span>
+                                <span class="provider-name"><?php _e('Telegram', 'two-factor-login-telegram'); ?></span>
+                                <span class="provider-description"><?php _e('Receive codes via Telegram', 'two-factor-login-telegram'); ?></span>
+                            </label>
+                        <?php endif; ?>
+
+                        <?php if ($user_has_totp): ?>
+                            <label class="wp-factor-provider-option">
+                                <input type="radio" name="default_provider" value="authenticator"
+                                       <?php checked($user_default_provider, 'authenticator'); ?>>
+                                <span class="provider-icon">🔐</span>
+                                <span class="provider-name"><?php _e('Authenticator App', 'two-factor-login-telegram'); ?></span>
+                                <span class="provider-description"><?php _e('Use codes from your authenticator app', 'two-factor-login-telegram'); ?></span>
+                            </label>
+                        <?php endif; ?>
+                    </div>
+
+                    <p class="submit">
+                        <button type="submit" class="button button-primary">
+                            <?php _e('Save Default Method', 'two-factor-login-telegram'); ?>
+                        </button>
+                    </p>
+                </form>
             </div>
             <?php endif; ?>
 
@@ -271,6 +333,64 @@ wp_enqueue_style('wp-factor-telegram-plugin');
     .recovery-codes-list {
         break-inside: avoid;
     }
+}
+
+.wp-factor-provider-options {
+    margin: 15px 0;
+}
+
+.wp-factor-provider-option {
+    display: block;
+    padding: 15px;
+    margin: 10px 0;
+    border: 2px solid #ddd;
+    border-radius: 6px;
+    background: #fff;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.wp-factor-provider-option:hover {
+    border-color: #0073aa;
+    background: #f9f9f9;
+}
+
+.wp-factor-provider-option input[type="radio"] {
+    margin: 0 10px 0 0;
+    vertical-align: top;
+}
+
+.wp-factor-provider-option input[type="radio"]:checked + .provider-icon {
+    background: #0073aa;
+    color: white;
+}
+
+.wp-factor-provider-option:has(input[type="radio"]:checked) {
+    border-color: #0073aa;
+    background: #f0f8ff;
+}
+
+.provider-icon {
+    font-size: 18px;
+    margin-right: 10px;
+    padding: 5px;
+    border-radius: 3px;
+    background: #f0f0f0;
+}
+
+.provider-name {
+    font-weight: bold;
+    display: inline-block;
+    margin-right: 10px;
+}
+
+.provider-description {
+    color: #666;
+    font-style: italic;
+    display: block;
+    margin-top: 5px;
+    margin-left: 30px;
 }
 </style>
 <?php endif; ?>

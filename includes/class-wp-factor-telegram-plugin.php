@@ -90,7 +90,7 @@ final class WP_Factor_Telegram_Plugin
     private function show_two_factor_login($user)
     {
         // Get providers settings
-        $providers = get_option('wp_factor_providers', array());
+        $providers = authpress_providers();
         $authenticator_enabled = isset($providers['authenticator']['enabled']) ? $providers['authenticator']['enabled'] : false;
         $telegram_enabled = isset($providers['telegram']['enabled']) ? $providers['telegram']['enabled'] : false;
 
@@ -142,6 +142,26 @@ final class WP_Factor_Telegram_Plugin
             plugins_url('assets/img/plugin_logo.png', WP_FACTOR_TG_FILE)
         );
 
+        $has_telegram = get_the_author_meta("tg_wp_factor_enabled", $user->ID) === "1";
+        $chat_id = get_user_meta($user->ID, "tg_wp_factor_chat_id", true);
+        $telegram_configured = $has_telegram && !empty($chat_id);
+
+        $totp = WP_Factor_Auth_Factory::create(WP_Factor_Auth_Factory::METHOD_TOTP);
+        $totp_enabled = $totp->is_user_totp_enabled($user->ID);
+        $totp_secret = $totp->get_user_secret($user->ID);
+        $totp_configured = $totp_enabled && !empty($totp_secret);
+
+        $providers = authpress_providers();
+        $authenticator_available = isset($providers['authenticator']['enabled']) ? $providers['authenticator']['enabled'] : false;
+        $telegram_available = isset($providers['telegram']['enabled']) ? $providers['telegram']['enabled'] : false;
+
+        $user_has_telegram = $has_telegram && $telegram_configured && $telegram_available;
+        $user_has_totp = $totp_configured && $authenticator_available;
+
+        $plugin_instance = WP_Factor_Telegram_Plugin::get_instance();
+        $default_method = $plugin_instance->get_effective_default_provider($user->ID);
+
+
         require_once(ABSPATH . '/wp-admin/includes/template.php');
         require_once(dirname(WP_FACTOR_TG_FILE) . "/templates/login-form.php");
     }
@@ -156,7 +176,7 @@ final class WP_Factor_Telegram_Plugin
     public function tg_login($user_login, $user)
     {
         // Check if any providers are enabled
-        $providers = get_option('wp_factor_providers', array());
+        $providers = authpress_providers();
         $authenticator_enabled = isset($providers['authenticator']['enabled']) ? $providers['authenticator']['enabled'] : false;
         $telegram_enabled = isset($providers['telegram']['enabled']) ? $providers['telegram']['enabled'] : false;
 
@@ -422,6 +442,46 @@ final class WP_Factor_Telegram_Plugin
                     }
                 }
                 break;
+
+            case 'set_default_provider':
+                if (wp_verify_nonce($_POST['wp_factor_default_provider_nonce'], 'wp_factor_set_default_provider')) {
+                    $default_provider = sanitize_text_field($_POST['default_provider']);
+
+                    // Validate that the selected provider is available for this user
+                    $valid_providers = [];
+
+                    // Check Telegram availability
+                    if ($this->is_telegram_enabled() && $this->is_valid_bot()) {
+                        $has_telegram = get_the_author_meta("tg_wp_factor_enabled", $current_user_id) === "1";
+                        $chat_id = $this->get_user_chatid($current_user_id);
+                        if ($has_telegram && !empty($chat_id)) {
+                            $valid_providers[] = 'telegram';
+                        }
+                    }
+
+                    // Check TOTP availability
+                    $providers = authpress_providers();
+                    $authenticator_enabled = isset($providers['authenticator']['enabled']) ? $providers['authenticator']['enabled'] : false;
+                    if ($authenticator_enabled) {
+                        $totp = WP_Factor_Auth_Factory::create(WP_Factor_Auth_Factory::METHOD_TOTP);
+                        if ($totp->is_user_totp_enabled($current_user_id)) {
+                            $valid_providers[] = 'authenticator';
+                        }
+                    }
+
+                    if (in_array($default_provider, $valid_providers)) {
+                        update_user_meta($current_user_id, 'wp_factor_user_default_provider', $default_provider);
+                        add_action('admin_notices', function() use ($default_provider) {
+                            $provider_name = ($default_provider === 'telegram') ? __('Telegram', 'two-factor-login-telegram') : __('Authenticator App', 'two-factor-login-telegram');
+                            echo '<div class="notice notice-success is-dismissible"><p>' . sprintf(__('Default 2FA method set to %s successfully!', 'two-factor-login-telegram'), $provider_name) . '</p></div>';
+                        });
+                    } else {
+                        add_action('admin_notices', function() {
+                            echo '<div class="notice notice-error is-dismissible"><p>' . __('Invalid default provider selected.', 'two-factor-login-telegram') . '</p></div>';
+                        });
+                    }
+                }
+                break;
         }
     }
 
@@ -632,6 +692,9 @@ final class WP_Factor_Telegram_Plugin
             'report_chat_id' => isset($input['telegram']['report_chat_id']) ? sanitize_text_field($input['telegram']['report_chat_id']) : ''
         );
 
+        // Default provider setting
+        $sanitized['default_provider'] = isset($input['default_provider']) && in_array($input['default_provider'], ['telegram', 'authenticator']) ? $input['default_provider'] : 'telegram';
+
         // Update legacy settings for backward compatibility
         if ($sanitized['telegram']['enabled'] && !empty($sanitized['telegram']['bot_token'])) {
             $legacy_settings = get_option('tg_col', array());
@@ -655,7 +718,7 @@ final class WP_Factor_Telegram_Plugin
     function is_valid_bot_for_providers($bot_token = null)
     {
         if (empty($bot_token)) {
-            $providers = get_option('wp_factor_providers', array());
+            $providers = authpress_providers();
             $bot_token = isset($providers['telegram']['bot_token']) ? $providers['telegram']['bot_token'] : '';
         }
 
@@ -913,7 +976,7 @@ final class WP_Factor_Telegram_Plugin
         }
 
         // Check if any 2FA provider is enabled at system level
-        $providers = get_option('wp_factor_providers', array());
+        $providers = authpress_providers();
         $authenticator_enabled = isset($providers['authenticator']['enabled']) ? $providers['authenticator']['enabled'] : false;
         $telegram_enabled = isset($providers['telegram']['enabled']) ? $providers['telegram']['enabled'] : false;
 
@@ -921,7 +984,7 @@ final class WP_Factor_Telegram_Plugin
             return;
         }
 
-        require_once(dirname(WP_FACTOR_TG_FILE) . "/templates/user-2fa-form.php");
+        require_once(dirname(WP_FACTOR_TG_FILE) . "/templates/user-2fa-settings-page.php");
     }
 
     public function load_tg_lib()
@@ -1308,8 +1371,89 @@ final class WP_Factor_Telegram_Plugin
      */
     public function is_telegram_enabled()
     {
-        $providers = get_option('wp_factor_providers', array());
+        $providers = authpress_providers();
         return isset($providers['telegram']['enabled']) ? $providers['telegram']['enabled'] : false;
+    }
+
+    /**
+     * Get the configured default provider
+     *
+     * @return string The default provider ('telegram' or 'authenticator')
+     */
+    public function get_default_provider()
+    {
+        $providers = authpress_providers();
+        return isset($providers['default_provider']) ? $providers['default_provider'] : 'telegram';
+    }
+
+    /**
+     * Get the effective default provider for a user based on availability and user preference
+     *
+     * @param int $user_id User ID
+     * @return string The effective default provider for this user
+     */
+    public function get_effective_default_provider($user_id)
+    {
+        // Get user's personal preference first
+        $user_preference = get_user_meta($user_id, 'wp_factor_user_default_provider', true);
+
+        // Fall back to system-configured default
+        $configured_default = $this->get_default_provider();
+        $preferred_default = !empty($user_preference) ? $user_preference : $configured_default;
+
+        $providers = authpress_providers();
+        $authenticator_enabled = isset($providers['authenticator']['enabled']) ? $providers['authenticator']['enabled'] : false;
+        $telegram_enabled = isset($providers['telegram']['enabled']) ? $providers['telegram']['enabled'] : false;
+
+        // Check user's actual available methods
+        $has_telegram = get_the_author_meta("tg_wp_factor_enabled", $user_id) === "1";
+        $chat_id = get_user_meta($user_id, "tg_wp_factor_chat_id", true);
+        $telegram_configured = !empty($chat_id);
+
+        $totp = WP_Factor_Auth_Factory::create(WP_Factor_Auth_Factory::METHOD_TOTP);
+        $totp_enabled = $totp->is_user_totp_enabled($user_id);
+        $totp_secret = $totp->get_user_secret($user_id);
+        $totp_configured = $totp_enabled && !empty($totp_secret);
+
+        $user_has_telegram = $has_telegram && $telegram_configured && $telegram_enabled && $this->is_valid_bot();
+        $user_has_totp = $totp_configured && $authenticator_enabled;
+
+        // Debug logging for administrators
+        if (current_user_can('manage_options') && defined('WP_DEBUG') && WP_DEBUG) {
+            error_log("WP Factor: Default provider selection for user $user_id:");
+            error_log("  - User preference: " . ($user_preference ?: 'none'));
+            error_log("  - System default: $configured_default");
+            error_log("  - Effective preference: $preferred_default");
+            error_log("  - User has Telegram: " . ($user_has_telegram ? 'Yes' : 'No'));
+            error_log("  - User has TOTP: " . ($user_has_totp ? 'Yes' : 'No'));
+        }
+
+        // If preferred default is available for this user, use it
+        if ($preferred_default === 'telegram' && $user_has_telegram) {
+            return 'telegram';
+        }
+        if (($preferred_default === 'authenticator' || $preferred_default === 'totp') && $user_has_totp) {
+            return 'totp';
+        }
+
+        // Fallback logic: prefer available method (respect system default first)
+        if ($configured_default === 'telegram' && $user_has_telegram) {
+            return 'telegram';
+        }
+        if (($configured_default === 'authenticator' || $configured_default === 'totp') && $user_has_totp) {
+            return 'totp';
+        }
+
+        // Final fallback to any available method
+        if ($user_has_telegram) {
+            return 'telegram';
+        }
+        if ($user_has_totp) {
+            return 'totp';
+        }
+
+        // Ultimate fallback
+        return $configured_default === 'authenticator' ? 'totp' : 'telegram';
     }
 
     /**
@@ -1324,7 +1468,7 @@ final class WP_Factor_Telegram_Plugin
             $user_id = get_current_user_id();
         }
 
-        $providers = get_option('wp_factor_providers', array());
+        $providers = authpress_providers();
         $authenticator_enabled = isset($providers['authenticator']['enabled']) ? $providers['authenticator']['enabled'] : false;
         $telegram_enabled = isset($providers['telegram']['enabled']) ? $providers['telegram']['enabled'] : false;
 
@@ -1609,11 +1753,12 @@ final class WP_Factor_Telegram_Plugin
         }
 
         // Add 2FA fields if any provider is enabled
-        $providers = get_option('wp_factor_providers', array());
+        /*        $providers = authpress_providers();
+
         $authenticator_enabled = isset($providers['authenticator']['enabled']) ? $providers['authenticator']['enabled'] : false;
         $telegram_enabled = isset($providers['telegram']['enabled']) ? $providers['telegram']['enabled'] : false;
 
-        if ($authenticator_enabled || $telegram_enabled) {
+        /*if ($authenticator_enabled || $telegram_enabled) {
             add_action(
                 'show_user_profile',
                 array($this, 'tg_add_two_factor_fields'),
@@ -1636,16 +1781,17 @@ final class WP_Factor_Telegram_Plugin
                     array($this, 'handle_telegram_validation_in_profile')
                 );
             }
-        }
+        }*/
 
-        add_action(
+        /*add_action(
             'personal_options_update',
             array($this, 'tg_save_custom_user_profile_fields')
         );
         add_action(
             'edit_user_profile_update',
             array($this, 'tg_save_custom_user_profile_fields')
-        );
+        );*/
+
         add_action('admin_enqueue_scripts', array($this, 'load_tg_lib'));
         add_action('admin_footer', array($this, 'hook_tg_lib'));
         add_action(

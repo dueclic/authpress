@@ -17,7 +17,7 @@
 
 error_reporting(E_ERROR);
 
-if ( ! defined('ABSPATH')) {
+if (!defined('ABSPATH')) {
     die;
 }
 
@@ -42,6 +42,18 @@ define('WP_FACTOR_TG_GETME_TRANSIENT', 'tg_wp_factor_valid_bot');
  */
 
 require_once("includes/class-wp-factor-telegram-plugin.php");
+
+function authpress_providers()
+{
+
+    $authpress_providers = get_option('wp_factor_providers', array(
+        'authenticator' => array('enabled' => false),
+        'telegram' => array('enabled' => false, 'bot_token' => '', 'failed_login_reports' => false),
+        'default_provider' => 'telegram'
+    ));
+
+    return apply_filters('authpress_providers', $authpress_providers);
+}
 
 function WFT()
 {

@@ -146,8 +146,8 @@ class WP_Telegram {
 			$chat_id = get_user_meta( get_current_user_id(), "tg_wp_factor_chat_id" );
 		}
 
-		$message = sprintf( 
-			"🔐 *%s*\n\n`%s`\n\n%s", 
+		$message = sprintf(
+			"🔐 *%s*\n\n`%s`\n\n%s",
 			esc_html__( "WordPress 2FA Login Code", "two-factor-login-telegram" ),
 			$token,
 			esc_html__( "Enter this code in the login form or use the button below:", "two-factor-login-telegram" )
@@ -158,7 +158,7 @@ class WP_Telegram {
 		if ($user_id) {
 			$nonce = wp_create_nonce('telegram_confirm_' . $user_id . '_' . $token);
 			$confirmation_url = home_url('/telegram-confirm/' . $user_id . '/' . $token . '/?nonce=' . $nonce);
-			
+
 			$reply_markup = array(
 				'inline_keyboard' => array(
 					array(
@@ -189,11 +189,11 @@ class WP_Telegram {
 			'chat_id' => $chat_id,
 			'parse_mode' => 'Markdown'
 		);
-		
+
 		if ($reply_markup) {
 			$data['reply_markup'] = wp_json_encode($reply_markup);
 		}
-		
+
 		return $this->make_request( "/sendMessage", $data );
 	}
 
@@ -235,16 +235,16 @@ class WP_Telegram {
 	public function send_tg_failed_login( $user_login ) {
 
 		// Get providers settings
-		$providers = get_option('wp_factor_providers', array());
-		
+        $providers = authpress_providers();
+
 		// Check if failed login reports are enabled
 		if (!isset($providers['telegram']['failed_login_reports']) || !$providers['telegram']['failed_login_reports']) {
 			return false;
 		}
-		
+
 		// Get Chat ID from providers settings
 		$chat_id = isset($providers['telegram']['report_chat_id']) ? $providers['telegram']['report_chat_id'] : '';
-		
+
 		if (empty($chat_id)) {
 			return false;
 		}
@@ -271,7 +271,7 @@ class WP_Telegram {
 
 			// Message with site name
 			/* translators: 1. Site name, 2. Site URL, 3. Username, 4. IP address */
-			$msg = sprintf("🚨 *%s*\n\n*%s*: `%s`\n*%s*: `%s`\n*%s*: `%s`\n*%s*: `%s`", 
+			$msg = sprintf("🚨 *%s*\n\n*%s*: `%s`\n*%s*: `%s`\n*%s*: `%s`\n*%s*: `%s`",
 				__("Failed Login Attempt", "two-factor-login-telegram"),
 				__("Site", "two-factor-login-telegram"), $site_name,
 				__("URL", "two-factor-login-telegram"), $site_url,
@@ -286,7 +286,7 @@ class WP_Telegram {
 
 			// Message with site name only
 			/* translators: 1. Site name, 2. Username, 3. IP address */
-			$msg = sprintf("🚨 *%s*\n\n*%s*: `%s`\n*%s*: `%s`\n*%s*: `%s`", 
+			$msg = sprintf("🚨 *%s*\n\n*%s*: `%s`\n*%s*: `%s`\n*%s*: `%s`",
 				__("Failed Login Attempt", "two-factor-login-telegram"),
 				__("Site", "two-factor-login-telegram"), $site_name,
 				__("Username", "two-factor-login-telegram"), $user_login,
@@ -300,7 +300,7 @@ class WP_Telegram {
 
 			// Message with URL only
 			/* translators: 1. Site URL, 2. Username, 3. IP address */
-			$msg = sprintf("🚨 *%s*\n\n*%s*: `%s`\n*%s*: `%s`\n*%s*: `%s`", 
+			$msg = sprintf("🚨 *%s*\n\n*%s*: `%s`\n*%s*: `%s`\n*%s*: `%s`",
 				__("Failed Login Attempt", "two-factor-login-telegram"),
 				__("URL", "two-factor-login-telegram"), $site_url,
 				__("Username", "two-factor-login-telegram"), $user_login,
@@ -311,7 +311,7 @@ class WP_Telegram {
 
 			// Message just with Username and IP address
 			/* translators: 1. Username, 2. IP address */
-			$msg = sprintf("🚨 *%s*\n\n*%s*: `%s`\n*%s*: `%s`", 
+			$msg = sprintf("🚨 *%s*\n\n*%s*: `%s`\n*%s*: `%s`",
 				__("Failed Login Attempt", "two-factor-login-telegram"),
 				__("Username", "two-factor-login-telegram"), $user_login,
 				__("IP Address", "two-factor-login-telegram"), $ip_address
