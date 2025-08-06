@@ -1,6 +1,6 @@
 <?php
 
-class WP_Factor_Telegram_OTP extends WP_Factor_Auth_Method
+class AuthPress_Telegram_OTP extends AuthPress_Auth_Method
 {
     /**
      * Generate a unique authentication code that doesn't exist in database

@@ -1,6 +1,6 @@
 <?php
 
-abstract class WP_Factor_Auth_Method
+abstract class AuthPress_Auth_Method
 {
     /**
      * Generate a random authentication code

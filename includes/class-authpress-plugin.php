@@ -1,12 +1,12 @@
 <?php
 
-final class WP_Factor_Telegram_Plugin
+final class AuthPress_Plugin
 {
 
     /**
      * Get an instance
      *
-     * @var WP_Factor_Telegram_Plugin
+     * @var AuthPress_Plugin
      */
 
     private static $instance;
@@ -29,18 +29,18 @@ final class WP_Factor_Telegram_Plugin
     /**
      * Get WP Factor Telegram
      *
-     * @return WP_Factor_Telegram_Plugin
+     * @return AuthPress_Plugin
      */
 
     public static function get_instance()
     {
         if (
             empty(self::$instance)
-            && !(self::$instance instanceof WP_Factor_Telegram_Plugin)
+            && !(self::$instance instanceof AuthPress_Plugin)
         ) {
-            self::$instance = new WP_Factor_Telegram_Plugin;
+            self::$instance = new AuthPress_Plugin;
             self::$instance->includes();
-            self::$instance->telegram = new WP_Telegram;
+            self::$instance->telegram = new WP_Telegram();
             self::$instance->add_hooks();
 
             do_action("wp_factor_telegram_loaded");
@@ -56,19 +56,19 @@ final class WP_Factor_Telegram_Plugin
     public function includes()
     {
         require_once(dirname(WP_FACTOR_TG_FILE)
-            . "/includes/class-wp-telegram.php");
+                . "/includes/class-authpress-core.php");
         require_once(dirname(WP_FACTOR_TG_FILE)
             . "/includes/class-telegram-logs-list-table.php");
         require_once(dirname(WP_FACTOR_TG_FILE)
-            . "/includes/abstract-wp-factor-auth-method.php");
+            . "/includes/abstract-authpress-auth-method.php");
         require_once(dirname(WP_FACTOR_TG_FILE)
-            . "/includes/class-wp-factor-recovery-codes.php");
+            . "/includes/class-authpress-recovery-codes.php");
         require_once(dirname(WP_FACTOR_TG_FILE)
-            . "/includes/class-wp-factor-telegram-otp.php");
+            . "/includes/class-authpress-telegram-otp.php");
         require_once(dirname(WP_FACTOR_TG_FILE)
-            . "/includes/class-wp-factor-totp.php");
+            . "/includes/class-authpress-totp.php");
         require_once(dirname(WP_FACTOR_TG_FILE)
-            . "/includes/class-wp-factor-auth-factory.php");
+            . "/includes/class-authpress-auth-factory.php");
     }
 
 
@@ -97,12 +97,12 @@ final class WP_Factor_Telegram_Plugin
         $has_telegram = get_the_author_meta("tg_wp_factor_enabled", $user->ID) === "1";
         $chat_id = $this->get_user_chatid($user->ID);
 
-        $totp = WP_Factor_Auth_Factory::create(WP_Factor_Auth_Factory::METHOD_TOTP);
+        $totp = AuthPress_Auth_Factory::create(AuthPress_Auth_Factory::METHOD_TOTP);
         $has_totp = $totp->is_user_totp_enabled($user->ID);
 
         // Send Telegram code if user has Telegram enabled and provider is active
         if ($has_telegram && !empty($chat_id) && $telegram_enabled && $this->is_valid_bot()) {
-            $telegram_otp = WP_Factor_Auth_Factory::create(WP_Factor_Auth_Factory::METHOD_TELEGRAM_OTP);
+            $telegram_otp = AuthPress_Auth_Factory::create(AuthPress_Auth_Factory::METHOD_TELEGRAM_OTP);
             $auth_code = $telegram_otp->save_authcode($user);
 
             $result = $this->telegram->send_tg_token($auth_code, $chat_id, $user->ID);
@@ -146,7 +146,7 @@ final class WP_Factor_Telegram_Plugin
         $chat_id = get_user_meta($user->ID, "tg_wp_factor_chat_id", true);
         $telegram_configured = $has_telegram && !empty($chat_id);
 
-        $totp = WP_Factor_Auth_Factory::create(WP_Factor_Auth_Factory::METHOD_TOTP);
+        $totp = AuthPress_Auth_Factory::create(AuthPress_Auth_Factory::METHOD_TOTP);
         $totp_enabled = $totp->is_user_totp_enabled($user->ID);
         $totp_secret = $totp->get_user_secret($user->ID);
         $totp_configured = $totp_enabled && !empty($totp_secret);
@@ -158,7 +158,7 @@ final class WP_Factor_Telegram_Plugin
         $user_has_telegram = $has_telegram && $telegram_configured && $telegram_available;
         $user_has_totp = $totp_configured && $authenticator_available;
 
-        $plugin_instance = WP_Factor_Telegram_Plugin::get_instance();
+        $plugin_instance = AuthPress_Plugin::get_instance();
         $default_method = $plugin_instance->get_effective_default_provider($user->ID);
 
 
@@ -187,7 +187,7 @@ final class WP_Factor_Telegram_Plugin
             return;
         }
 
-        $totp = WP_Factor_Auth_Factory::create(WP_Factor_Auth_Factory::METHOD_TOTP);
+        $totp = AuthPress_Auth_Factory::create(AuthPress_Auth_Factory::METHOD_TOTP);
         $has_telegram = get_the_author_meta("tg_wp_factor_enabled", $user->ID) === "1";
         $has_totp = $totp->is_user_totp_enabled($user->ID);
 
@@ -250,7 +250,7 @@ final class WP_Factor_Telegram_Plugin
             }
         } else {
 
-            $validation_result = WP_Factor_Auth_Factory::validateByMethod($code, $user->ID, $login_method);
+            $validation_result = AuthPress_Auth_Factory::validateByMethod($code, $user->ID, $login_method);
 
             if ($validation_result) {
                 $login_successful = true;
@@ -285,7 +285,7 @@ final class WP_Factor_Telegram_Plugin
                     ));
                 } elseif ($login_method === 'telegram') {
                     // For Telegram OTP, check validation status BEFORE generating new code
-                    $telegram_otp = WP_Factor_Auth_Factory::create(WP_Factor_Auth_Factory::METHOD_TELEGRAM_OTP);
+                    $telegram_otp = AuthPress_Auth_Factory::create(AuthPress_Auth_Factory::METHOD_TELEGRAM_OTP);
                     $authcode_validation = $telegram_otp->validate_authcode($code, $user->ID);
 
                     // Now generate new code if user has Telegram enabled
@@ -336,7 +336,7 @@ final class WP_Factor_Telegram_Plugin
 
         wp_set_auth_cookie($user->ID, $rememberme);
 
-        $recovery_codes = WP_Factor_Auth_Factory::create(WP_Factor_Auth_Factory::METHOD_RECOVERY_CODES);
+        $recovery_codes = AuthPress_Auth_Factory::create(AuthPress_Auth_Factory::METHOD_RECOVERY_CODES);
         if (/*!$recovery_codes->has_recovery_codes($user->ID)*/ true) {
             $codes = $recovery_codes->regenerate_recovery_codes($user->ID);
             $plugin_logo = apply_filters('two_factor_login_telegram_logo', plugins_url('assets/img/plugin_logo.png', WP_FACTOR_TG_FILE));
@@ -358,6 +358,7 @@ final class WP_Factor_Telegram_Plugin
 
     public function configure_tg()
     {
+        $providers = authpress_providers();
         require_once(dirname(WP_FACTOR_TG_FILE) . "/templates/configuration.php");
     }
 
@@ -392,7 +393,7 @@ final class WP_Factor_Telegram_Plugin
         switch ($action) {
             case 'disable_totp':
                 if (wp_verify_nonce($_POST['wp_factor_totp_disable_nonce'], 'wp_factor_disable_totp')) {
-                    $totp = WP_Factor_Auth_Factory::create(WP_Factor_Auth_Factory::METHOD_TOTP);
+                    $totp = AuthPress_Auth_Factory::create(AuthPress_Auth_Factory::METHOD_TOTP);
                     if ($totp->disable_user_totp($current_user_id)) {
                         add_action('admin_notices', function() {
                             echo '<div class="notice notice-success is-dismissible"><p>' . __('Authenticator app has been disabled successfully.', 'two-factor-login-telegram') . '</p></div>';
@@ -421,7 +422,7 @@ final class WP_Factor_Telegram_Plugin
 
             case 'generate_recovery':
                 if (wp_verify_nonce($_POST['wp_factor_recovery_nonce'], 'wp_factor_generate_recovery')) {
-                    $recovery = WP_Factor_Auth_Factory::create(WP_Factor_Auth_Factory::METHOD_RECOVERY_CODES);
+                    $recovery = AuthPress_Auth_Factory::create(AuthPress_Auth_Factory::METHOD_RECOVERY_CODES);
                     $codes = $recovery->regenerate_recovery_codes($current_user_id);
                     if (!empty($codes)) {
                         add_action('admin_notices', function() {
@@ -433,7 +434,7 @@ final class WP_Factor_Telegram_Plugin
 
             case 'regenerate_recovery':
                 if (wp_verify_nonce($_POST['wp_factor_recovery_regenerate_nonce'], 'wp_factor_regenerate_recovery')) {
-                    $recovery = WP_Factor_Auth_Factory::create(WP_Factor_Auth_Factory::METHOD_RECOVERY_CODES);
+                    $recovery = AuthPress_Auth_Factory::create(AuthPress_Auth_Factory::METHOD_RECOVERY_CODES);
                     $codes = $recovery->regenerate_recovery_codes($current_user_id);
                     if (!empty($codes)) {
                         add_action('admin_notices', function() {
@@ -463,7 +464,7 @@ final class WP_Factor_Telegram_Plugin
                     $providers = authpress_providers();
                     $authenticator_enabled = isset($providers['authenticator']['enabled']) ? $providers['authenticator']['enabled'] : false;
                     if ($authenticator_enabled) {
-                        $totp = WP_Factor_Auth_Factory::create(WP_Factor_Auth_Factory::METHOD_TOTP);
+                        $totp = AuthPress_Auth_Factory::create(AuthPress_Auth_Factory::METHOD_TOTP);
                         if ($totp->is_user_totp_enabled($current_user_id)) {
                             $valid_providers[] = 'authenticator';
                         }
@@ -1072,7 +1073,7 @@ final class WP_Factor_Telegram_Plugin
                 (function ($) {
 
                     $(document).ready(function () {
-                        WP_Factor_Telegram_Plugin.init();
+                        AuthPress_Plugin.init();
 
                         // Handle disable 2FA button clicks in users list
                         $('.disable-2fa-telegram').on('click', function (e) {
@@ -1143,7 +1144,7 @@ final class WP_Factor_Telegram_Plugin
             die(json_encode($response));
         }
 
-        $telegram_otp = WP_Factor_Auth_Factory::create(WP_Factor_Auth_Factory::METHOD_TELEGRAM_OTP);
+        $telegram_otp = AuthPress_Auth_Factory::create(AuthPress_Auth_Factory::METHOD_TELEGRAM_OTP);
         $codes = $telegram_otp->generate_codes(0, ['length' => 5]);
         $auth_code = !empty($codes) ? $codes[0] : '';
 
@@ -1286,7 +1287,7 @@ final class WP_Factor_Telegram_Plugin
             die(json_encode($response));
         }
 
-        $telegram_otp = WP_Factor_Auth_Factory::create(WP_Factor_Auth_Factory::METHOD_TELEGRAM_OTP);
+        $telegram_otp = AuthPress_Auth_Factory::create(AuthPress_Auth_Factory::METHOD_TELEGRAM_OTP);
         if (!$telegram_otp->validate_tokencheck_authcode($_POST['token'], $_POST['chat_id'])) {
             $response['msg'] = __(
                 'Validation code entered is wrong.',
@@ -1410,7 +1411,7 @@ final class WP_Factor_Telegram_Plugin
         $chat_id = get_user_meta($user_id, "tg_wp_factor_chat_id", true);
         $telegram_configured = !empty($chat_id);
 
-        $totp = WP_Factor_Auth_Factory::create(WP_Factor_Auth_Factory::METHOD_TOTP);
+        $totp = AuthPress_Auth_Factory::create(AuthPress_Auth_Factory::METHOD_TOTP);
         $totp_enabled = $totp->is_user_totp_enabled($user_id);
         $totp_secret = $totp->get_user_secret($user_id);
         $totp_configured = $totp_enabled && !empty($totp_secret);
@@ -1474,7 +1475,7 @@ final class WP_Factor_Telegram_Plugin
 
         // Check TOTP
         if ($authenticator_enabled) {
-            $totp = WP_Factor_Auth_Factory::create(WP_Factor_Auth_Factory::METHOD_TOTP);
+            $totp = AuthPress_Auth_Factory::create(AuthPress_Auth_Factory::METHOD_TOTP);
             if ($totp->is_user_totp_enabled($user_id)) {
                 return true;
             }
@@ -1891,7 +1892,7 @@ final class WP_Factor_Telegram_Plugin
         }
 
         // Validate the token
-        $telegram_otp = WP_Factor_Auth_Factory::create(WP_Factor_Auth_Factory::METHOD_TELEGRAM_OTP);
+        $telegram_otp = AuthPress_Auth_Factory::create(AuthPress_Auth_Factory::METHOD_TELEGRAM_OTP);
         $authcode_validation = $telegram_otp->validate_authcode($token, $user_id);
 
         if ('valid' !== $authcode_validation) {
@@ -2123,7 +2124,7 @@ final class WP_Factor_Telegram_Plugin
             // Verify nonce
             if (wp_verify_nonce($nonce, 'telegram_validate_' . $user_id . '_' . $token)) {
                 // Check if the token is valid using the transient method
-                $telegram_otp = WP_Factor_Auth_Factory::create(WP_Factor_Auth_Factory::METHOD_TELEGRAM_OTP);
+                $telegram_otp = AuthPress_Auth_Factory::create(AuthPress_Auth_Factory::METHOD_TELEGRAM_OTP);
                 if ($telegram_otp->validate_tokencheck_authcode($token, $chat_id)) {
                     // Save user 2FA settings - this enables 2FA and saves the chat_id
                     $save_result = $this->save_user_2fa_settings($user_id, $chat_id, true);
@@ -2183,7 +2184,7 @@ final class WP_Factor_Telegram_Plugin
         if (!wp_verify_nonce($_POST['_wpnonce'], 'tg_regenerate_recovery_codes_' . $user_id)) {
             wp_send_json_error(['message' => __('Invalid request.', 'two-factor-login-telegram')]);
         }
-        $recovery_codes = WP_Factor_Auth_Factory::create(WP_Factor_Auth_Factory::METHOD_RECOVERY_CODES);
+        $recovery_codes = AuthPress_Auth_Factory::create(AuthPress_Auth_Factory::METHOD_RECOVERY_CODES);
         $codes = $recovery_codes->regenerate_recovery_codes($user_id, 8, 10);
 
         $plugin_logo = apply_filters('two_factor_login_telegram_logo', plugins_url('assets/img/plugin_logo.png', WP_FACTOR_TG_FILE));
@@ -2211,7 +2212,7 @@ final class WP_Factor_Telegram_Plugin
             wp_send_json_error(['message' => __('Invalid request.', 'two-factor-login-telegram')]);
         }
 
-        $totp = WP_Factor_Auth_Factory::create(WP_Factor_Auth_Factory::METHOD_TOTP);
+        $totp = AuthPress_Auth_Factory::create(AuthPress_Auth_Factory::METHOD_TOTP);
         $totp_data = $totp->generate_codes($user_id);
 
         if (empty($totp_data)) {
@@ -2246,7 +2247,7 @@ final class WP_Factor_Telegram_Plugin
         }
 
         $code = sanitize_text_field($_POST['code']);
-        $totp = WP_Factor_Auth_Factory::create(WP_Factor_Auth_Factory::METHOD_TOTP);
+        $totp = AuthPress_Auth_Factory::create(AuthPress_Auth_Factory::METHOD_TOTP);
 
         // Validate the TOTP code during setup
         if ($totp->verify_setup_code($code, $user_id)) {
@@ -2285,7 +2286,7 @@ final class WP_Factor_Telegram_Plugin
             wp_send_json_error(['message' => __('Invalid request.', 'two-factor-login-telegram')]);
         }
 
-        $totp = WP_Factor_Auth_Factory::create(WP_Factor_Auth_Factory::METHOD_TOTP);
+        $totp = AuthPress_Auth_Factory::create(AuthPress_Auth_Factory::METHOD_TOTP);
 
         if ($totp->disable_user_totp($user_id)) {
             $this->log_telegram_action('totp_disabled', array(

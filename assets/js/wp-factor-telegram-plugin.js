@@ -2,7 +2,7 @@
  * WP Factor Telegram Plugin
  */
 
-var WP_Factor_Telegram_Plugin = function ($) {
+var AuthPress_Plugin = function ($) {
 
     var $twfci = $("#tg_wp_factor_chat_id");
     var $twfciconf = $("#tg_wp_factor_chat_id_confirm");

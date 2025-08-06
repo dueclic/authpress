@@ -1,12 +1,15 @@
 <?php
+
+/**
+ * @var array $providers
+ */
+
 if (isset($_GET['tab'])) {
     $active_tab = sanitize_text_field($_GET['tab']);
 } else {
     $active_tab = 'providers';
 }
 
-// Get current provider settings
-$providers = authpress_providers();
 ?>
 
 <div id="wft-wrap" class="wrap">

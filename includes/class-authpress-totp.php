@@ -1,6 +1,6 @@
 <?php
 
-class WP_Factor_TOTP extends WP_Factor_Auth_Method
+class AuthPress_TOTP extends AuthPress_Auth_Method
 {
     const SECRET_LENGTH = 32;
     const CODE_LENGTH = 6;

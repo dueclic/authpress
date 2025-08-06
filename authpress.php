@@ -41,7 +41,7 @@ define('WP_FACTOR_TG_GETME_TRANSIENT', 'tg_wp_factor_valid_bot');
  *
  */
 
-require_once("includes/class-wp-factor-telegram-plugin.php");
+require_once("includes/class-authpress-plugin.php");
 
 function authpress_providers()
 {
@@ -57,7 +57,7 @@ function authpress_providers()
 
 function WFT()
 {
-    return WP_Factor_Telegram_Plugin::get_instance();
+    return AuthPress_Plugin::get_instance();
 }
 
 WFT();

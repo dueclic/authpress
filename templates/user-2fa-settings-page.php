@@ -4,7 +4,7 @@ if (!defined('ABSPATH')) {
 }
 
 $current_user_id = get_current_user_id();
-$plugin = WP_Factor_Telegram_Plugin::get_instance();
+$plugin = AuthPress_Plugin::get_instance();
 
 // Check if providers are available
 $providers = authpress_providers();
@@ -33,9 +33,9 @@ $telegram_user_enabled = false;
 $recovery_codes = [];
 
 if ($has_providers) {
-    $totp = WP_Factor_Auth_Factory::create(WP_Factor_Auth_Factory::METHOD_TOTP);
-    $telegram_otp = WP_Factor_Auth_Factory::create(WP_Factor_Auth_Factory::METHOD_TELEGRAM_OTP);
-    $recovery = WP_Factor_Auth_Factory::create(WP_Factor_Auth_Factory::METHOD_RECOVERY_CODES);
+    $totp = AuthPress_Auth_Factory::create(AuthPress_Auth_Factory::METHOD_TOTP);
+    $telegram_otp = AuthPress_Auth_Factory::create(AuthPress_Auth_Factory::METHOD_TELEGRAM_OTP);
+    $recovery = AuthPress_Auth_Factory::create(AuthPress_Auth_Factory::METHOD_RECOVERY_CODES);
 
     $totp_enabled = $totp->has_codes($current_user_id);
     $telegram_user_enabled = $telegram_otp->has_codes($current_user_id);
@@ -280,9 +280,6 @@ wp_enqueue_style('wp-factor-telegram-plugin');
 
 <?php if ($has_providers): ?>
 <style>
-.wp-factor-2fa-settings {
-    max-width: 800px;
-}
 
 .wp-factor-section {
     background: #fff;

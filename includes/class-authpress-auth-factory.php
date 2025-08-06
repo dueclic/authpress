@@ -1,6 +1,6 @@
 <?php
 
-class WP_Factor_Auth_Factory
+class AuthPress_Auth_Factory
 {
     const METHOD_TELEGRAM_OTP = 'telegram_otp';
     const METHOD_RECOVERY_CODES = 'recovery_codes';
@@ -14,7 +14,7 @@ class WP_Factor_Auth_Factory
     /**
      * Create or get an authentication method instance
      * @param string $method_type The type of authentication method
-     * @return WP_Factor_Auth_Method|null The authentication method instance
+     * @return AuthPress_Auth_Method|null The authentication method instance
      */
     public static function create($method_type)
     {
@@ -24,15 +24,15 @@ class WP_Factor_Auth_Factory
 
         switch ($method_type) {
             case self::METHOD_TELEGRAM_OTP:
-                self::$instances[$method_type] = new WP_Factor_Telegram_OTP();
+                self::$instances[$method_type] = new AuthPress_Telegram_OTP();
                 break;
 
             case self::METHOD_RECOVERY_CODES:
-                self::$instances[$method_type] = new WP_Factor_Recovery_Codes();
+                self::$instances[$method_type] = new AuthPress_Recovery_Codes();
                 break;
 
             case self::METHOD_TOTP:
-                self::$instances[$method_type] = new WP_Factor_TOTP();
+                self::$instances[$method_type] = new AuthPress_TOTP();
                 break;
 
             default:
@@ -45,7 +45,7 @@ class WP_Factor_Auth_Factory
     /**
      * Get the appropriate auth method based on login method
      * @param string $login_method The login method from form data
-     * @return WP_Factor_Auth_Method|null
+     * @return AuthPress_Auth_Method|null
      */
     public static function getByLoginMethod($login_method)
     {

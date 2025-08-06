@@ -1,6 +1,6 @@
 <?php
 
-class WP_Factor_Recovery_Codes extends WP_Factor_Auth_Method
+class AuthPress_Recovery_Codes extends AuthPress_Auth_Method
 {
     /**
      * Generate N random recovery codes
