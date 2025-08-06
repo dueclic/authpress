@@ -9,20 +9,10 @@ $plugin = AuthPress_Plugin::get_instance();
 // Check if providers are available
 $providers = authpress_providers();
 
-function is_bot_token_valid($bot_token)
-{
-    if (empty($bot_token)) {
-        return false;
-    }
-
-    // Check if token has the expected Telegram bot token format
-    // Telegram bot tokens are typically in format: 123456789:ABCdefGHIjklMNOpqrsTUVwxyz
-    return preg_match('/^\d+:[A-Za-z0-9_-]+$/', $bot_token);
-}
-
 
 $bot_token = $providers['telegram']['bot_token'];
-$telegram_available = $providers['telegram']['enabled'] && is_bot_token_valid($bot_token);
+$telegram_available = $providers['telegram']['enabled'] && authpress_tg_provider_bot_token_valid($bot_token);
+$telegram_chat_id = get_user_meta($current_user_id, 'tg_wp_factor_chat_id', true);
 $authenticator_enabled = $providers['authenticator']['enabled'];
 
 $has_providers = $authenticator_enabled || $telegram_available;
@@ -38,7 +28,7 @@ if ($has_providers) {
     $recovery = AuthPress_Auth_Factory::create(AuthPress_Auth_Factory::METHOD_RECOVERY_CODES);
 
     $totp_enabled = $totp->has_codes($current_user_id);
-    $telegram_user_enabled = $telegram_otp->has_codes($current_user_id);
+    $telegram_user_enabled =  $telegram_chat_id != NULL;
 
     // Get existing recovery codes
     if ($recovery) {
@@ -160,17 +150,115 @@ wp_enqueue_style('wp-factor-telegram-plugin');
 
                     <div class="wp-factor-telegram-setup">
                         <h3><?php _e('Setup Telegram', 'two-factor-login-telegram'); ?></h3>
-                        <p><?php _e('Click the button below to start the Telegram configuration process.', 'two-factor-login-telegram'); ?></p>
 
-                        <form method="post" action="">
-                            <?php wp_nonce_field('wp_factor_setup_telegram', 'wp_factor_telegram_nonce'); ?>
-                            <input type="hidden" name="wp_factor_action" value="setup_telegram">
-                            <p>
-                                <button type="submit" class="button button-primary">
-                                    <?php _e('Setup Telegram 2FA', 'two-factor-login-telegram'); ?>
-                                </button>
-                            </p>
-                        </form>
+                        <?php
+                        $username = $this->telegram->get_me()->username;
+                        ?>
+
+                        <div class="tg-setup-steps">
+                            <h4><?php _e('🚀 Setup Steps', 'two-factor-login-telegram'); ?></h4>
+                            <ol>
+                                <li>
+                                    <?php
+                                    printf(__('Open a conversation with %s and press on <strong>Start</strong>',
+                                        'two-factor-login-telegram'),
+                                        '<a href="https://telegram.me/' . $username
+                                        . '" target="_blank">@' . $username . '</a>');
+                                    ?>
+                                </li>
+                                <li>
+                                    <?php
+                                    printf(__('Type command %s to obtain your Chat ID.',
+                                        "two-factor-login-telegram"),
+                                        '<code>/get_id</code>');
+                                    ?>
+                                </li>
+                                <li>
+                                    <?php
+                                    _e("The bot will reply with your <strong>Chat ID</strong> number",
+                                        'two-factor-login-telegram');
+                                    ?>
+                                </li>
+                                <li><?php
+                                    _e('Copy your Chat ID and paste it below, then press <strong>Submit code</strong>',
+                                        'two-factor-login-telegram'); ?></li>
+                            </ol>
+                        </div>
+
+                        <div class="tg-progress">
+                            <div class="tg-progress-bar" id="tg-progress-bar"></div>
+                        </div>
+
+                        <div class="wp-factor-telegram-config">
+                            <table class="form-table">
+                                <tr>
+                                    <th>
+                                        <label for="tg_wp_factor_chat_id"><?php
+                                            _e('Telegram Chat ID',
+                                                'two-factor-login-telegram'); ?>
+                                        </label>
+                                    </th>
+                                    <td>
+                                        <input type="text" name="tg_wp_factor_chat_id"
+                                               id="tg_wp_factor_chat_id" value="<?php echo $telegram_chat_id; ?>"
+                                               class="regular-text"/><br/>
+                                        <span class="description"><?php
+                                            _e('Put your Telegram Chat ID',
+                                                'two-factor-login-telegram'); ?></span>
+                                    </td>
+                                    <td>
+                                        <button type="button" class="button button-primary tg-action-button" id="tg_wp_factor_chat_id_send"><?php
+                                            _e("Submit code",
+                                                "two-factor-login-telegram"); ?></button>
+                                        <div id="chat-id-status" class="tg-status" style="display: none;"></div>
+                                    </td>
+                                </tr>
+
+                                <tr id="factor-chat-confirm" style="display: none;">
+                                    <th>
+                                        <label for="tg_wp_factor_chat_id_confirm"><?php
+                                            _e('Confirmation code',
+                                                'two-factor-login-telegram'); ?>
+                                        </label>
+                                    </th>
+                                    <td>
+                                        <input type="text" name="tg_wp_factor_chat_id_confirm"
+                                               id="tg_wp_factor_chat_id_confirm" value=""
+                                               class="regular-text"/><br/>
+                                        <span class="description"><?php
+                                            _e('Please enter the confirmation code you received on Telegram',
+                                                'two-factor-login-telegram'); ?></span>
+                                    </td>
+                                    <td>
+                                        <button type="button" class="button button-primary tg-action-button" id="tg_wp_factor_chat_id_check"><?php
+                                            _e("Validate",
+                                                "two-factor-login-telegram"); ?></button>
+                                        <div id="validation-status" class="tg-status" style="display: none;"></div>
+                                    </td>
+                                </tr>
+                                <tr id="factor-chat-response" style="display: none;">
+                                    <td colspan="3">
+                                        <div class="wpft-notice wpft-notice-warning">
+                                            <p></p>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr id="factor-chat-save" style="display: none;">
+                                    <td colspan="3">
+                                        <form method="post" action="" class="wp-factor-telegram-save-form">
+                                            <?php wp_nonce_field('wp_factor_save_telegram', 'wp_factor_telegram_save_nonce'); ?>
+                                            <input type="hidden" name="wp_factor_action" value="save_telegram">
+                                            <input type="hidden" name="tg_chat_id" id="tg_chat_id_hidden" value="">
+                                            <p class="submit">
+                                                <button type="submit" class="button button-primary">
+                                                    <?php _e('Save Telegram Configuration', 'two-factor-login-telegram'); ?>
+                                                </button>
+                                            </p>
+                                        </form>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
                     </div>
                 <?php endif; ?>
             </div>
@@ -388,6 +476,103 @@ wp_enqueue_style('wp-factor-telegram-plugin');
     display: block;
     margin-top: 5px;
     margin-left: 30px;
+}
+
+/* Telegram setup specific styles */
+.tg-setup-steps {
+    margin: 20px 0;
+    padding: 15px;
+    background-color: #007cba;
+    border: 1px solid #dee2e6;
+    border-radius: 6px;
+}
+
+.tg-setup-steps h4 {
+    margin: 0 0 10px 0;
+    color: #495057;
+}
+
+.tg-setup-steps ol {
+    margin: 0;
+    padding-left: 20px;
+}
+
+.tg-setup-steps li {
+    margin: 8px 0;
+    line-height: 1.5;
+}
+
+.tg-progress {
+    width: 100%;
+    height: 6px;
+    background-color: #e9ecef;
+    border-radius: 3px;
+    margin: 15px 0;
+}
+
+.tg-progress-bar {
+    height: 100%;
+    background-color: #007cba;
+    border-radius: 3px;
+    width: 0;
+    transition: width 0.3s ease;
+}
+
+.wp-factor-telegram-config {
+    margin-top: 20px;
+}
+
+.wp-factor-telegram-config .form-table {
+    background: #fff;
+    border: 1px solid #c3c4c7;
+    border-radius: 4px;
+}
+
+.wp-factor-telegram-config .form-table th {
+    background: #f6f7f7;
+    border-bottom: 1px solid #c3c4c7;
+    padding: 15px;
+    font-weight: 600;
+}
+
+.wp-factor-telegram-config .form-table td {
+    padding: 15px;
+    border-bottom: 1px solid #c3c4c7;
+}
+
+.tg-status {
+    margin-top: 10px;
+    padding: 8px 12px;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.tg-status.success {
+    background: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+.tg-status.error {
+    background: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+.tg-action-button {
+    min-width: 120px;
+}
+
+.wpft-notice {
+    padding: 12px;
+    border-radius: 4px;
+    margin: 10px 0;
+}
+
+.wpft-notice-warning {
+    background: #fff3cd;
+    color: #856404;
+    border: 1px solid #ffeaa7;
 }
 </style>
 <?php endif; ?>

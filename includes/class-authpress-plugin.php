@@ -412,6 +412,23 @@ final class AuthPress_Plugin
                 }
                 break;
 
+            case 'save_telegram':
+                if (wp_verify_nonce($_POST['wp_factor_telegram_save_nonce'], 'wp_factor_save_telegram')) {
+                    $chat_id = sanitize_text_field($_POST['tg_chat_id']);
+                    if (!empty($chat_id)) {
+                        update_user_meta($current_user_id, 'tg_wp_factor_chat_id', $chat_id);
+                        update_user_meta($current_user_id, 'tg_wp_factor_enabled', '1');
+                        add_action('admin_notices', function() {
+                            echo '<div class="notice notice-success is-dismissible"><p>' . __('Telegram 2FA has been configured successfully!', 'two-factor-login-telegram') . '</p></div>';
+                        });
+                    } else {
+                        add_action('admin_notices', function() {
+                            echo '<div class="notice notice-error is-dismissible"><p>' . __('Invalid Telegram Chat ID.', 'two-factor-login-telegram') . '</p></div>';
+                        });
+                    }
+                }
+                break;
+
             case 'setup_telegram':
                 if (wp_verify_nonce($_POST['wp_factor_telegram_nonce'], 'wp_factor_setup_telegram')) {
                     // Redirect to profile page with specific instructions

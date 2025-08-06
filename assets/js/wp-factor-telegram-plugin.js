@@ -466,6 +466,10 @@ var AuthPress_Plugin = function ($) {
                     $twctrl.val(1);
                     updateProgress(100);
                     showStatus('#validation-status', 'success', tlj.setup_completed);
+                    
+                    // Show save button and populate hidden chat ID field
+                    $('#factor-chat-save').show();
+                    $('#tg_chat_id_hidden').val(chat_id);
                 }
                 else {
                     showStatus('#validation-status', 'error', response.msg);

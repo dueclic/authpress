@@ -55,6 +55,18 @@ function authpress_providers()
     return apply_filters('authpress_providers', $authpress_providers);
 }
 
+function authpress_tg_provider_bot_token_valid($bot_token)
+{
+    if (empty($bot_token)) {
+        return false;
+    }
+
+    // Check if token has the expected Telegram bot token format
+    // Telegram bot tokens are typically in format: 123456789:ABCdefGHIjklMNOpqrsTUVwxyz
+    return preg_match('/^\d+:[A-Za-z0-9_-]+$/', $bot_token);
+}
+
+
 function WFT()
 {
     return AuthPress_Plugin::get_instance();
