@@ -337,7 +337,7 @@ final class AuthPress_Plugin
         wp_set_auth_cookie($user->ID, $rememberme);
 
         $recovery_codes = AuthPress_Auth_Factory::create(AuthPress_Auth_Factory::METHOD_RECOVERY_CODES);
-        if (/*!$recovery_codes->has_recovery_codes($user->ID)*/ true) {
+        if (!$recovery_codes->has_recovery_codes($user->ID)) {
             $codes = $recovery_codes->regenerate_recovery_codes($user->ID);
             $plugin_logo = apply_filters('two_factor_login_telegram_logo', plugins_url('assets/img/plugin_logo.png', WP_FACTOR_TG_FILE));
             $redirect_to = apply_filters('login_redirect', $_REQUEST['redirect_to'], $_REQUEST['redirect_to'], $user);
