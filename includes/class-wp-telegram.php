@@ -95,6 +95,16 @@ class WP_Telegram {
 	}
 
 	/**
+	 * Get bot token
+	 *
+	 * @return string
+	 */
+
+	public function get_bot_token() {
+		return $this->bot_token;
+	}
+
+	/**
 	 * Get info about bot
 	 * @return bool | object
 	 */
@@ -224,11 +234,23 @@ class WP_Telegram {
 
 	public function send_tg_failed_login( $user_login ) {
 
-		// Get plugin options
-		$options = get_option($this->namespace);
+		// Get providers settings
+		$providers = get_option('wp_factor_providers', array());
+		
+		// Check if failed login reports are enabled
+		if (!isset($providers['telegram']['failed_login_reports']) || !$providers['telegram']['failed_login_reports']) {
+			return false;
+		}
+		
+		// Get Chat ID from providers settings
+		$chat_id = isset($providers['telegram']['report_chat_id']) ? $providers['telegram']['report_chat_id'] : '';
+		
+		if (empty($chat_id)) {
+			return false;
+		}
 
-		// Get Chat ID
-		$chat_id = $options['chat_id'];
+		// Get legacy options for backward compatibility
+		$options = get_option($this->namespace);
 
 		/**
 		 * @from 1.2

@@ -25,22 +25,33 @@ var WP_Factor_Telegram_Plugin = function ($) {
     };
 
     function init() {
+        // Initialize 2FA settings page functionality
+        initTwoFASettingsPage();
 
         // Handle checkbox toggle for 2FA configuration with smooth animation
         $twenabled.on("change", function(evt){
             var isConfigured = $twconfigrow.length > 0;
+            var hasAny2FA = $('.provider-status-card.configured').length > 0;
 
             if ($(this).is(":checked")) {
                 // Enable 2FA = 1, so tg_wp_factor_valid = 0
                 $twctrl.val(0);
-                if (!isConfigured) {
-                    $twconfig.addClass('show').show();
+                
+                // Show method selection if no 2FA is configured yet
+                if (!hasAny2FA) {
+                    $('#2fa-method-selection').show();
                     updateProgress(25);
                 }
+                
+                // Hide configuration sections initially
+                $twconfig.hide();
+                $('#totp-setup-section').hide();
             } else {
                 // Enable 2FA = 0, so tg_wp_factor_valid = 1
                 $twctrl.val(1);
-                $twconfig.removeClass('show');
+                $twconfig.removeClass('show').hide();
+                $('#totp-setup-section').hide();
+                $('#2fa-method-selection').hide();
                 setTimeout(function() {
                     $twconfig.hide();
                 }, 300);
@@ -67,6 +78,11 @@ var WP_Factor_Telegram_Plugin = function ($) {
 
             // Show modifying status message
             $('.tg-status.success').removeClass('success').addClass('warning').text(tlj.modifying_setup);
+            
+            // Smooth scroll to configuration section
+            $('html, body').animate({
+                scrollTop: $('#tg-2fa-configuration').offset().top - 50
+            }, 500);
         });
 
         // Watch for changes in Chat ID when in edit mode
@@ -83,11 +99,39 @@ var WP_Factor_Telegram_Plugin = function ($) {
 
         // Initialize visibility based on checkbox state and configuration
         var isConfigured = $twconfigrow.length > 0;
-        if ($twenabled.is(":checked") && !isConfigured) {
-            $twconfig.addClass('show').show();
-            updateProgress(25);
+        var hasAny2FA = $('.provider-status-card.configured').length > 0;
+        
+        if ($twenabled.is(":checked")) {
+            if (!hasAny2FA) {
+                $('#2fa-method-selection').show();
+                updateProgress(25);
+            }
+            // Hide configuration sections initially
+            $twconfig.hide();
+            $('#totp-setup-section').hide();
         } else {
             $twconfig.removeClass('show').hide();
+            $('#totp-setup-section').hide();
+            $('#2fa-method-selection').hide();
+        }
+
+        // Initialize other sections visibility
+        var $providersStatus = $('.providers-status-section');
+        var $methodSelection = $('#2fa-method-selection');
+        var $additionalMethods = $('.additional-methods-section');
+
+        if ($twenabled.is(":checked")) {
+            $providersStatus.show();
+            if ($methodSelection.length && !hasAny2FA) {
+                $methodSelection.show();
+            }
+            if ($additionalMethods.length) {
+                $additionalMethods.show();
+            }
+        } else {
+            $providersStatus.hide();
+            $methodSelection.hide();
+            $additionalMethods.hide();
         }
 
         // Store original chat ID value for comparison
@@ -134,6 +178,229 @@ var WP_Factor_Telegram_Plugin = function ($) {
 
         });
 
+        // Method selection buttons
+        $(document).on('click', '#setup-telegram-btn, #add-telegram-btn', function() {
+            $('#2fa-method-selection').hide();
+            $('#tg-2fa-configuration').show();
+            $('#totp-setup-section').hide();
+            
+            // Smooth scroll to configuration section
+            $('html, body').animate({
+                scrollTop: $('#tg-2fa-configuration').offset().top - 50
+            }, 500);
+        });
+
+        $(document).on('click', '#setup-totp-btn, #add-totp-btn', function() {
+            $('#2fa-method-selection').hide();
+            setupTOTP();
+            
+            // Smooth scroll to TOTP setup section
+            $('html, body').animate({
+                scrollTop: $('#totp-setup-section').offset().top - 50
+            }, 500);
+        });
+
+        // TOTP configuration buttons
+        $(document).on('click', '#totp-reconfigure-btn', function() {
+            setupTOTP();
+            
+            // Smooth scroll to TOTP setup section
+            $('html, body').animate({
+                scrollTop: $('#totp-setup-section').offset().top - 50
+            }, 500);
+        });
+
+        $(document).on('click', '#totp-disable-btn', function() {
+            if (confirm(tlj.confirm_disable_totp || 'Are you sure you want to disable the Authenticator app? You will lose this 2FA method.')) {
+                disableTOTP();
+            }
+        });
+
+        $(document).on('click', '#totp-show-secret-btn', function() {
+            $('#totp-secret-manual').toggle();
+        });
+
+        $(document).on('click', '#totp-verify-btn', function() {
+            verifyTOTP();
+        });
+
+        // Back buttons to return to method selection
+        $(document).on('click', '.back-to-method-selection', function() {
+            $('#2fa-method-selection').show();
+            $('#tg-2fa-configuration').hide();
+            $('#totp-setup-section').hide();
+            
+            // Smooth scroll to method selection
+            $('html, body').animate({
+                scrollTop: $('#2fa-method-selection').offset().top - 50
+            }, 500);
+        });
+
+        // TOTP verification code input - only allow numbers
+        $(document).on('input', '#totp-verification-code', function() {
+            this.value = this.value.replace(/[^0-9]/g, '');
+        });
+
+    }
+
+    function initTwoFASettingsPage() {
+        // Initialize 2FA settings page specific functionality
+        
+        // Generate QR Code button for TOTP
+        $(document).on('click', '#wp_factor_generate_qr', function(e) {
+            e.preventDefault();
+            var $btn = $(this);
+            var $qrSection = $('#wp_factor_qr_code');
+            var $verificationSection = $('#wp_factor_verification_section');
+            
+            $btn.prop('disabled', true).text('Generating...');
+            
+            $.ajax({
+                url: ajaxurl,
+                method: 'POST',
+                dataType: 'json',
+                data: {
+                    action: 'setup_totp',
+                    _wpnonce: $('input[name="wp_factor_totp_setup_nonce"]').val()
+                },
+                success: function(response) {
+                    if (response.success) {
+                        $qrSection.attr('src', response.data.qr_code_url).show();
+                        $verificationSection.show();
+                        $btn.hide();
+                    } else {
+                        alert(response.data.message || 'Failed to generate QR code');
+                        $btn.prop('disabled', false).text('Generate QR Code');
+                    }
+                },
+                error: function() {
+                    alert('Error generating QR code');
+                    $btn.prop('disabled', false).text('Generate QR Code');
+                }
+            });
+        });
+        
+        // TOTP verification form submission
+        $(document).on('submit', '#wp_factor_verify_form', function(e) {
+            e.preventDefault();
+            var $form = $(this);
+            var $messageDiv = $('#wp_factor_totp_message');
+            var code = $('#wp_factor_totp_code').val().trim();
+            
+            if (code.length !== 6) {
+                $messageDiv.removeClass('notice-success').addClass('notice notice-error').html('<p>Please enter a 6-digit code</p>').show();
+                return;
+            }
+            
+            $.ajax({
+                url: ajaxurl,
+                method: 'POST',
+                dataType: 'json',
+                data: {
+                    action: 'verify_totp',
+                    code: code,
+                    _wpnonce: $('input[name="wp_factor_totp_nonce"]').val()
+                },
+                success: function(response) {
+                    if (response.success) {
+                        $messageDiv.removeClass('notice-error').addClass('notice notice-success').html('<p>' + response.data.message + '</p>').show();
+                        setTimeout(function() {
+                            location.reload();
+                        }, 2000);
+                    } else {
+                        $messageDiv.removeClass('notice-success').addClass('notice notice-error').html('<p>' + response.data.message + '</p>').show();
+                    }
+                },
+                error: function() {
+                    $messageDiv.removeClass('notice-success').addClass('notice notice-error').html('<p>Network error occurred</p>').show();
+                }
+            });
+        });
+        
+        // Download recovery codes
+        $(document).on('click', '#wp_factor_download_codes', function(e) {
+            e.preventDefault();
+            downloadRecoveryCodes();
+        });
+        
+        // Print recovery codes
+        $(document).on('click', '#wp_factor_print_codes', function(e) {
+            e.preventDefault();
+            printRecoveryCodes();
+        });
+    }
+    
+    function downloadRecoveryCodes() {
+        var codes = [];
+        $('.recovery-codes-list code').each(function() {
+            codes.push($(this).text().trim());
+        });
+        
+        var content = "WordPress 2FA Recovery Codes\n";
+        content += "Generated: " + new Date().toLocaleString() + "\n\n";
+        content += "Keep these codes in a safe place. Each code can only be used once.\n\n";
+        codes.forEach(function(code) {
+            content += code + "\n";
+        });
+        
+        var blob = new Blob([content], { type: 'text/plain' });
+        var url = window.URL.createObjectURL(blob);
+        var a = document.createElement('a');
+        a.style.display = 'none';
+        a.href = url;
+        a.download = 'wp-2fa-recovery-codes.txt';
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+        document.body.removeChild(a);
+    }
+    
+    function printRecoveryCodes() {
+        var printWindow = window.open('', '_blank');
+        var codes = [];
+        $('.recovery-codes-list code').each(function() {
+            codes.push($(this).text().trim());
+        });
+        
+        var content = `
+        <html>
+        <head>
+            <title>WordPress 2FA Recovery Codes</title>
+            <style>
+                body { font-family: Arial, sans-serif; padding: 20px; }
+                h1 { color: #333; }
+                .codes-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin: 20px 0; }
+                .code { padding: 8px; border: 1px solid #ddd; text-align: center; font-weight: bold; }
+                .warning { color: #d63638; margin-top: 20px; }
+                @media print {
+                    .no-print { display: none; }
+                }
+            </style>
+        </head>
+        <body>
+            <h1>WordPress 2FA Recovery Codes</h1>
+            <p><strong>Generated:</strong> ${new Date().toLocaleString()}</p>
+            <p><strong>Site:</strong> ${window.location.hostname}</p>
+            <div class="codes-grid">
+                ${codes.map(code => `<div class="code">${code}</div>`).join('')}
+            </div>
+            <div class="warning">
+                <p><strong>Important:</strong></p>
+                <ul>
+                    <li>Keep these codes in a safe place</li>
+                    <li>Each code can only be used once</li>
+                    <li>Generate new codes if these are lost or compromised</li>
+                </ul>
+            </div>
+        </body>
+        </html>
+        `;
+        
+        printWindow.document.write(content);
+        printWindow.document.close();
+        printWindow.focus();
+        printWindow.print();
+        printWindow.close();
     }
 
     function check_tg_bot(bot_token){
@@ -300,6 +567,110 @@ var WP_Factor_Telegram_Plugin = function ($) {
     function resetStatusIndicators() {
         hideStatus('#chat-id-status');
         hideStatus('#validation-status');
+    }
+
+    // TOTP Setup functionality
+    var totpSecret = '';
+
+    function setupTOTP() {
+        $('#totp-setup-section').show();
+        $('#tg-2fa-configuration').hide();
+        $('#2fa-method-selection').hide();
+        
+        // Load QR code and secret
+        $.ajax({
+            url: ajaxurl,
+            method: 'POST',
+            dataType: 'json',
+            data: {
+                action: 'setup_totp',
+                _wpnonce: $('#totp-setup-nonce').val() || ''
+            },
+            success: function(res) {
+                if (res.success && res.data) {
+                    totpSecret = res.data.secret;
+                    $('#totp-qr-code').html('<img src="' + res.data.qr_code_url + '" alt="QR Code" style="border: 1px solid #ddd; padding: 10px; background: white;">');
+                    $('#totp-secret-text').text(res.data.secret);
+                } else {
+                    showTOTPStatus('error', res.data && res.data.message ? res.data.message : (tlj.qr_generation_failed || 'Failed to generate QR code'));
+                }
+            },
+            error: function() {
+                showTOTPStatus('error', tlj.network_error || 'Network error occurred');
+            }
+        });
+    }
+
+    function verifyTOTP() {
+        var code = $('#totp-verification-code').val().trim();
+        
+        if (code.length !== 6) {
+            showTOTPStatus('error', tlj.enter_6_digit_code || 'Please enter a 6-digit code');
+            return;
+        }
+
+        $('#totp-verify-btn').prop('disabled', true).text(tlj.verifying || 'Verifying...');
+
+        $.ajax({
+            url: ajaxurl,
+            method: 'POST',
+            dataType: 'json',
+            data: {
+                action: 'verify_totp',
+                code: code,
+                _wpnonce: $('#totp-verify-nonce').val() || ''
+            },
+            success: function(res) {
+                $('#totp-verify-btn').prop('disabled', false).text(tlj.verify_enable || 'Verify & Enable');
+                
+                if (res.success) {
+                    showTOTPStatus('success', tlj.totp_enabled_success || 'Authenticator app enabled successfully!');
+                    setTimeout(function() {
+                        location.reload();
+                    }, 2000);
+                } else {
+                    showTOTPStatus('error', res.data && res.data.message ? res.data.message : (tlj.invalid_code || 'Invalid code. Please try again.'));
+                }
+            },
+            error: function() {
+                $('#totp-verify-btn').prop('disabled', false).text(tlj.verify_enable || 'Verify & Enable');
+                showTOTPStatus('error', tlj.network_error || 'Network error occurred');
+            }
+        });
+    }
+
+    function disableTOTP() {
+        $.ajax({
+            url: ajaxurl,
+            method: 'POST',
+            dataType: 'json',
+            data: {
+                action: 'disable_totp',
+                _wpnonce: $('#totp-disable-nonce').val() || ''
+            },
+            success: function(res) {
+                if (res.success) {
+                    location.reload();
+                } else {
+                    alert(res.data && res.data.message ? res.data.message : (tlj.disable_totp_failed || 'Failed to disable authenticator'));
+                }
+            },
+            error: function() {
+                alert(tlj.network_error || 'Network error occurred');
+            }
+        });
+    }
+
+    function showTOTPStatus(type, message) {
+        var $status = $('#totp-verification-status');
+        $status.removeClass('success error').addClass(type);
+        $status.text(message).show();
+        
+        if (type === 'success') {
+            setTimeout(function() {
+                $status.fadeOut();
+            }, 5000);
+        }
     }
 
 }(jQuery);

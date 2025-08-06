@@ -1,4 +1,4 @@
-=== WP 2FA with Telegram ===
+=== AuthPress ===
 Contributors: dueclic, yordansoares
 Tags: 2fa, authentication, telegram, authenticate, security
 Requires at least: 6.0
@@ -12,7 +12,7 @@ This plugin enables two factor authentication with Telegram by increasing your w
 
 == Description ==
 
-WP 2FA with Telegram allows you to enable Two-factor authentication for WordPress Login using Telegram.
+AuthPress allows you to enable Two-factor authentication for WordPress Login using Telegram.
 
 * **Easy Configuration**: install plugin and setup in a few seconds.
 * **Increase security**: increase the level of security in your blog / website by adding and additional authentication factor
@@ -23,11 +23,11 @@ WP 2FA with Telegram allows you to enable Two-factor authentication for WordPres
 * **Languages**: plugin is available in Italian, English and Spanish languages.
 
 == Frequently Asked Questions ==
-= Can I customize the logo on the "WP 2FA with Telegram" login screen? =
+= Can I customize the logo on the "AuthPress" login screen? =
 Yes, you can do it. To use your custom logo, you must to use the <code>two_factor_login_telegram_logo</code> filter hook. Below you can see a useful code snippet as example of use (you must to put this in a custom plugin or the <code>functions.php</code> file of your active theme):
 
 <code>
-// Custom logo on "WP 2FA with Telegram" login screen:
+// Custom logo on "AuthPress" login screen:
 function two_factor_login_telegram_custom_logo(){
 
   $image_path = home_url('/images/');
@@ -127,7 +127,7 @@ Please note the URL generated in the example above is https://example.com/images
 * Improved markup in setup page
 * Tested up to WordPress 5.4
 = 1.8.3 =
-* Introduced <code>two_factor_login_telegram_logo</code> filter hook to customize the logo in «WP 2FA with Telegram» login screen
+* Introduced <code>two_factor_login_telegram_logo</code> filter hook to customize the logo in «AuthPress» login screen
 * Added new screenshot to show the <code>two_factor_login_telegram_logo</code> filter hook in action
 * Added FAQ entry to explain of <code>two_factor_login_telegram_logo</code> filter hook use.
 * Updated plugin name to "WP 2FA with Telegram" (Previusly "WP Two Factor Authentication with Telegram")

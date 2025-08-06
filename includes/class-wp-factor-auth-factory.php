@@ -4,6 +4,7 @@ class WP_Factor_Auth_Factory
 {
     const METHOD_TELEGRAM_OTP = 'telegram_otp';
     const METHOD_RECOVERY_CODES = 'recovery_codes';
+    const METHOD_TOTP = 'totp';
 
     /**
      * @var array Auth method instances cache
@@ -30,6 +31,10 @@ class WP_Factor_Auth_Factory
                 self::$instances[$method_type] = new WP_Factor_Recovery_Codes();
                 break;
 
+            case self::METHOD_TOTP:
+                self::$instances[$method_type] = new WP_Factor_TOTP();
+                break;
+
             default:
                 return null;
         }
@@ -47,6 +52,9 @@ class WP_Factor_Auth_Factory
         switch ($login_method) {
             case 'recovery':
                 return self::create(self::METHOD_RECOVERY_CODES);
+
+            case 'totp':
+                return self::create(self::METHOD_TOTP);
 
             case 'telegram':
             default:
