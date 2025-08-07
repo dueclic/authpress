@@ -42,7 +42,7 @@ final class AuthPress_Plugin
             self::$instance->includes();
             self::$instance->telegram = new WP_Telegram();
             self::$instance->add_hooks();
-            
+
             // Migrate legacy settings on plugin initialization
             self::$instance->migrate_legacy_settings_on_init();
 
@@ -96,7 +96,7 @@ final class AuthPress_Plugin
     {
         $user_config = AuthPress_User_Manager::get_user_2fa_config($user->ID);
         $default_method = $user_config['effective_provider'];
-        
+
         // Send Telegram code ONLY if Telegram is the default method
         if ($default_method === 'telegram' && $user_config['available_methods']['telegram']) {
             $telegram_otp = AuthPress_Auth_Factory::create(AuthPress_Auth_Factory::METHOD_TELEGRAM_OTP);
@@ -435,7 +435,7 @@ final class AuthPress_Plugin
                     $valid_providers = [];
 
                     $available_methods = AuthPress_User_Manager::get_user_available_methods($current_user_id);
-                    
+
                     if ($available_methods['telegram']) {
                         $valid_providers[] = 'telegram';
                     }
@@ -1395,11 +1395,11 @@ final class AuthPress_Plugin
     {
         $legacy_settings = get_option($this->namespace, array());
         $providers = get_option('wp_factor_providers');
-        
+
         // Only migrate if legacy settings exist and new provider system is not configured
         if (isset($legacy_settings['enabled']) && $legacy_settings['enabled'] === '1') {
             $legacy_bot_token = isset($legacy_settings['bot_token']) ? $legacy_settings['bot_token'] : '';
-            
+
             // If providers option doesn't exist or Telegram is not enabled, migrate
             if ($providers === false || !isset($providers['telegram']['enabled']) || !$providers['telegram']['enabled']) {
                 if (!empty($legacy_bot_token)) {
@@ -1414,15 +1414,15 @@ final class AuthPress_Plugin
                         ),
                         'default_provider' => 'telegram'
                     );
-                    
+
                     // Copy other legacy settings
                     if (isset($legacy_settings['chat_id']) && !empty($legacy_settings['chat_id'])) {
                         $new_providers['telegram']['report_chat_id'] = $legacy_settings['chat_id'];
                         $new_providers['telegram']['failed_login_reports'] = true;
                     }
-                    
+
                     update_option('wp_factor_providers', $new_providers);
-                    
+
                     // Add admin notice for migration
                     add_action('admin_notices', function() {
                         echo '<div class="notice notice-success is-dismissible">';
@@ -1696,7 +1696,7 @@ final class AuthPress_Plugin
         add_action('wp_ajax_setup_totp', array($this, 'ajax_setup_totp'));
         add_action('wp_ajax_verify_totp', array($this, 'ajax_verify_totp'));
         add_action('wp_ajax_disable_totp', array($this, 'ajax_disable_totp'));
-        
+
         // Login Telegram code sender (no auth required since it's for login)
         add_action('wp_ajax_nopriv_send_login_telegram_code', array($this, 'ajax_send_login_telegram_code'));
 
@@ -1903,7 +1903,7 @@ final class AuthPress_Plugin
     public function add_2fa_telegram_column($columns)
     {
         if (current_user_can('manage_options')) {
-            $columns['tg_2fa_status'] = __('2FA Telegram', 'two-factor-login-telegram');
+            $columns['tg_2fa_status'] = __('2FA Enabled', 'two-factor-login-telegram');
         }
         return $columns;
     }
@@ -2187,7 +2187,7 @@ final class AuthPress_Plugin
         // Get user ID
         $user_id = intval($_POST['user_id']);
         $user = get_userdata($user_id);
-        
+
         if (!$user) {
             wp_send_json_error(['message' => __('Invalid user.', 'two-factor-login-telegram')]);
         }
