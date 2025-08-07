@@ -246,6 +246,9 @@ var AuthPress_Plugin = function ($) {
     function initTwoFASettingsPage() {
         // Initialize 2FA settings page specific functionality
         
+        // Setup Telegram reconfiguration
+        setupTelegramReconfiguration();
+        
         // Generate QR Code button for TOTP
         $(document).on('click', '#wp_factor_generate_qr', function(e) {
             e.preventDefault();
@@ -675,6 +678,120 @@ var AuthPress_Plugin = function ($) {
                 $status.fadeOut();
             }, 5000);
         }
+    }
+
+    // Telegram reconfiguration functionality
+    function setupTelegramReconfiguration() {
+        // Show reconfiguration section
+        $('#reconfigure-telegram').on('click', function() {
+            $('#telegram-reconfig-section').slideDown();
+            $(this).hide();
+        });
+
+        // Cancel reconfiguration
+        $('#cancel-reconfigure').on('click', function() {
+            $('#telegram-reconfig-section').slideUp();
+            $('#reconfigure-telegram').show();
+            resetReconfigurationForm();
+        });
+
+        // Send test code for reconfiguration
+        $('#tg_wp_factor_reconfig_send').on('click', function() {
+            var chatId = $('#tg_wp_factor_chat_id_reconfig').val().trim();
+            if (!chatId) {
+                $('#reconfig-status').removeClass('success').addClass('error').text('Please enter a Chat ID').show();
+                return;
+            }
+
+            $(this).prop('disabled', true).text('Sending...');
+            $('#reconfig-status').removeClass('error success').text('Sending test code...').show();
+
+            $.ajax({
+                url: ajaxurl,
+                method: 'POST',
+                dataType: 'json',
+                data: {
+                    action: 'send_token_check',
+                    chat_id: chatId,
+                    nonce: tlj.sendtoken_nonce
+                },
+                success: function(response) {
+                    $('#tg_wp_factor_reconfig_send').prop('disabled', false).text('Send Test Code');
+                    
+                    if (response.type === 'success') {
+                        $('#reconfig-status').removeClass('error').addClass('success').text(response.msg);
+                        $('#factor-reconfig-confirm').show();
+                        $('#tg_wp_factor_reconfig_confirm').focus();
+                    } else {
+                        $('#reconfig-status').removeClass('success').addClass('error').text(response.msg);
+                    }
+                },
+                error: function() {
+                    $('#tg_wp_factor_reconfig_send').prop('disabled', false).text('Send Test Code');
+                    $('#reconfig-status').removeClass('success').addClass('error').text('Network error. Please try again.');
+                }
+            });
+        });
+
+        // Validate and save reconfiguration
+        $('#tg_wp_factor_reconfig_validate').on('click', function() {
+            var chatId = $('#tg_wp_factor_chat_id_reconfig').val().trim();
+            var confirmCode = $('#tg_wp_factor_reconfig_confirm').val().trim();
+            
+            if (!confirmCode) {
+                $('#reconfig-validation-status').removeClass('success').addClass('error').text('Please enter the confirmation code').show();
+                return;
+            }
+
+            $(this).prop('disabled', true).text('Validating...');
+            $('#reconfig-validation-status').removeClass('error success').text('Validating code...').show();
+
+            $.ajax({
+                url: ajaxurl,
+                method: 'POST',
+                dataType: 'json',
+                data: {
+                    action: 'token_check',
+                    token: confirmCode,
+                    chat_id: chatId,
+                    nonce: tlj.tokencheck_nonce
+                },
+                success: function(response) {
+                    $('#tg_wp_factor_reconfig_validate').prop('disabled', false).text('Validate & Save');
+                    
+                    if (response.type === 'success') {
+                        $('#reconfig-validation-status').removeClass('error').addClass('success').text('Code validated! Saving configuration...');
+                        
+                        // Save the new configuration
+                        saveNewTelegramConfig(chatId);
+                    } else {
+                        $('#reconfig-validation-status').removeClass('success').addClass('error').text(response.msg);
+                    }
+                },
+                error: function() {
+                    $('#tg_wp_factor_reconfig_validate').prop('disabled', false).text('Validate & Save');
+                    $('#reconfig-validation-status').removeClass('success').addClass('error').text('Network error. Please try again.');
+                }
+            });
+        });
+    }
+
+    function saveNewTelegramConfig(chatId) {
+        // Create a hidden form to submit the new configuration
+        var form = $('<form method="post" style="display:none;">');
+        form.append($('<input name="wp_factor_action" value="save_telegram">'));
+        form.append($('<input name="tg_chat_id" value="' + chatId + '">'));
+        form.append($('<input name="wp_factor_telegram_save_nonce" value="' + $('input[name="wp_factor_telegram_save_nonce"]').val() + '">'));
+        
+        $('body').append(form);
+        form.submit();
+    }
+
+    function resetReconfigurationForm() {
+        $('#tg_wp_factor_chat_id_reconfig').val('');
+        $('#tg_wp_factor_reconfig_confirm').val('');
+        $('#factor-reconfig-confirm').hide();
+        $('#reconfig-status, #reconfig-validation-status').hide();
     }
 
 }(jQuery);
