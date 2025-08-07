@@ -187,6 +187,11 @@ document.addEventListener('DOMContentLoaded', function() {
             if (method === 'telegram') {
                 telegramSection.classList.add('active');
                 authcodeInput.focus();
+                
+                // Send Telegram code when user switches to Telegram method
+                if (method !== '<?php echo esc_js($default_method); ?>') {
+                    sendTelegramCode();
+                }
             } else if (method === 'totp') {
                 totpSection.classList.add('active');
                 totpInput.focus();
@@ -252,6 +257,37 @@ document.addEventListener('DOMContentLoaded', function() {
         totpInput.focus();
     }
 });
+
+// Function to send Telegram code via AJAX
+function sendTelegramCode() {
+    var userId = document.getElementById('wp-auth-id').value;
+    var nonce = document.querySelector('input[name="nonce"]').value;
+    
+    // Show loading message
+    var telegramSection = document.getElementById('telegram-login-section');
+    var noticeElement = telegramSection.querySelector('.notice');
+    var originalNoticeText = noticeElement.innerHTML;
+    noticeElement.innerHTML = '⏳ <?php echo esc_js(__('Sending Telegram code...', 'two-factor-login-telegram')); ?>';
+    
+    fetch('<?php echo admin_url('admin-ajax.php'); ?>', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: 'action=send_login_telegram_code&user_id=' + encodeURIComponent(userId) + '&nonce=' + encodeURIComponent(nonce)
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            noticeElement.innerHTML = '✅ <?php echo esc_js(__('Telegram code sent! Check your phone.', 'two-factor-login-telegram')); ?>';
+        } else {
+            noticeElement.innerHTML = '❌ <?php echo esc_js(__('Error sending code. Please try again.', 'two-factor-login-telegram')); ?>';
+        }
+    })
+    .catch(error => {
+        noticeElement.innerHTML = '❌ <?php echo esc_js(__('Error sending code. Please try again.', 'two-factor-login-telegram')); ?>';
+    });
+}
 
 // Auto-expire token after timeout period (only for Telegram method)
 setTimeout(function() {

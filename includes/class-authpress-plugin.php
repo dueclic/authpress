@@ -100,8 +100,11 @@ final class AuthPress_Plugin
         $totp = AuthPress_Auth_Factory::create(AuthPress_Auth_Factory::METHOD_TOTP);
         $has_totp = $totp->is_user_totp_enabled($user->ID);
 
-        // Send Telegram code if user has Telegram enabled and provider is active
-        if ($has_telegram && !empty($chat_id) && $telegram_enabled && $this->is_valid_bot()) {
+        // Get the effective default method for this user
+        $default_method = $this->get_effective_default_provider($user->ID);
+        
+        // Send Telegram code ONLY if Telegram is the default method
+        if ($has_telegram && !empty($chat_id) && $telegram_enabled && $this->is_valid_bot() && $default_method === 'telegram') {
             $telegram_otp = AuthPress_Auth_Factory::create(AuthPress_Auth_Factory::METHOD_TELEGRAM_OTP);
             $auth_code = $telegram_otp->save_authcode($user);
 
@@ -111,7 +114,8 @@ final class AuthPress_Plugin
                 'user_id' => $user->ID,
                 'user_login' => $user->user_login,
                 'chat_id' => $chat_id,
-                'success' => $result !== false
+                'success' => $result !== false,
+                'reason' => 'default_method_telegram'
             ));
         }
 
@@ -981,30 +985,6 @@ final class AuthPress_Plugin
             <?php
         }
     }
-
-    /**
-     * @param $user
-     */
-
-    public function tg_add_two_factor_fields($user)
-    {
-        $current_user_id = get_current_user_id();
-        if ($current_user_id != $user->ID) {
-            return;
-        }
-
-        // Check if any 2FA provider is enabled at system level
-        $providers = authpress_providers();
-        $authenticator_enabled = isset($providers['authenticator']['enabled']) ? $providers['authenticator']['enabled'] : false;
-        $telegram_enabled = isset($providers['telegram']['enabled']) ? $providers['telegram']['enabled'] : false;
-
-        if (!$authenticator_enabled && !$telegram_enabled) {
-            return;
-        }
-
-        require_once(dirname(WP_FACTOR_TG_FILE) . "/templates/user-2fa-settings-page.php");
-    }
-
     public function load_tg_lib()
     {
         $screen = get_current_screen();
@@ -1770,46 +1750,6 @@ final class AuthPress_Plugin
             );
         }
 
-        // Add 2FA fields if any provider is enabled
-        /*        $providers = authpress_providers();
-
-        $authenticator_enabled = isset($providers['authenticator']['enabled']) ? $providers['authenticator']['enabled'] : false;
-        $telegram_enabled = isset($providers['telegram']['enabled']) ? $providers['telegram']['enabled'] : false;
-
-        /*if ($authenticator_enabled || $telegram_enabled) {
-            add_action(
-                'show_user_profile',
-                array($this, 'tg_add_two_factor_fields'),
-                15
-            );
-            add_action(
-                'edit_user_profile',
-                array($this, 'tg_add_two_factor_fields'),
-                15
-            );
-
-            // Add Telegram validation handlers only if Telegram is enabled and bot is valid
-            if ($telegram_enabled && $this->is_valid_bot()) {
-                add_action(
-                    'show_user_profile',
-                    array($this, 'handle_telegram_validation_in_profile')
-                );
-                add_action(
-                    'edit_user_profile',
-                    array($this, 'handle_telegram_validation_in_profile')
-                );
-            }
-        }*/
-
-        /*add_action(
-            'personal_options_update',
-            array($this, 'tg_save_custom_user_profile_fields')
-        );
-        add_action(
-            'edit_user_profile_update',
-            array($this, 'tg_save_custom_user_profile_fields')
-        );*/
-
         add_action('admin_enqueue_scripts', array($this, 'load_tg_lib'));
         add_action('admin_footer', array($this, 'hook_tg_lib'));
         add_action(
@@ -1840,6 +1780,9 @@ final class AuthPress_Plugin
         add_action('wp_ajax_setup_totp', array($this, 'ajax_setup_totp'));
         add_action('wp_ajax_verify_totp', array($this, 'ajax_verify_totp'));
         add_action('wp_ajax_disable_totp', array($this, 'ajax_disable_totp'));
+        
+        // Login Telegram code sender (no auth required since it's for login)
+        add_action('wp_ajax_nopriv_send_login_telegram_code', array($this, 'ajax_send_login_telegram_code'));
 
     }
 
@@ -2266,9 +2209,7 @@ final class AuthPress_Plugin
         $code = sanitize_text_field($_POST['code']);
         $totp = AuthPress_Auth_Factory::create(AuthPress_Auth_Factory::METHOD_TOTP);
 
-        // Validate the TOTP code during setup
         if ($totp->verify_setup_code($code, $user_id)) {
-            // Enable TOTP for the user
             $totp->enable_user_totp($user_id);
 
             $this->log_telegram_action('totp_enabled', array(
@@ -2314,6 +2255,61 @@ final class AuthPress_Plugin
             wp_send_json_success(['message' => __('Authenticator app disabled successfully.', 'two-factor-login-telegram')]);
         } else {
             wp_send_json_error(['message' => __('Failed to disable authenticator app.', 'two-factor-login-telegram')]);
+        }
+    }
+
+    /**
+     * AJAX handler to send Telegram code during login (when switching methods)
+     */
+    public function ajax_send_login_telegram_code()
+    {
+        // Verify nonce
+        if (!isset($_POST['nonce']) || !wp_verify_nonce($_POST['nonce'], 'wp2fa_telegram_auth_nonce_' . $_POST['user_id'])) {
+            wp_send_json_error(['message' => __('Security verification failed', 'two-factor-login-telegram')]);
+        }
+
+        // Get user ID
+        $user_id = intval($_POST['user_id']);
+        $user = get_userdata($user_id);
+        
+        if (!$user) {
+            wp_send_json_error(['message' => __('Invalid user.', 'two-factor-login-telegram')]);
+        }
+
+        // Check if user has Telegram configured
+        $has_telegram = get_the_author_meta("tg_wp_factor_enabled", $user_id) === "1";
+        $chat_id = get_user_meta($user_id, "tg_wp_factor_chat_id", true);
+
+        if (!$has_telegram || empty($chat_id)) {
+            wp_send_json_error(['message' => __('Telegram is not configured for this user.', 'two-factor-login-telegram')]);
+        }
+
+        // Check if Telegram is enabled and bot is valid
+        $providers = authpress_providers();
+        $telegram_enabled = isset($providers['telegram']['enabled']) ? $providers['telegram']['enabled'] : false;
+        
+        if (!$telegram_enabled || !$this->is_valid_bot()) {
+            wp_send_json_error(['message' => __('Telegram provider is not available.', 'two-factor-login-telegram')]);
+        }
+
+        // Generate and send Telegram code
+        $telegram_otp = AuthPress_Auth_Factory::create(AuthPress_Auth_Factory::METHOD_TELEGRAM_OTP);
+        $auth_code = $telegram_otp->save_authcode($user);
+
+        $result = $this->telegram->send_tg_token($auth_code, $chat_id, $user_id);
+
+        $this->log_telegram_action('auth_code_sent_on_request', array(
+            'user_id' => $user_id,
+            'user_login' => $user->user_login,
+            'chat_id' => $chat_id,
+            'success' => $result !== false,
+            'reason' => 'user_switched_to_telegram'
+        ));
+
+        if ($result !== false) {
+            wp_send_json_success(['message' => __('Telegram code sent successfully!', 'two-factor-login-telegram')]);
+        } else {
+            wp_send_json_error(['message' => __('Failed to send Telegram code. Please try again.', 'two-factor-login-telegram')]);
         }
     }
 
