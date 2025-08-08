@@ -12,14 +12,20 @@ $user_config = AuthPress_User_Manager::get_user_2fa_config($current_user_id);
 
 // Extract simplified variables for template compatibility
 $user_has_telegram = $user_config['available_methods']['telegram'];
+$user_has_email = $user_config['available_methods']['email'];
 $user_has_totp = $user_config['available_methods']['totp'];
 $user_has_active_methods = $user_config['has_2fa'];
 $telegram_available = $user_config['providers_enabled']['telegram'];
+$email_available = $user_config['providers_enabled']['email'];
 $authenticator_enabled = $user_config['providers_enabled']['authenticator'];
-$has_providers = $telegram_available || $authenticator_enabled;
+$has_providers = $telegram_available || $email_available || $authenticator_enabled;
 $totp_enabled = $user_has_totp;
 $telegram_chat_id = $user_config['chat_id'] ?: '';
 $telegram_user_enabled = $user_has_telegram;
+
+// Check if email is available but not necessarily enabled
+$email_user_available = AuthPress_User_Manager::user_email_available($current_user_id);
+$email_user_enabled = $user_has_email;
 
 // Get recovery codes
 $recovery_codes = [];
@@ -272,6 +278,56 @@ wp_enqueue_style('wp-factor-telegram-plugin');
                 </div>
             <?php endif; ?>
 
+            <?php if ($email_available): ?>
+            <!-- Email Section -->
+            <div class="wp-factor-section">
+                <h2><?php _e('Email', 'two-factor-login-telegram'); ?></h2>
+
+                <?php if ($email_user_available): ?>
+                    <?php if ($email_user_enabled): ?>
+                        <div class="notice notice-success inline">
+                            <p>
+                                <?php _e('✅ Email 2FA is configured and active.', 'two-factor-login-telegram'); ?>
+                                <br>
+                                <strong><?php _e('Email:', 'two-factor-login-telegram'); ?></strong> <?php echo esc_html(wp_get_current_user()->user_email); ?>
+                            </p>
+                        </div>
+                        <p><?php _e('Authentication codes will be sent to your registered email address when you log in.', 'two-factor-login-telegram'); ?></p>
+                        
+                        <form method="post" action="" class="wp-factor-disable-form" style="margin-top: 15px;">
+                            <?php wp_nonce_field('wp_factor_disable_email', 'wp_factor_email_disable_nonce'); ?>
+                            <input type="hidden" name="wp_factor_action" value="disable_email">
+                            <button type="submit" class="button button-secondary" onclick="return confirm('<?php _e('Are you sure you want to disable Email 2FA?', 'two-factor-login-telegram'); ?>')">
+                                <?php _e('Disable Email 2FA', 'two-factor-login-telegram'); ?>
+                            </button>
+                        </form>
+                    <?php else: ?>
+                        <div class="notice notice-info inline">
+                            <p>
+                                <?php _e('📧 Email 2FA is available but not enabled.', 'two-factor-login-telegram'); ?>
+                                <br>
+                                <strong><?php _e('Email:', 'two-factor-login-telegram'); ?></strong> <?php echo esc_html(wp_get_current_user()->user_email); ?>
+                            </p>
+                        </div>
+                        <p><?php _e('Enable email 2FA to receive authentication codes via email when you log in.', 'two-factor-login-telegram'); ?></p>
+                        
+                        <form method="post" action="" class="wp-factor-enable-form" style="margin-top: 15px;">
+                            <?php wp_nonce_field('wp_factor_enable_email', 'wp_factor_email_enable_nonce'); ?>
+                            <input type="hidden" name="wp_factor_action" value="enable_email">
+                            <button type="submit" class="button button-primary">
+                                <?php _e('Enable Email 2FA', 'two-factor-login-telegram'); ?>
+                            </button>
+                        </form>
+                    <?php endif; ?>
+                <?php else: ?>
+                    <div class="notice notice-warning inline">
+                        <p><?php _e('⚠️ Email 2FA is not available.', 'two-factor-login-telegram'); ?></p>
+                    </div>
+                    <p><?php _e('You need a valid email address in your profile to use email 2FA. Please update your email address in your user profile.', 'two-factor-login-telegram'); ?></p>
+                <?php endif; ?>
+            </div>
+            <?php endif; ?>
+
             <?php if ($authenticator_enabled): ?>
             <!-- Authenticator App Section -->
             <div class="wp-factor-section">
@@ -348,6 +404,16 @@ wp_enqueue_style('wp-factor-telegram-plugin');
                                 <span class="provider-icon">📱</span>
                                 <span class="provider-name"><?php _e('Telegram', 'two-factor-login-telegram'); ?></span>
                                 <span class="provider-description"><?php _e('Receive codes via Telegram', 'two-factor-login-telegram'); ?></span>
+                            </label>
+                        <?php endif; ?>
+
+                        <?php if ($user_has_email): ?>
+                            <label class="wp-factor-provider-option">
+                                <input type="radio" name="default_provider" value="email"
+                                       <?php checked($user_default_provider, 'email'); ?>>
+                                <span class="provider-icon">📧</span>
+                                <span class="provider-name"><?php _e('Email', 'two-factor-login-telegram'); ?></span>
+                                <span class="provider-description"><?php _e('Receive codes via email', 'two-factor-login-telegram'); ?></span>
                             </label>
                         <?php endif; ?>
 

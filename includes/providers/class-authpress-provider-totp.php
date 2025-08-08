@@ -1,6 +1,8 @@
 <?php
 
-class AuthPress_TOTP extends AuthPress_Auth_Method
+namespace AuthPress\Providers;
+
+class TOTP_Provider extends Abstract_Provider
 {
     const SECRET_LENGTH = 32;
     const CODE_LENGTH = 6;

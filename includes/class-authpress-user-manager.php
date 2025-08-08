@@ -120,6 +120,12 @@ final class AuthPress_User_Manager
             return false;
         }
 
+        // Check if user has email 2FA enabled
+        $enabled = get_user_meta($user_id, "wp_factor_email_enabled", true) === "1";
+        if (!$enabled) {
+            return false;
+        }
+
         $user = get_userdata($user_id);
         return $user && !empty($user->user_email);
     }
@@ -244,6 +250,47 @@ final class AuthPress_User_Manager
         }
 
         return null;
+    }
+
+    /**
+     * Check if user has email available for 2FA (regardless of enabled status)
+     * 
+     * @param int $user_id User ID
+     * @return bool
+     */
+    public static function user_email_available($user_id)
+    {
+        if (!self::is_email_provider_enabled()) {
+            return false;
+        }
+
+        $user = get_userdata($user_id);
+        return $user && !empty($user->user_email);
+    }
+
+    /**
+     * Enable email 2FA for user
+     * 
+     * @param int $user_id User ID
+     * @return bool
+     */
+    public static function enable_user_email($user_id)
+    {
+        if (!self::user_email_available($user_id)) {
+            return false;
+        }
+        return update_user_meta($user_id, 'wp_factor_email_enabled', '1');
+    }
+
+    /**
+     * Disable email 2FA for user
+     * 
+     * @param int $user_id User ID
+     * @return bool
+     */
+    public static function disable_user_email($user_id)
+    {
+        return delete_user_meta($user_id, 'wp_factor_email_enabled');
     }
 
     /**

@@ -1,7 +1,18 @@
 <?php
 
-class AuthPress_Telegram_OTP extends AuthPress_Auth_Method
+namespace AuthPress\Providers;
+
+use WP_Telegram;
+use WP_User;
+
+class Telegram_Provider extends Abstract_Provider implements OTP_Provider_Interface
 {
+    private $telegram;
+
+    public function __construct()
+    {
+        $this->telegram = new WP_Telegram();
+    }
     /**
      * Generate a unique authentication code that doesn't exist in database
      * @param int $length Code length
@@ -269,5 +280,76 @@ class AuthPress_Telegram_OTP extends AuthPress_Auth_Method
         );
 
         return $result !== false;
+    }
+
+    /**
+     * Send an OTP code to the user via Telegram
+     * @param WP_User|int $user The user object or user ID
+     * @param string $code The OTP code to send
+     * @return bool True on success, false on failure
+     */
+    public function send_otp($user, $code)
+    {
+        $user_id = is_object($user) ? $user->ID : intval($user);
+        $chat_id = \AuthPress_User_Manager::get_user_chat_id($user_id);
+        
+        if (!$chat_id) {
+            return false;
+        }
+
+        return $this->telegram->send_tg_token($code, $chat_id, $user_id) !== false;
+    }
+
+    /**
+     * Save and send an authentication code for a user
+     * @param WP_User|int $user User object or user ID
+     * @param int $code_length Length of the code to generate
+     * @return string|false The generated code on success, false on failure
+     */
+    public function save_and_send_authcode($user, $code_length = 5)
+    {
+        $auth_code = $this->save_authcode($user, $code_length);
+        
+        if ($auth_code && $this->send_otp($user, $auth_code)) {
+            return $auth_code;
+        }
+        
+        return false;
+    }
+
+    /**
+     * Resend the last authentication code for a user
+     * @param WP_User|int $user User object or user ID
+     * @return bool True on success, false on failure
+     */
+    public function resend_authcode($user)
+    {
+        // Generate a new code and send it
+        $auth_code = $this->save_authcode($user);
+        
+        if ($auth_code) {
+            return $this->send_otp($user, $auth_code);
+        }
+        
+        return false;
+    }
+
+    /**
+     * Check if the user can receive OTP via this provider
+     * @param int $user_id The user ID
+     * @return bool True if user can receive OTP, false otherwise
+     */
+    public function can_send_otp($user_id)
+    {
+        return \AuthPress_User_Manager::user_has_telegram($user_id);
+    }
+
+    /**
+     * Get the display name for this OTP provider
+     * @return string The display name
+     */
+    public function get_provider_name()
+    {
+        return __('Telegram', 'two-factor-login-telegram');
     }
 }

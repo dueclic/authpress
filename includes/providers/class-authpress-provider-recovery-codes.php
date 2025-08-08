@@ -1,6 +1,8 @@
 <?php
 
-class AuthPress_Recovery_Codes extends AuthPress_Auth_Method
+namespace AuthPress\Providers;
+
+class Recovery_Codes_Provider extends Abstract_Provider
 {
     /**
      * Generate N random recovery codes

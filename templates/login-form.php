@@ -314,25 +314,23 @@ function sendTelegramCode() {
     var originalNoticeText = noticeElement.innerHTML;
     noticeElement.innerHTML = '⏳ <?php echo esc_js(__('Sending Telegram code...', 'two-factor-login-telegram')); ?>';
 
-    jQuery.ajax({
-        url: '<?php echo admin_url('admin-ajax.php'); ?>',
+    fetch('<?php echo admin_url('admin-ajax.php'); ?>', {
         method: 'POST',
-        data: {
-            action: 'send_login_telegram_code',
-            user_id: userId,
-            nonce: nonce
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
         },
-        dataType: 'json',
-        success: function(data) {
-            if (data.success) {
-                noticeElement.innerHTML = '✅ <?php echo esc_js(__('Telegram code sent! Check your phone.', 'two-factor-login-telegram')); ?>';
-            } else {
-                noticeElement.innerHTML = '❌ <?php echo esc_js(__('Error sending code. Please try again.', 'two-factor-login-telegram')); ?>';
-            }
-        },
-        error: function() {
+        body: 'action=send_login_telegram_code&user_id=' + encodeURIComponent(userId) + '&nonce=' + encodeURIComponent(nonce)
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            noticeElement.innerHTML = '✅ <?php echo esc_js(__('Telegram code sent! Check your phone.', 'two-factor-login-telegram')); ?>';
+        } else {
             noticeElement.innerHTML = '❌ <?php echo esc_js(__('Error sending code. Please try again.', 'two-factor-login-telegram')); ?>';
         }
+    })
+    .catch(error => {
+        noticeElement.innerHTML = '❌ <?php echo esc_js(__('Error sending code. Please try again.', 'two-factor-login-telegram')); ?>';
     });
 }
 
@@ -347,25 +345,23 @@ function sendEmailCode() {
     var originalNoticeText = noticeElement.innerHTML;
     noticeElement.innerHTML = '⏳ <?php echo esc_js(__('Sending email code...', 'two-factor-login-telegram')); ?>';
 
-    jQuery.ajax({
-        url: '<?php echo admin_url('admin-ajax.php'); ?>',
+    fetch('<?php echo admin_url('admin-ajax.php'); ?>', {
         method: 'POST',
-        data: {
-            action: 'send_login_email_code',
-            user_id: userId,
-            nonce: nonce
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
         },
-        dataType: 'json',
-        success: function(data) {
-            if (data.success) {
-                noticeElement.innerHTML = '✅ <?php echo esc_js(__('Email code sent! Check your inbox.', 'two-factor-login-telegram')); ?>';
-            } else {
-                noticeElement.innerHTML = '❌ <?php echo esc_js(__('Error sending code. Please try again.', 'two-factor-login-telegram')); ?>';
-            }
-        },
-        error: function() {
+        body: 'action=send_login_email_code&user_id=' + encodeURIComponent(userId) + '&nonce=' + encodeURIComponent(nonce)
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            noticeElement.innerHTML = '✅ <?php echo esc_js(__('Email code sent! Check your inbox.', 'two-factor-login-telegram')); ?>';
+        } else {
             noticeElement.innerHTML = '❌ <?php echo esc_js(__('Error sending code. Please try again.', 'two-factor-login-telegram')); ?>';
         }
+    })
+    .catch(error => {e
+        noticeElement.innerHTML = '❌ <?php echo esc_js(__('Error sending code. Please try again.', 'two-factor-login-telegram')); ?>';
     });
 }
 

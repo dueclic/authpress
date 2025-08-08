@@ -1,6 +1,8 @@
 <?php
 
-abstract class AuthPress_Auth_Method
+namespace AuthPress\Providers;
+
+abstract class Abstract_Provider
 {
     /**
      * Generate a random authentication code

@@ -1,5 +1,11 @@
 <?php
 
+use AuthPress\Providers\Telegram_Provider;
+use AuthPress\Providers\Email_Provider;
+use AuthPress\Providers\TOTP_Provider;
+use AuthPress\Providers\Recovery_Codes_Provider;
+use AuthPress\Providers\Abstract_Provider;
+
 class AuthPress_Auth_Factory
 {
     const METHOD_TELEGRAM_OTP = 'telegram_otp';
@@ -15,7 +21,7 @@ class AuthPress_Auth_Factory
     /**
      * Create or get an authentication method instance
      * @param string $method_type The type of authentication method
-     * @return AuthPress_Auth_Method|null The authentication method instance
+     * @return Abstract_Provider|null The authentication method instance
      */
     public static function create($method_type)
     {
@@ -25,19 +31,19 @@ class AuthPress_Auth_Factory
 
         switch ($method_type) {
             case self::METHOD_TELEGRAM_OTP:
-                self::$instances[$method_type] = new AuthPress_Telegram_OTP();
+                self::$instances[$method_type] = new Telegram_Provider();
                 break;
 
             case self::METHOD_EMAIL_OTP:
-                self::$instances[$method_type] = new AuthPress_Email_OTP();
+                self::$instances[$method_type] = new Email_Provider();
                 break;
 
             case self::METHOD_RECOVERY_CODES:
-                self::$instances[$method_type] = new AuthPress_Recovery_Codes();
+                self::$instances[$method_type] = new Recovery_Codes_Provider();
                 break;
 
             case self::METHOD_TOTP:
-                self::$instances[$method_type] = new AuthPress_TOTP();
+                self::$instances[$method_type] = new TOTP_Provider();
                 break;
 
             default:
