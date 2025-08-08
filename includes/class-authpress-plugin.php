@@ -59,9 +59,9 @@ final class AuthPress_Plugin
     public function includes()
     {
         require_once(dirname(WP_FACTOR_TG_FILE)
-                . "/includes/class-authpress-core.php");
+                . "/includes/class-wp-telegram.php");
         require_once(dirname(WP_FACTOR_TG_FILE)
-            . "/includes/class-telegram-logs-list-table.php");
+                . "/includes/class-authpress-logs-list-table.php");
         require_once(dirname(WP_FACTOR_TG_FILE)
             . "/includes/abstract-authpress-auth-method.php");
         require_once(dirname(WP_FACTOR_TG_FILE)
@@ -244,7 +244,7 @@ final class AuthPress_Plugin
 
                 // Log successful login
                 $log_action = ($login_method === 'recovery') ? 'recovery_code_login_success' :
-                    ($login_method === 'totp' ? 'totp_code_login_success' : 
+                    ($login_method === 'totp' ? 'totp_code_login_success' :
                     ($login_method === 'email' ? 'email_code_login_success' : 'telegram_code_login_success'));
                 $this->log_telegram_action($log_action, array(
                     'user_id' => $user->ID,
@@ -477,7 +477,7 @@ final class AuthPress_Plugin
                     if (in_array($default_provider, $valid_providers)) {
                         update_user_meta($current_user_id, 'wp_factor_user_default_provider', $default_provider);
                         add_action('admin_notices', function() use ($default_provider) {
-                            $provider_name = ($default_provider === 'telegram') ? __('Telegram', 'two-factor-login-telegram') : 
+                            $provider_name = ($default_provider === 'telegram') ? __('Telegram', 'two-factor-login-telegram') :
                                           (($default_provider === 'email') ? __('Email', 'two-factor-login-telegram') : __('Authenticator App', 'two-factor-login-telegram'));
                             echo '<div class="notice notice-success is-dismissible"><p>' . sprintf(__('Default 2FA method set to %s successfully!', 'two-factor-login-telegram'), $provider_name) . '</p></div>';
                         });
@@ -1736,7 +1736,7 @@ final class AuthPress_Plugin
 
         // Login Telegram code sender (no auth required since it's for login)
         add_action('wp_ajax_nopriv_send_login_telegram_code', array($this, 'ajax_send_login_telegram_code'));
-        
+
         // Login Email code sender (no auth required since it's for login)
         add_action('wp_ajax_nopriv_send_login_email_code', array($this, 'ajax_send_login_email_code'));
 

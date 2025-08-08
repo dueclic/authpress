@@ -313,7 +313,7 @@ if (isset($_GET['tab'])) {
             $activities_table = $wpdb->prefix . 'wp2fat_activities';
 
             // Create an instance of our package class
-            $logs_list_table = new Telegram_Logs_List_Table();
+            $logs_list_table = new Authpress_Logs_List_Table();
 
             // Handle clear logs action
             if (isset($_POST['clear_logs']) && wp_verify_nonce($_POST['_wpnonce'], 'clear_telegram_logs')) {
