@@ -3,6 +3,7 @@
 class AuthPress_Auth_Factory
 {
     const METHOD_TELEGRAM_OTP = 'telegram_otp';
+    const METHOD_EMAIL_OTP = 'email_otp';
     const METHOD_RECOVERY_CODES = 'recovery_codes';
     const METHOD_TOTP = 'totp';
 
@@ -25,6 +26,10 @@ class AuthPress_Auth_Factory
         switch ($method_type) {
             case self::METHOD_TELEGRAM_OTP:
                 self::$instances[$method_type] = new AuthPress_Telegram_OTP();
+                break;
+
+            case self::METHOD_EMAIL_OTP:
+                self::$instances[$method_type] = new AuthPress_Email_OTP();
                 break;
 
             case self::METHOD_RECOVERY_CODES:
@@ -55,6 +60,9 @@ class AuthPress_Auth_Factory
 
             case 'totp':
                 return self::create(self::METHOD_TOTP);
+
+            case 'email':
+                return self::create(self::METHOD_EMAIL_OTP);
 
             case 'telegram':
             default:

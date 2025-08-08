@@ -85,15 +85,25 @@ if (!empty($error_msg)) {
     <!-- Hidden input to track which form is being used -->
     <input type="hidden" name="login_method" id="login_method" value="<?php echo esc_attr($default_method); ?>">
 
-    <?php if ($user_has_telegram && $user_has_totp): ?>
+    <?php $available_methods = [$user_has_telegram, $user_has_email, $user_has_totp]; ?>
+    <?php if (array_sum($available_methods) > 1): ?>
         <!-- Method Selector -->
         <div class="method-selector">
-            <div class="method-button <?php echo $default_method === 'telegram' ? 'active' : ''; ?>" data-method="telegram">
-                📱 <?php _e("Telegram", "two-factor-login-telegram"); ?>
-            </div>
-            <div class="method-button <?php echo $default_method === 'totp' ? 'active' : ''; ?>" data-method="totp">
-                🔐 <?php _e("Authenticator", "two-factor-login-telegram"); ?>
-            </div>
+            <?php if ($user_has_telegram): ?>
+                <div class="method-button <?php echo $default_method === 'telegram' ? 'active' : ''; ?>" data-method="telegram">
+                    📱 <?php _e("Telegram", "two-factor-login-telegram"); ?>
+                </div>
+            <?php endif; ?>
+            <?php if ($user_has_email): ?>
+                <div class="method-button <?php echo $default_method === 'email' ? 'active' : ''; ?>" data-method="email">
+                    📧 <?php _e("Email", "two-factor-login-telegram"); ?>
+                </div>
+            <?php endif; ?>
+            <?php if ($user_has_totp): ?>
+                <div class="method-button <?php echo $default_method === 'totp' ? 'active' : ''; ?>" data-method="totp">
+                    🔐 <?php _e("Authenticator", "two-factor-login-telegram"); ?>
+                </div>
+            <?php endif; ?>
         </div>
     <?php endif; ?>
 
@@ -108,6 +118,20 @@ if (!empty($error_msg)) {
                 <?php _e("Authentication code:", "two-factor-login-telegram"); ?>
             </label>
             <input type="text" name="authcode" id="authcode" class="input" value="" size="5"/>
+        </p>
+    </div>
+
+    <!-- Email Login Section -->
+    <div id="email-login-section" class="login-section <?php echo $default_method === 'email' ? 'active' : ''; ?>">
+        <p class="notice notice-info">
+            <?php _e("Enter the code sent to your email address.", "two-factor-login-telegram"); ?>
+        </p>
+
+        <p>
+            <label for="email_code" style="padding-top:1em">
+                <?php _e("Email code:", "two-factor-login-telegram"); ?>
+            </label>
+            <input type="text" name="email_code" id="email_code" class="input" value="" size="6" maxlength="6" placeholder="123456"/>
         </p>
     </div>
 
@@ -157,9 +181,11 @@ document.addEventListener('DOMContentLoaded', function() {
     var loginMethodInput = document.getElementById('login_method');
     var useRecoveryButton = document.getElementById('use-recovery-code');
     var telegramSection = document.getElementById('telegram-login-section');
+    var emailSection = document.getElementById('email-login-section');
     var totpSection = document.getElementById('totp-login-section');
     var recoverySection = document.getElementById('recovery-login-section');
     var authcodeInput = document.getElementById('authcode');
+    var emailInput = document.getElementById('email_code');
     var totpInput = document.getElementById('totp_code');
     var recoveryInput = document.getElementById('recovery_code');
     var loginButton = document.getElementById('wp-submit');
@@ -181,16 +207,25 @@ document.addEventListener('DOMContentLoaded', function() {
 
             // Show/hide sections
             telegramSection.classList.remove('active');
+            emailSection.classList.remove('active');
             totpSection.classList.remove('active');
             recoverySection.classList.remove('active');
 
             if (method === 'telegram') {
                 telegramSection.classList.add('active');
                 authcodeInput.focus();
-                
+
                 // Send Telegram code when user switches to Telegram method
                 if (method !== '<?php echo esc_js($default_method); ?>') {
                     sendTelegramCode();
+                }
+            } else if (method === 'email') {
+                emailSection.classList.add('active');
+                emailInput.focus();
+
+                // Send email code when user switches to email method
+                if (method !== '<?php echo esc_js($default_method); ?>') {
+                    sendEmailCode();
                 }
             } else if (method === 'totp') {
                 totpSection.classList.add('active');
@@ -216,6 +251,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
             // Show appropriate section
             telegramSection.classList.remove('active');
+            emailSection.classList.remove('active');
             totpSection.classList.remove('active');
             recoverySection.classList.remove('active');
 
@@ -224,6 +260,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 useRecoveryButton.value = '<?php esc_attr_e('Use Recovery Code', 'two-factor-login-telegram'); ?>';
                 recoveryInput.value = '';
                 authcodeInput.focus();
+            } else if (defaultMethod === 'email') {
+                emailSection.classList.add('active');
+                useRecoveryButton.value = '<?php esc_attr_e('Use Recovery Code', 'two-factor-login-telegram'); ?>';
+                recoveryInput.value = '';
+                emailInput.focus();
             } else if (defaultMethod === 'totp') {
                 totpSection.classList.add('active');
                 useRecoveryButton.value = '<?php esc_attr_e('Use Recovery Code', 'two-factor-login-telegram'); ?>';
@@ -234,6 +275,7 @@ document.addEventListener('DOMContentLoaded', function() {
             // Switch to recovery mode
             loginMethodInput.value = 'recovery';
             telegramSection.classList.remove('active');
+            emailSection.classList.remove('active');
             totpSection.classList.remove('active');
             recoverySection.classList.add('active');
 
@@ -244,6 +286,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
             useRecoveryButton.value = '<?php esc_attr_e('Back to 2FA', 'two-factor-login-telegram'); ?>';
             authcodeInput.value = '';
+            emailInput.value = '';
             totpInput.value = '';
             recoveryInput.focus();
         }
@@ -253,6 +296,8 @@ document.addEventListener('DOMContentLoaded', function() {
     var defaultMethod = '<?php echo esc_js($default_method); ?>';
     if (defaultMethod === 'telegram') {
         authcodeInput.focus();
+    } else if (defaultMethod === 'email') {
+        emailInput.focus();
     } else if (defaultMethod === 'totp') {
         totpInput.focus();
     }
@@ -262,30 +307,65 @@ document.addEventListener('DOMContentLoaded', function() {
 function sendTelegramCode() {
     var userId = document.getElementById('wp-auth-id').value;
     var nonce = document.querySelector('input[name="nonce"]').value;
-    
+
     // Show loading message
     var telegramSection = document.getElementById('telegram-login-section');
     var noticeElement = telegramSection.querySelector('.notice');
     var originalNoticeText = noticeElement.innerHTML;
     noticeElement.innerHTML = '⏳ <?php echo esc_js(__('Sending Telegram code...', 'two-factor-login-telegram')); ?>';
-    
-    fetch('<?php echo admin_url('admin-ajax.php'); ?>', {
+
+    jQuery.ajax({
+        url: '<?php echo admin_url('admin-ajax.php'); ?>',
         method: 'POST',
-        headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
+        data: {
+            action: 'send_login_telegram_code',
+            user_id: userId,
+            nonce: nonce
         },
-        body: 'action=send_login_telegram_code&user_id=' + encodeURIComponent(userId) + '&nonce=' + encodeURIComponent(nonce)
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            noticeElement.innerHTML = '✅ <?php echo esc_js(__('Telegram code sent! Check your phone.', 'two-factor-login-telegram')); ?>';
-        } else {
+        dataType: 'json',
+        success: function(data) {
+            if (data.success) {
+                noticeElement.innerHTML = '✅ <?php echo esc_js(__('Telegram code sent! Check your phone.', 'two-factor-login-telegram')); ?>';
+            } else {
+                noticeElement.innerHTML = '❌ <?php echo esc_js(__('Error sending code. Please try again.', 'two-factor-login-telegram')); ?>';
+            }
+        },
+        error: function() {
             noticeElement.innerHTML = '❌ <?php echo esc_js(__('Error sending code. Please try again.', 'two-factor-login-telegram')); ?>';
         }
-    })
-    .catch(error => {
-        noticeElement.innerHTML = '❌ <?php echo esc_js(__('Error sending code. Please try again.', 'two-factor-login-telegram')); ?>';
+    });
+}
+
+// Function to send Email code via AJAX
+function sendEmailCode() {
+    var userId = document.getElementById('wp-auth-id').value;
+    var nonce = document.querySelector('input[name="nonce"]').value;
+
+    // Show loading message
+    var emailSection = document.getElementById('email-login-section');
+    var noticeElement = emailSection.querySelector('.notice');
+    var originalNoticeText = noticeElement.innerHTML;
+    noticeElement.innerHTML = '⏳ <?php echo esc_js(__('Sending email code...', 'two-factor-login-telegram')); ?>';
+
+    jQuery.ajax({
+        url: '<?php echo admin_url('admin-ajax.php'); ?>',
+        method: 'POST',
+        data: {
+            action: 'send_login_email_code',
+            user_id: userId,
+            nonce: nonce
+        },
+        dataType: 'json',
+        success: function(data) {
+            if (data.success) {
+                noticeElement.innerHTML = '✅ <?php echo esc_js(__('Email code sent! Check your inbox.', 'two-factor-login-telegram')); ?>';
+            } else {
+                noticeElement.innerHTML = '❌ <?php echo esc_js(__('Error sending code. Please try again.', 'two-factor-login-telegram')); ?>';
+            }
+        },
+        error: function() {
+            noticeElement.innerHTML = '❌ <?php echo esc_js(__('Error sending code. Please try again.', 'two-factor-login-telegram')); ?>';
+        }
     });
 }
 

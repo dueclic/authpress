@@ -1,0 +1,190 @@
+<?php
+
+class AuthPress_Email_OTP extends AuthPress_Auth_Method
+{
+    /**
+     * Send authentication code to user via email
+     * @param WP_User $user The user to send the code to
+     * @return string|false The generated code or false on failure
+     */
+    public function send_email_otp($user)
+    {
+        if (!$user || !$user->user_email) {
+            return false;
+        }
+
+        $auth_code = $this->generate_auth_code(6);
+        $hashed_code = $this->hash_code($auth_code);
+        
+        global $wpdb;
+        $table_name = $wpdb->prefix . 'telegram_auth_codes';
+        
+        // Clean up old codes for this user
+        $wpdb->delete(
+            $table_name,
+            array('user_id' => $user->ID),
+            array('%d')
+        );
+        
+        // Insert new code
+        $result = $wpdb->insert(
+            $table_name,
+            array(
+                'auth_code' => $hashed_code,
+                'user_id' => $user->ID,
+                'creation_date' => current_time('mysql'),
+                'expiration_date' => date('Y-m-d H:i:s', current_time('timestamp') + WP_FACTOR_AUTHCODE_EXPIRE_SECONDS)
+            ),
+            array('%s', '%d', '%s', '%s')
+        );
+        
+        if ($result === false) {
+            return false;
+        }
+
+        // Send email
+        $subject = sprintf(__('[%s] Two-Factor Authentication Code', 'two-factor-login-telegram'), get_bloginfo('name'));
+        
+        $message = sprintf(
+            __("Hello %s,\n\nHere's your verification code for logging into %s:\n\n%s\n\nThis code will expire in %d minutes.\n\nIf you didn't request this code, please ignore this email.\n\nBest regards,\n%s Team", 'two-factor-login-telegram'),
+            $user->display_name,
+            get_bloginfo('name'),
+            $auth_code,
+            WP_FACTOR_AUTHCODE_EXPIRE_SECONDS / 60,
+            get_bloginfo('name')
+        );
+        
+        $headers = array('Content-Type: text/plain; charset=UTF-8');
+        
+        $sent = wp_mail($user->user_email, $subject, $message, $headers);
+        
+        return $sent ? $auth_code : false;
+    }
+    
+    /**
+     * Validate email OTP code
+     * @param string $code The code to validate
+     * @param int $user_id The user ID
+     * @return bool True if valid, false otherwise
+     */
+    public function validate_code($code, $user_id)
+    {
+        if (empty($code) || empty($user_id)) {
+            return false;
+        }
+
+        $normalized_code = $this->normalize_code($code);
+        $hashed_code = $this->hash_code($normalized_code);
+        
+        global $wpdb;
+        $table_name = $wpdb->prefix . 'telegram_auth_codes';
+        
+        $stored_code = $wpdb->get_row($wpdb->prepare(
+            "SELECT * FROM $table_name WHERE user_id = %d AND auth_code = %s AND expiration_date > %s ORDER BY creation_date DESC LIMIT 1",
+            $user_id,
+            $hashed_code,
+            current_time('mysql')
+        ));
+        
+        if ($stored_code) {
+            // Delete the used code
+            $wpdb->delete(
+                $table_name,
+                array('id' => $stored_code->id),
+                array('%d')
+            );
+            return true;
+        }
+        
+        return false;
+    }
+    
+    /**
+     * Check if code is expired or invalid
+     * @param string $code The code to validate
+     * @param int $user_id The user ID
+     * @return string Status: 'valid', 'expired', or 'invalid'
+     */
+    public function validate_authcode($code, $user_id)
+    {
+        if (empty($code) || empty($user_id)) {
+            return 'invalid';
+        }
+
+        $normalized_code = $this->normalize_code($code);
+        $hashed_code = $this->hash_code($normalized_code);
+        
+        global $wpdb;
+        $table_name = $wpdb->prefix . 'telegram_auth_codes';
+        
+        // Check if code exists and is valid
+        $stored_code = $wpdb->get_row($wpdb->prepare(
+            "SELECT * FROM $table_name WHERE user_id = %d AND auth_code = %s ORDER BY creation_date DESC LIMIT 1",
+            $user_id,
+            $hashed_code
+        ));
+        
+        if (!$stored_code) {
+            return 'invalid';
+        }
+        
+        // Check if expired
+        if (strtotime($stored_code->expiration_date) < current_time('timestamp')) {
+            return 'expired';
+        }
+        
+        return 'valid';
+    }
+    
+    /**
+     * Save authentication code for user (used during login)
+     * @param WP_User $user The user
+     * @return string|false The generated code or false on failure
+     */
+    public function save_authcode($user)
+    {
+        return $this->send_email_otp($user);
+    }
+    
+    /**
+     * Generate new codes for a user (email doesn't need pre-generated codes)
+     * @param int $user_id The user ID
+     * @param array $options Additional options
+     * @return array Empty array (email sends codes on demand)
+     */
+    public function generate_codes($user_id, $options = [])
+    {
+        // Email OTP doesn't need pre-generated codes
+        return array();
+    }
+    
+    /**
+     * Check if user has active codes (for email, this means having an email address)
+     * @param int $user_id The user ID
+     * @return bool True if user has an email address
+     */
+    public function has_codes($user_id)
+    {
+        $user = get_userdata($user_id);
+        return $user && !empty($user->user_email);
+    }
+    
+    /**
+     * Delete all codes for a user
+     * @param int $user_id The user ID
+     * @return bool True on success, false on failure
+     */
+    public function delete_user_codes($user_id)
+    {
+        global $wpdb;
+        $table_name = $wpdb->prefix . 'telegram_auth_codes';
+        
+        $result = $wpdb->delete(
+            $table_name,
+            array('user_id' => $user_id),
+            array('%d')
+        );
+        
+        return $result !== false;
+    }
+}

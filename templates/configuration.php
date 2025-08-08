@@ -49,7 +49,11 @@ if (isset($_GET['tab'])) {
 
         <?php if ($active_tab == "providers") { ?>
 
-            <h2><?php _e("2FA Providers Configuration", "two-factor-login-telegram"); ?></h2>
+            <h2><?php _e("2FA Methods Configuration", "two-factor-login-telegram"); ?></h2>
+
+            <div class="providers-category">
+                <h3><?php _e("TOTP Providers", "two-factor-login-telegram"); ?></h3>
+                <p class="providers-description"><?php _e("Time-based One-Time Password providers that send codes directly to you.", "two-factor-login-telegram"); ?></p>
 
             <form method="post" action="options.php">
                 <?php settings_fields('wp_factor_providers'); ?>
@@ -166,6 +170,55 @@ if (isset($_GET['tab'])) {
                         </div>
                     </div>
 
+                    <!-- Email Provider -->
+                    <div class="provider-card <?php echo $providers['email']['enabled'] ? 'enabled' : 'disabled'; ?>">
+                        <div class="provider-header">
+                            <div class="provider-icon">
+                                <span class="dashicons dashicons-email"></span>
+                            </div>
+                            <div class="provider-info">
+                                <h3><?php _e("Email", "two-factor-login-telegram"); ?></h3>
+                                <p><?php _e("Receive authentication codes via email messages", "two-factor-login-telegram"); ?></p>
+                            </div>
+                            <div class="provider-toggle">
+                                <label class="switch">
+                                    <input type="checkbox" name="wp_factor_providers[email][enabled]"
+                                           value="1" <?php checked($providers['email']['enabled'], true); ?>>
+                                    <span class="slider round"></span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="provider-content">
+                            <div class="provider-features">
+                                <h4><?php _e("Features:", "two-factor-login-telegram"); ?></h4>
+                                <ul>
+                                    <li>✅ <?php _e("Universal compatibility", "two-factor-login-telegram"); ?></li>
+                                    <li>✅ <?php _e("Works with any email client", "two-factor-login-telegram"); ?></li>
+                                    <li>✅ <?php _e("No additional apps required", "two-factor-login-telegram"); ?></li>
+                                    <li>✅ <?php _e("Automatic availability for all users", "two-factor-login-telegram"); ?></li>
+                                </ul>
+                            </div>
+
+                            <?php if ($providers['email']['enabled']) { ?>
+                                <div class="provider-status enabled">
+                                    <span class="dashicons dashicons-yes-alt"></span>
+                                    <?php _e("Email provider is active", "two-factor-login-telegram"); ?>
+                                </div>
+                            <?php } else { ?>
+                                <div class="provider-status disabled">
+                                    <span class="dashicons dashicons-no-alt"></span>
+                                    <?php _e("Email provider is disabled", "two-factor-login-telegram"); ?>
+                                </div>
+                            <?php } ?>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="providers-category">
+                    <h3><?php _e("Authenticator Apps", "two-factor-login-telegram"); ?></h3>
+                    <p class="providers-description"><?php _e("Time-based One-Time Password apps that generate codes offline.", "two-factor-login-telegram"); ?></p>
+
                     <!-- Authenticator Provider -->
                     <div class="provider-card <?php echo $providers['authenticator']['enabled'] ? 'enabled' : 'disabled'; ?>">
                         <div class="provider-header">
@@ -222,6 +275,9 @@ if (isset($_GET['tab'])) {
                                 <select name="wp_factor_providers[default_provider]" id="default_provider">
                                     <option value="telegram" <?php selected($providers['default_provider'] ?? 'telegram', 'telegram'); ?>>
                                         <?php _e("Telegram", "two-factor-login-telegram"); ?>
+                                    </option>
+                                    <option value="email" <?php selected($providers['default_provider'] ?? 'telegram', 'email'); ?>>
+                                        <?php _e("Email", "two-factor-login-telegram"); ?>
                                     </option>
                                     <option value="authenticator" <?php selected($providers['default_provider'] ?? 'telegram', 'authenticator'); ?>>
                                         <?php _e("Authenticator App", "two-factor-login-telegram"); ?>
@@ -747,6 +803,38 @@ input:checked + .slider:before {
     margin-top: 8px;
 }
 
+.providers-category {
+    margin: 30px 0;
+}
+
+.providers-category h3 {
+    margin: 0 0 10px 0;
+    color: #1e40af;
+    font-size: 1.3em;
+    display: flex;
+    align-items: center;
+}
+
+.providers-category h3:before {
+    content: "📱";
+    margin-right: 8px;
+    font-size: 1.1em;
+}
+
+.providers-category:last-of-type h3:before {
+    content: "🔐";
+}
+
+.providers-description {
+    color: #666;
+    font-style: italic;
+    margin: 0 0 20px 0;
+    background: #f8f9fa;
+    padding: 12px 16px;
+    border-left: 4px solid #0073aa;
+    border-radius: 4px;
+}
+
 @media (max-width: 768px) {
     .providers-container {
         grid-template-columns: 1fr;
@@ -757,23 +845,28 @@ input:checked + .slider:before {
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const telegramToggle = document.querySelector('input[name="wp_factor_providers[telegram][enabled]"]');
+    const emailToggle = document.querySelector('input[name="wp_factor_providers[email][enabled]"]');
     const authenticatorToggle = document.querySelector('input[name="wp_factor_providers[authenticator][enabled]"]');
     const defaultProviderSection = document.querySelector('.default-provider-section');
     const defaultProviderSelect = document.querySelector('#default_provider');
 
     function updateDefaultProviderVisibility() {
         const telegramEnabled = telegramToggle.checked;
+        const emailEnabled = emailToggle ? emailToggle.checked : false;
         const authenticatorEnabled = authenticatorToggle.checked;
+        const enabledCount = [telegramEnabled, emailEnabled, authenticatorEnabled].filter(Boolean).length;
 
-        if (telegramEnabled && authenticatorEnabled) {
+        if (enabledCount > 1) {
             defaultProviderSection.style.display = 'block';
         } else {
             defaultProviderSection.style.display = 'none';
 
             // Set default based on which provider is enabled
-            if (telegramEnabled && !authenticatorEnabled) {
+            if (telegramEnabled && !emailEnabled && !authenticatorEnabled) {
                 defaultProviderSelect.value = 'telegram';
-            } else if (!telegramEnabled && authenticatorEnabled) {
+            } else if (!telegramEnabled && emailEnabled && !authenticatorEnabled) {
+                defaultProviderSelect.value = 'email';
+            } else if (!telegramEnabled && !emailEnabled && authenticatorEnabled) {
                 defaultProviderSelect.value = 'authenticator';
             }
         }
@@ -784,6 +877,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Listen for changes
     telegramToggle.addEventListener('change', updateDefaultProviderVisibility);
+    if (emailToggle) emailToggle.addEventListener('change', updateDefaultProviderVisibility);
     authenticatorToggle.addEventListener('change', updateDefaultProviderVisibility);
 });
 </script>

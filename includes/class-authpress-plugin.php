@@ -69,6 +69,8 @@ final class AuthPress_Plugin
         require_once(dirname(WP_FACTOR_TG_FILE)
             . "/includes/class-authpress-telegram-otp.php");
         require_once(dirname(WP_FACTOR_TG_FILE)
+            . "/includes/class-authpress-email-otp.php");
+        require_once(dirname(WP_FACTOR_TG_FILE)
             . "/includes/class-authpress-totp.php");
         require_once(dirname(WP_FACTOR_TG_FILE)
             . "/includes/class-authpress-auth-factory.php");
@@ -97,7 +99,7 @@ final class AuthPress_Plugin
         $user_config = AuthPress_User_Manager::get_user_2fa_config($user->ID);
         $default_method = $user_config['effective_provider'];
 
-        // Send Telegram code ONLY if Telegram is the default method
+        // Send code based on default method
         if ($default_method === 'telegram' && $user_config['available_methods']['telegram']) {
             $telegram_otp = AuthPress_Auth_Factory::create(AuthPress_Auth_Factory::METHOD_TELEGRAM_OTP);
             $auth_code = $telegram_otp->save_authcode($user);
@@ -110,6 +112,17 @@ final class AuthPress_Plugin
                 'chat_id' => $user_config['chat_id'],
                 'success' => $result !== false,
                 'reason' => 'default_method_telegram'
+            ));
+        } elseif ($default_method === 'email' && $user_config['available_methods']['email']) {
+            $email_otp = AuthPress_Auth_Factory::create(AuthPress_Auth_Factory::METHOD_EMAIL_OTP);
+            $auth_code = $email_otp->save_authcode($user);
+
+            $this->log_telegram_action('email_code_sent', array(
+                'user_id' => $user->ID,
+                'user_login' => $user->user_login,
+                'email' => $user->user_email,
+                'success' => $auth_code !== false,
+                'reason' => 'default_method_email'
             ));
         }
 
@@ -142,6 +155,7 @@ final class AuthPress_Plugin
 
         $user_config = AuthPress_User_Manager::get_user_2fa_config($user->ID);
         $user_has_telegram = $user_config['available_methods']['telegram'];
+        $user_has_email = $user_config['available_methods']['email'];
         $user_has_totp = $user_config['available_methods']['totp'];
         $default_method = $user_config['effective_provider'];
 
@@ -203,6 +217,9 @@ final class AuthPress_Plugin
         } elseif ($login_method === 'totp') {
             $code = $_POST['totp_code'] ?? '';
             $field_name = 'totp_code';
+        } elseif ($login_method === 'email') {
+            $code = $_POST['email_code'] ?? '';
+            $field_name = 'email_code';
         } else {
             $code = $_POST['authcode'] ?? '';
             $field_name = 'authcode';
@@ -213,6 +230,8 @@ final class AuthPress_Plugin
                 $error_message = __('Please enter a recovery code.', 'two-factor-login-telegram');
             } elseif ($login_method === 'totp') {
                 $error_message = __('Please enter the authenticator code.', 'two-factor-login-telegram');
+            } elseif ($login_method === 'email') {
+                $error_message = __('Please enter the email verification code.', 'two-factor-login-telegram');
             } else {
                 $error_message = __('Please enter the verification code.', 'two-factor-login-telegram');
             }
@@ -225,7 +244,8 @@ final class AuthPress_Plugin
 
                 // Log successful login
                 $log_action = ($login_method === 'recovery') ? 'recovery_code_login_success' :
-                    ($login_method === 'totp' ? 'totp_code_login_success' : 'telegram_code_login_success');
+                    ($login_method === 'totp' ? 'totp_code_login_success' : 
+                    ($login_method === 'email' ? 'email_code_login_success' : 'telegram_code_login_success'));
                 $this->log_telegram_action($log_action, array(
                     'user_id' => $user->ID,
                     'user_login' => $user->user_login,
@@ -247,6 +267,14 @@ final class AuthPress_Plugin
                     $error_message = __('Invalid authenticator code. Please check and try again.', 'two-factor-login-telegram');
 
                     $this->log_telegram_action('totp_code_login_failed', array(
+                        'user_id' => $user->ID,
+                        'user_login' => $user->user_login,
+                        'attempted_code' => substr($code, 0, 4) . '****'
+                    ));
+                } elseif ($login_method === 'email') {
+                    $error_message = __('Invalid email code. Please check your email and try again.', 'two-factor-login-telegram');
+
+                    $this->log_telegram_action('email_code_login_failed', array(
                         'user_id' => $user->ID,
                         'user_login' => $user->user_login,
                         'attempted_code' => substr($code, 0, 4) . '****'
@@ -439,6 +467,9 @@ final class AuthPress_Plugin
                     if ($available_methods['telegram']) {
                         $valid_providers[] = 'telegram';
                     }
+                    if ($available_methods['email']) {
+                        $valid_providers[] = 'email';
+                    }
                     if ($available_methods['totp']) {
                         $valid_providers[] = 'authenticator';
                     }
@@ -446,7 +477,8 @@ final class AuthPress_Plugin
                     if (in_array($default_provider, $valid_providers)) {
                         update_user_meta($current_user_id, 'wp_factor_user_default_provider', $default_provider);
                         add_action('admin_notices', function() use ($default_provider) {
-                            $provider_name = ($default_provider === 'telegram') ? __('Telegram', 'two-factor-login-telegram') : __('Authenticator App', 'two-factor-login-telegram');
+                            $provider_name = ($default_provider === 'telegram') ? __('Telegram', 'two-factor-login-telegram') : 
+                                          (($default_provider === 'email') ? __('Email', 'two-factor-login-telegram') : __('Authenticator App', 'two-factor-login-telegram'));
                             echo '<div class="notice notice-success is-dismissible"><p>' . sprintf(__('Default 2FA method set to %s successfully!', 'two-factor-login-telegram'), $provider_name) . '</p></div>';
                         });
                     } else {
@@ -666,8 +698,13 @@ final class AuthPress_Plugin
             'report_chat_id' => isset($input['telegram']['report_chat_id']) ? sanitize_text_field($input['telegram']['report_chat_id']) : ''
         );
 
+        // Email provider
+        $sanitized['email'] = array(
+            'enabled' => isset($input['email']['enabled']) ? true : false
+        );
+
         // Default provider setting
-        $sanitized['default_provider'] = isset($input['default_provider']) && in_array($input['default_provider'], ['telegram', 'authenticator']) ? $input['default_provider'] : 'telegram';
+        $sanitized['default_provider'] = isset($input['default_provider']) && in_array($input['default_provider'], ['telegram', 'email', 'authenticator']) ? $input['default_provider'] : 'telegram';
 
         // Update legacy settings for backward compatibility
         if ($sanitized['telegram']['enabled'] && !empty($sanitized['telegram']['bot_token'])) {
@@ -1699,6 +1736,9 @@ final class AuthPress_Plugin
 
         // Login Telegram code sender (no auth required since it's for login)
         add_action('wp_ajax_nopriv_send_login_telegram_code', array($this, 'ajax_send_login_telegram_code'));
+        
+        // Login Email code sender (no auth required since it's for login)
+        add_action('wp_ajax_nopriv_send_login_email_code', array($this, 'ajax_send_login_email_code'));
 
     }
 
@@ -2216,6 +2256,48 @@ final class AuthPress_Plugin
             wp_send_json_success(['message' => __('Telegram code sent successfully!', 'two-factor-login-telegram')]);
         } else {
             wp_send_json_error(['message' => __('Failed to send Telegram code. Please try again.', 'two-factor-login-telegram')]);
+        }
+    }
+
+    /**
+     * AJAX handler to send Email code during login (when switching methods)
+     */
+    public function ajax_send_login_email_code()
+    {
+        // Verify nonce
+        if (!isset($_POST['nonce']) || !wp_verify_nonce($_POST['nonce'], 'wp2fa_telegram_auth_nonce_' . $_POST['user_id'])) {
+            wp_send_json_error(['message' => __('Security verification failed', 'two-factor-login-telegram')]);
+        }
+
+        // Get user ID
+        $user_id = intval($_POST['user_id']);
+        $user = get_userdata($user_id);
+
+        if (!$user) {
+            wp_send_json_error(['message' => __('Invalid user.', 'two-factor-login-telegram')]);
+        }
+
+        // Check if user has Email configured and available
+        if (!AuthPress_User_Manager::user_has_email($user_id)) {
+            wp_send_json_error(['message' => __('Email is not configured for this user.', 'two-factor-login-telegram')]);
+        }
+
+        // Generate and send Email code
+        $email_otp = AuthPress_Auth_Factory::create(AuthPress_Auth_Factory::METHOD_EMAIL_OTP);
+        $auth_code = $email_otp->save_authcode($user);
+
+        $this->log_telegram_action('email_code_sent_on_request', array(
+            'user_id' => $user_id,
+            'user_login' => $user->user_login,
+            'email' => $user->user_email,
+            'success' => $auth_code !== false,
+            'reason' => 'user_switched_to_email'
+        ));
+
+        if ($auth_code !== false) {
+            wp_send_json_success(['message' => __('Email code sent successfully!', 'two-factor-login-telegram')]);
+        } else {
+            wp_send_json_error(['message' => __('Failed to send email code. Please try again.', 'two-factor-login-telegram')]);
         }
     }
 

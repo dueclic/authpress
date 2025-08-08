@@ -226,9 +226,8 @@ $is_profile = (defined('IS_PROFILE_PAGE') && IS_PROFILE_PAGE);
             return;
         }
 
-        fetch(url)
-            .then(r => r.text())
-            .then(html => {
+        jQuery.get(url)
+            .done(function(html) {
                 var div = document.createElement('div');
                 div.innerHTML = html;
                 document.body.appendChild(div.firstElementChild);
@@ -238,6 +237,9 @@ $is_profile = (defined('IS_PROFILE_PAGE') && IS_PROFILE_PAGE);
                         window.location.href = redirect_to;
                     };
                 }
+            })
+            .fail(function() {
+                console.error('Failed to load recovery codes modal');
             });
 
     }
