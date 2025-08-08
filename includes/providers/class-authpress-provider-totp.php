@@ -2,6 +2,11 @@
 
 namespace AuthPress\Providers;
 
+use BaconQrCode\Renderer\ImageRenderer;
+use BaconQrCode\Renderer\RendererStyle\RendererStyle;
+use BaconQrCode\Renderer\Image\SvgImageBackEnd;
+use BaconQrCode\Writer;
+
 class TOTP_Provider extends Abstract_Provider
 {
     const SECRET_LENGTH = 32;
@@ -17,11 +22,11 @@ class TOTP_Provider extends Abstract_Provider
     {
         $secret = '';
         $chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
-        
+
         for ($i = 0; $i < self::SECRET_LENGTH; $i++) {
             $secret .= $chars[random_int(0, strlen($chars) - 1)];
         }
-        
+
         return $secret;
     }
 
@@ -35,17 +40,17 @@ class TOTP_Provider extends Abstract_Provider
         $alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
         $binary = '';
         $data = strtoupper($data);
-        
+
         for ($i = 0; $i < strlen($data); $i++) {
             $char = $data[$i];
             if ($char === '=') break;
-            
+
             $pos = strpos($alphabet, $char);
             if ($pos === false) continue;
-            
+
             $binary .= str_pad(decbin($pos), 5, '0', STR_PAD_LEFT);
         }
-        
+
         $result = '';
         for ($i = 0; $i < strlen($binary); $i += 8) {
             $byte = substr($binary, $i, 8);
@@ -53,8 +58,22 @@ class TOTP_Provider extends Abstract_Provider
                 $result .= chr(bindec($byte));
             }
         }
-        
+
         return $result;
+    }
+
+    /**
+     * Normalize code by removing spaces and ensuring it's the correct length
+     * @param string $code The code to normalize
+     * @return string Normalized code
+     */
+    protected function normalize_code($code)
+    {
+        // First apply parent normalization
+        $code = parent::normalize_code($code);
+
+        // Then pad with leading zeros if needed for TOTP
+        return str_pad($code, self::CODE_LENGTH, '0', STR_PAD_LEFT);
     }
 
     /**
@@ -68,21 +87,21 @@ class TOTP_Provider extends Abstract_Provider
         if ($timestamp === null) {
             $timestamp = time();
         }
-        
+
         $time_counter = intval($timestamp / self::TIME_STEP);
         $binary_secret = $this->base32_decode($secret);
         $time_bytes = pack('N*', 0) . pack('N*', $time_counter);
-        
+
         $hash = hash_hmac('sha1', $time_bytes, $binary_secret, true);
         $offset = ord($hash[19]) & 0xf;
-        
+
         $code = (
             ((ord($hash[$offset + 0]) & 0x7f) << 24) |
             ((ord($hash[$offset + 1]) & 0xff) << 16) |
             ((ord($hash[$offset + 2]) & 0xff) << 8) |
             (ord($hash[$offset + 3]) & 0xff)
         ) % pow(10, self::CODE_LENGTH);
-        
+
         return str_pad($code, self::CODE_LENGTH, '0', STR_PAD_LEFT);
     }
 
@@ -98,38 +117,38 @@ class TOTP_Provider extends Abstract_Provider
         if ($timestamp === null) {
             $timestamp = time();
         }
-        
+
         $code = $this->normalize_code($code);
-        
+
         // Check current time and drift windows
         for ($drift = -self::TIME_DRIFT; $drift <= self::TIME_DRIFT; $drift++) {
             $check_time = $timestamp + ($drift * self::TIME_STEP);
             $expected_code = $this->generate_totp($secret, $check_time);
-            
+
             if (hash_equals($code, $expected_code)) {
                 return true;
             }
         }
-        
+
         return false;
     }
 
     /**
-     * Generate a QR code URL for TOTP setup
+     * Generate a QR code data URL for TOTP setup
      * @param string $secret Base32 encoded secret
      * @param string $account_name Account name (usually email or username)
      * @param string $issuer Issuer name (site name)
-     * @return string QR code URL
+     * @return string QR code data URL (base64 encoded PNG)
      */
     public function get_qr_code_url($secret, $account_name, $issuer = null)
     {
         if (!$issuer) {
             $issuer = get_bloginfo('name');
         }
-        
+
         $issuer = rawurlencode($issuer);
         $account_name = rawurlencode($account_name);
-        
+
         $otpauth_url = sprintf(
             'otpauth://totp/%s:%s?secret=%s&issuer=%s&digits=%d&period=%d',
             $issuer,
@@ -139,8 +158,23 @@ class TOTP_Provider extends Abstract_Provider
             self::CODE_LENGTH,
             self::TIME_STEP
         );
-        
-        return 'https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=' . rawurlencode($otpauth_url);
+
+        // Use bacon-qr-code library for QR generation
+        try {
+            $renderer = new ImageRenderer(
+                new RendererStyle(200),
+                new SvgImageBackEnd()
+            );
+
+            $writer = new Writer($renderer);
+            $svg = $writer->writeString($otpauth_url);
+
+            return 'data:image/svg+xml;base64,' . base64_encode($svg);
+        } catch (\Exception $e) {
+            error_log('AuthPress: Bacon QR Code generation failed: ' . $e->getMessage());
+            // Fallback to external service
+            return 'https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=' . rawurlencode($otpauth_url);
+        }
     }
 
     /**
@@ -151,12 +185,12 @@ class TOTP_Provider extends Abstract_Provider
     public function get_user_secret($user_id)
     {
         $secret = get_user_meta($user_id, 'wp_factor_totp_secret', true);
-        
+
         if (empty($secret)) {
             $secret = $this->generate_secret();
             update_user_meta($user_id, 'wp_factor_totp_secret', $secret);
         }
-        
+
         return $secret;
     }
 
@@ -205,12 +239,12 @@ class TOTP_Provider extends Abstract_Provider
         if (!$this->is_user_totp_enabled($user_id)) {
             return false;
         }
-        
+
         $secret = $this->get_user_secret($user_id);
         if (empty($secret)) {
             return false;
         }
-        
+
         return $this->verify_totp($code, $secret);
     }
 
@@ -226,7 +260,7 @@ class TOTP_Provider extends Abstract_Provider
         if (empty($secret)) {
             return false;
         }
-        
+
         return $this->verify_totp($code, $secret);
     }
 
@@ -240,14 +274,14 @@ class TOTP_Provider extends Abstract_Provider
     {
         $secret = $this->get_user_secret($user_id);
         $user = get_userdata($user_id);
-        
+
         if (!$user) {
             return [];
         }
-        
+
         $account_name = $user->user_email;
         $qr_url = $this->get_qr_code_url($secret, $account_name);
-        
+
         return [
             'secret' => $secret,
             'qr_code_url' => $qr_url,

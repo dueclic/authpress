@@ -285,7 +285,7 @@ class Email_Provider extends Abstract_Provider implements OTP_Provider_Interface
      */
     public function can_send_otp($user_id)
     {
-        return \AuthPress_User_Manager::user_has_email($user_id);
+        return \Authpress\AuthPress_User_Manager::user_has_email($user_id);
     }
 
     /**

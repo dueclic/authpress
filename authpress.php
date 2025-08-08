@@ -41,6 +41,11 @@ define('WP_FACTOR_TG_GETME_TRANSIENT', 'tg_wp_factor_valid_bot');
  *
  */
 
+// Load Composer autoloader first
+if (file_exists(dirname(__FILE__) . '/vendor/autoload.php')) {
+    require_once(dirname(__FILE__) . '/vendor/autoload.php');
+}
+
 require_once("includes/class-authpress-plugin.php");
 
 function authpress_providers()
@@ -70,7 +75,7 @@ function authpress_tg_provider_bot_token_valid($bot_token)
 
 function WFT()
 {
-    return AuthPress_Plugin::get_instance();
+    return \Authpress\AuthPress_Plugin::get_instance();
 }
 
 WFT();

@@ -1,5 +1,7 @@
 <?php
 
+namespace Authpress;
+
 class AuthPress_Hooks_Manager
 {
     private $authentication_handler;

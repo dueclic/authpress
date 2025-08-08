@@ -1,5 +1,7 @@
 <?php
 
+namespace Authpress;
+
 class AuthPress_Admin_Manager
 {
     private $namespace = "tg_col";

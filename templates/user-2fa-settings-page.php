@@ -4,10 +4,10 @@ if (!defined('ABSPATH')) {
 }
 
 $current_user_id = get_current_user_id();
-$plugin = AuthPress_Plugin::get_instance();
+$plugin = \Authpress\AuthPress_Plugin::get_instance();
 
 // Get centralized user configuration
-$user_config = AuthPress_User_Manager::get_user_2fa_config($current_user_id);
+$user_config = \Authpress\AuthPress_User_Manager::get_user_2fa_config($current_user_id);
 
 
 // Extract simplified variables for template compatibility
@@ -24,17 +24,14 @@ $telegram_chat_id = $user_config['chat_id'] ?: '';
 $telegram_user_enabled = $user_has_telegram;
 
 // Check if email is available but not necessarily enabled
-$email_user_available = AuthPress_User_Manager::user_email_available($current_user_id);
+$email_user_available = \Authpress\AuthPress_User_Manager::user_email_available($current_user_id);
 $email_user_enabled = $user_has_email;
 
-// Get recovery codes
-$recovery_codes = [];
-$recovery = AuthPress_Auth_Factory::create(AuthPress_Auth_Factory::METHOD_RECOVERY_CODES);
+// Check if user has recovery codes (but don't load them for display)
+$has_recovery_codes = false;
+$recovery = \Authpress\AuthPress_Auth_Factory::create(\Authpress\AuthPress_Auth_Factory::METHOD_RECOVERY_CODES);
 if ($recovery) {
-    $existing_codes = $recovery->get_user_recovery_codes($current_user_id);
-    if (!empty($existing_codes)) {
-        $recovery_codes = $existing_codes;
-    }
+    $has_recovery_codes = $recovery->has_recovery_codes($current_user_id);
 }
 
 // Get user's preferred default provider
@@ -441,40 +438,21 @@ wp_enqueue_style('wp-factor-telegram-plugin');
             <div class="wp-factor-section">
                 <h2><?php _e('Recovery Codes', 'two-factor-login-telegram'); ?></h2>
 
-                <?php if (!empty($recovery_codes)): ?>
+                <?php if ($has_recovery_codes): ?>
                     <div class="notice notice-info inline">
                         <p><?php _e('You have recovery codes available. Keep them safe!', 'two-factor-login-telegram'); ?></p>
                     </div>
 
                     <div class="wp-factor-recovery-codes">
-                        <h3><?php _e('Your Recovery Codes', 'two-factor-login-telegram'); ?></h3>
-                        <p><?php _e('Save these codes in a safe place. Each code can only be used once.', 'two-factor-login-telegram'); ?></p>
-
-                        <div class="recovery-codes-list">
-                            <?php foreach ($recovery_codes as $code): ?>
-                                <code><?php echo esc_html($code); ?></code>
-                            <?php endforeach; ?>
-                        </div>
-
-                        <p>
-                            <button type="button" id="wp_factor_download_codes" class="button">
-                                <?php _e('Download Recovery Codes', 'two-factor-login-telegram'); ?>
-                            </button>
-                            <button type="button" id="wp_factor_print_codes" class="button">
-                                <?php _e('Print Recovery Codes', 'two-factor-login-telegram'); ?>
-                            </button>
-                        </p>
+                        <p><?php _e('Your recovery codes are hidden for security. Regenerate them to view and save new codes.', 'two-factor-login-telegram'); ?></p>
                     </div>
 
-                    <form method="post" action="" style="margin-top: 20px;">
-                        <?php wp_nonce_field('wp_factor_regenerate_recovery', 'wp_factor_recovery_regenerate_nonce'); ?>
-                        <input type="hidden" name="wp_factor_action" value="regenerate_recovery">
-                        <p>
-                            <button type="submit" class="button button-secondary" onclick="return confirm('<?php _e('Are you sure? This will invalidate your current recovery codes.', 'two-factor-login-telegram'); ?>')">
-                                <?php _e('Generate New Recovery Codes', 'two-factor-login-telegram'); ?>
-                            </button>
-                        </p>
-                    </form>
+                    <p>
+                        <button type="button" id="regenerate_recovery_codes_btn" class="button button-primary" data-user-id="<?php echo $current_user_id; ?>" onclick="if(confirm('<?php _e('Are you sure? This will invalidate your current recovery codes and generate new ones that you must save immediately.', 'two-factor-login-telegram'); ?>')) { regenerateRecoveryCodes(); }">
+                            <?php _e('Regenerate Recovery Codes', 'two-factor-login-telegram'); ?>
+                        </button>
+                        <input type="hidden" id="regenerate_recovery_nonce" value="<?php echo wp_create_nonce('tg_regenerate_recovery_codes_' . $current_user_id); ?>" />
+                    </p>
 
                 <?php else: ?>
                     <div class="notice notice-warning inline">

@@ -2,7 +2,7 @@
 
 namespace AuthPress\Providers;
 
-use WP_Telegram;
+use \Authpress\WP_Telegram;
 use WP_User;
 
 class Telegram_Provider extends Abstract_Provider implements OTP_Provider_Interface
@@ -291,7 +291,7 @@ class Telegram_Provider extends Abstract_Provider implements OTP_Provider_Interf
     public function send_otp($user, $code)
     {
         $user_id = is_object($user) ? $user->ID : intval($user);
-        $chat_id = \AuthPress_User_Manager::get_user_chat_id($user_id);
+        $chat_id = \Authpress\AuthPress_User_Manager::get_user_chat_id($user_id);
         
         if (!$chat_id) {
             return false;
@@ -341,7 +341,7 @@ class Telegram_Provider extends Abstract_Provider implements OTP_Provider_Interf
      */
     public function can_send_otp($user_id)
     {
-        return \AuthPress_User_Manager::user_has_telegram($user_id);
+        return \Authpress\AuthPress_User_Manager::user_has_telegram($user_id);
     }
 
     /**

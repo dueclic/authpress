@@ -1,5 +1,7 @@
 <?php
 
+namespace Authpress;
+
 final class AuthPress_Plugin
 {
     private static $instance;
@@ -138,11 +140,6 @@ final class AuthPress_Plugin
         return $this->admin_manager->configure_admin_page();
     }
 
-    public function show_telegram_logs()
-    {
-        return $this->admin_manager->show_telegram_logs();
-    }
-
     public function show_user_2fa_page()
     {
         return $this->admin_manager->show_user_2fa_page();
@@ -224,12 +221,12 @@ final class AuthPress_Plugin
     public function is_valid_bot()
     {
         $valid_bot_transient = WP_FACTOR_TG_GETME_TRANSIENT;
-        
+
         if (($is_valid_bot = get_transient($valid_bot_transient)) === false) {
             $is_valid_bot = $this->telegram->get_me() !== false;
             set_transient($valid_bot_transient, $is_valid_bot, 60 * 60 * 24);
         }
-        
+
         return boolval($is_valid_bot);
     }
 }

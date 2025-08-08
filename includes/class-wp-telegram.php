@@ -1,5 +1,7 @@
 <?php
 
+namespace Authpress;
+
 class WP_Telegram {
 
 	private $namespace = "tg_col";

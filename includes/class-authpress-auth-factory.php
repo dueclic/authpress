@@ -1,5 +1,7 @@
 <?php
 
+namespace Authpress;
+
 use AuthPress\Providers\Telegram_Provider;
 use AuthPress\Providers\Email_Provider;
 use AuthPress\Providers\TOTP_Provider;

@@ -1,5 +1,7 @@
 <?php
 
+namespace Authpress;
+
 /**
  * Centralized user authentication management for AuthPress
  * 

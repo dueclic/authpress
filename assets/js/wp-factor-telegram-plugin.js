@@ -36,13 +36,13 @@ var AuthPress_Plugin = function ($) {
             if ($(this).is(":checked")) {
                 // Enable 2FA = 1, so tg_wp_factor_valid = 0
                 $twctrl.val(0);
-                
+
                 // Show method selection if no 2FA is configured yet
                 if (!hasAny2FA) {
                     $('#2fa-method-selection').show();
                     updateProgress(25);
                 }
-                
+
                 // Hide configuration sections initially
                 $twconfig.hide();
                 $('#totp-setup-section').hide();
@@ -78,7 +78,7 @@ var AuthPress_Plugin = function ($) {
 
             // Show modifying status message
             $('.tg-status.success').removeClass('success').addClass('warning').text(tlj.modifying_setup);
-            
+
             // Smooth scroll to configuration section
             $('html, body').animate({
                 scrollTop: $('#tg-2fa-configuration').offset().top - 50
@@ -100,7 +100,7 @@ var AuthPress_Plugin = function ($) {
         // Initialize visibility based on checkbox state and configuration
         var isConfigured = $twconfigrow.length > 0;
         var hasAny2FA = $('.provider-status-card.configured').length > 0;
-        
+
         if ($twenabled.is(":checked")) {
             if (!hasAny2FA) {
                 $('#2fa-method-selection').show();
@@ -183,7 +183,7 @@ var AuthPress_Plugin = function ($) {
             $('#2fa-method-selection').hide();
             $('#tg-2fa-configuration').show();
             $('#totp-setup-section').hide();
-            
+
             // Smooth scroll to configuration section
             $('html, body').animate({
                 scrollTop: $('#tg-2fa-configuration').offset().top - 50
@@ -193,7 +193,7 @@ var AuthPress_Plugin = function ($) {
         $(document).on('click', '#setup-totp-btn, #add-totp-btn', function() {
             $('#2fa-method-selection').hide();
             setupTOTP();
-            
+
             // Smooth scroll to TOTP setup section
             $('html, body').animate({
                 scrollTop: $('#totp-setup-section').offset().top - 50
@@ -203,7 +203,7 @@ var AuthPress_Plugin = function ($) {
         // TOTP configuration buttons
         $(document).on('click', '#totp-reconfigure-btn', function() {
             setupTOTP();
-            
+
             // Smooth scroll to TOTP setup section
             $('html, body').animate({
                 scrollTop: $('#totp-setup-section').offset().top - 50
@@ -229,7 +229,7 @@ var AuthPress_Plugin = function ($) {
             $('#2fa-method-selection').show();
             $('#tg-2fa-configuration').hide();
             $('#totp-setup-section').hide();
-            
+
             // Smooth scroll to method selection
             $('html, body').animate({
                 scrollTop: $('#2fa-method-selection').offset().top - 50
@@ -245,19 +245,19 @@ var AuthPress_Plugin = function ($) {
 
     function initTwoFASettingsPage() {
         // Initialize 2FA settings page specific functionality
-        
+
         // Setup Telegram reconfiguration
         setupTelegramReconfiguration();
-        
+
         // Generate QR Code button for TOTP
         $(document).on('click', '#wp_factor_generate_qr', function(e) {
             e.preventDefault();
             var $btn = $(this);
             var $qrSection = $('#wp_factor_qr_code');
             var $verificationSection = $('#wp_factor_verification_section');
-            
+
             $btn.prop('disabled', true).text('Generating...');
-            
+
             $.ajax({
                 url: ajaxurl,
                 method: 'POST',
@@ -282,19 +282,19 @@ var AuthPress_Plugin = function ($) {
                 }
             });
         });
-        
+
         // TOTP verification form submission
         $(document).on('submit', '#wp_factor_verify_form', function(e) {
             e.preventDefault();
             var $form = $(this);
             var $messageDiv = $('#wp_factor_totp_message');
             var code = $('#wp_factor_totp_code').val().trim();
-            
+
             if (code.length !== 6) {
                 $messageDiv.removeClass('notice-success').addClass('notice notice-error').html('<p>Please enter a 6-digit code</p>').show();
                 return;
             }
-            
+
             $.ajax({
                 url: ajaxurl,
                 method: 'POST',
@@ -319,33 +319,33 @@ var AuthPress_Plugin = function ($) {
                 }
             });
         });
-        
+
         // Download recovery codes
         $(document).on('click', '#wp_factor_download_codes', function(e) {
             e.preventDefault();
             downloadRecoveryCodes();
         });
-        
+
         // Print recovery codes
         $(document).on('click', '#wp_factor_print_codes', function(e) {
             e.preventDefault();
             printRecoveryCodes();
         });
     }
-    
+
     function downloadRecoveryCodes() {
         var codes = [];
         $('.recovery-codes-list code').each(function() {
             codes.push($(this).text().trim());
         });
-        
+
         var content = "WordPress 2FA Recovery Codes\n";
         content += "Generated: " + new Date().toLocaleString() + "\n\n";
         content += "Keep these codes in a safe place. Each code can only be used once.\n\n";
         codes.forEach(function(code) {
             content += code + "\n";
         });
-        
+
         var blob = new Blob([content], { type: 'text/plain' });
         var url = window.URL.createObjectURL(blob);
         var a = document.createElement('a');
@@ -357,14 +357,14 @@ var AuthPress_Plugin = function ($) {
         window.URL.revokeObjectURL(url);
         document.body.removeChild(a);
     }
-    
+
     function printRecoveryCodes() {
         var printWindow = window.open('', '_blank');
         var codes = [];
         $('.recovery-codes-list code').each(function() {
             codes.push($(this).text().trim());
         });
-        
+
         var content = `
         <html>
         <head>
@@ -398,7 +398,7 @@ var AuthPress_Plugin = function ($) {
         </body>
         </html>
         `;
-        
+
         printWindow.document.write(content);
         printWindow.document.close();
         printWindow.focus();
@@ -469,7 +469,7 @@ var AuthPress_Plugin = function ($) {
                     $twctrl.val(1);
                     updateProgress(100);
                     showStatus('#validation-status', 'success', tlj.setup_completed);
-                    
+
                     // Show save button and populate hidden chat ID field
                     $('#factor-chat-save').show();
                     $('#tg_chat_id_hidden').val(chat_id);
@@ -583,7 +583,7 @@ var AuthPress_Plugin = function ($) {
         $('#totp-setup-section').show();
         $('#tg-2fa-configuration').hide();
         $('#2fa-method-selection').hide();
-        
+
         // Load QR code and secret
         $.ajax({
             url: ajaxurl,
@@ -610,7 +610,7 @@ var AuthPress_Plugin = function ($) {
 
     function verifyTOTP() {
         var code = $('#totp-verification-code').val().trim();
-        
+
         if (code.length !== 6) {
             showTOTPStatus('error', tlj.enter_6_digit_code || 'Please enter a 6-digit code');
             return;
@@ -629,7 +629,7 @@ var AuthPress_Plugin = function ($) {
             },
             success: function(res) {
                 $('#totp-verify-btn').prop('disabled', false).text(tlj.verify_enable || 'Verify & Enable');
-                
+
                 if (res.success) {
                     showTOTPStatus('success', tlj.totp_enabled_success || 'Authenticator app enabled successfully!');
                     setTimeout(function() {
@@ -672,7 +672,7 @@ var AuthPress_Plugin = function ($) {
         var $status = $('#totp-verification-status');
         $status.removeClass('success error').addClass(type);
         $status.text(message).show();
-        
+
         if (type === 'success') {
             setTimeout(function() {
                 $status.fadeOut();
@@ -717,7 +717,7 @@ var AuthPress_Plugin = function ($) {
                 },
                 success: function(response) {
                     $('#tg_wp_factor_reconfig_send').prop('disabled', false).text('Send Test Code');
-                    
+
                     if (response.type === 'success') {
                         $('#reconfig-status').removeClass('error').addClass('success').text(response.msg);
                         $('#factor-reconfig-confirm').show();
@@ -737,7 +737,7 @@ var AuthPress_Plugin = function ($) {
         $('#tg_wp_factor_reconfig_validate').on('click', function() {
             var chatId = $('#tg_wp_factor_chat_id_reconfig').val().trim();
             var confirmCode = $('#tg_wp_factor_reconfig_confirm').val().trim();
-            
+
             if (!confirmCode) {
                 $('#reconfig-validation-status').removeClass('success').addClass('error').text('Please enter the confirmation code').show();
                 return;
@@ -758,10 +758,10 @@ var AuthPress_Plugin = function ($) {
                 },
                 success: function(response) {
                     $('#tg_wp_factor_reconfig_validate').prop('disabled', false).text('Validate & Save');
-                    
+
                     if (response.type === 'success') {
                         $('#reconfig-validation-status').removeClass('error').addClass('success').text('Code validated! Saving configuration...');
-                        
+
                         // Save the new configuration
                         saveNewTelegramConfig(chatId);
                     } else {
@@ -782,7 +782,7 @@ var AuthPress_Plugin = function ($) {
         form.append($('<input name="wp_factor_action" value="save_telegram">'));
         form.append($('<input name="tg_chat_id" value="' + chatId + '">'));
         form.append($('<input name="wp_factor_telegram_save_nonce" value="' + $('input[name="wp_factor_telegram_save_nonce"]').val() + '">'));
-        
+
         $('body').append(form);
         form.submit();
     }
@@ -891,3 +891,41 @@ window.copyRecoveryCodes = function() {
         alert('Failed to copy codes to clipboard');
     });
 }
+
+jQuery(function($) {
+
+// Function to regenerate recovery codes via AJAX
+    window.regenerateRecoveryCodes = function () {
+        var $btn = $('#regenerate_recovery_codes_btn');
+        var originalText = $btn.text();
+        var nonce = $('#regenerate_recovery_nonce').val();
+
+        // Disable button and show loading state
+        $btn.prop('disabled', true).text('Generating...');
+
+        $.ajax({
+            url: ajaxurl,
+            method: 'POST',
+            dataType: 'json',
+            data: {
+                action: 'regenerate_recovery_codes',
+                _wpnonce: nonce
+            },
+            success: function (response) {
+                $btn.prop('disabled', false).text(originalText);
+
+                if (response.success && response.data.html) {
+                    // Open modal with new recovery codes
+                    openRecoveryCodesModal('', window.location.href, response.data.html);
+                } else {
+                    alert(response.data && response.data.message ? response.data.message : 'Failed to regenerate recovery codes');
+                }
+            },
+            error: function () {
+                $btn.prop('disabled', false).text(originalText);
+                alert('Network error occurred while regenerating recovery codes');
+            }
+        });
+    }
+
+});

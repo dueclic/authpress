@@ -1,2 +1,4 @@
 .idea/
 deploy-rsync.sh
+composer.lock
+vendor

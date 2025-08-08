@@ -1,5 +1,7 @@
 <?php
 
+namespace Authpress;
+
 class AuthPress_Authentication_Handler
 {
     private $telegram;
