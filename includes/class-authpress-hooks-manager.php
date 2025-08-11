@@ -23,7 +23,7 @@ class AuthPress_Hooks_Manager
     {
         // Authentication hooks
         add_action('wp_login', array($this->authentication_handler, 'handle_login'), 10, 2);
-        add_action('login_form_validate_tg', array($this->authentication_handler, 'validate_authentication'));
+        add_action('login_form_validate_authpress', array($this->authentication_handler, 'validate_authentication'));
 
         // Failed login hook
         add_action('wp_login_failed', array($this->telegram, 'send_tg_failed_login'), 10, 2);

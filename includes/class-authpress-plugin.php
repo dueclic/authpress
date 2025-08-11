@@ -130,7 +130,7 @@ final class AuthPress_Plugin
         return $this->authentication_handler->handle_login($user_login, $user);
     }
 
-    public function validate_tg()
+    public function validate_authpress()
     {
         return $this->authentication_handler->validate_authentication();
     }

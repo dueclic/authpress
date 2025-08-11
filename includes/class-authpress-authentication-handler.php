@@ -63,7 +63,7 @@ class AuthPress_Authentication_Handler
         $this->login_html($user, $redirect_to);
     }
 
-    private function login_html($user, $redirect_to, $error_msg = '')
+    private function login_html($user, $redirect_to, $error_msg = '', $failed_method = null)
     {
         $rememberme = 0;
         if (isset($_REQUEST['rememberme']) && $_REQUEST['rememberme']) {
@@ -80,6 +80,11 @@ class AuthPress_Authentication_Handler
         $user_has_email = $user_config['available_methods']['email'];
         $user_has_totp = $user_config['available_methods']['totp'];
         $default_method = $user_config['effective_provider'];
+        
+        // If validation failed, set the failed method as the active method
+        if ($failed_method !== null && $failed_method !== 'recovery') {
+            $default_method = $failed_method;
+        }
 
         require_once(ABSPATH . '/wp-admin/includes/template.php');
         require_once(dirname(WP_FACTOR_TG_FILE) . "/templates/login-form.php");
@@ -120,7 +125,7 @@ class AuthPress_Authentication_Handler
         }
 
         if (!$login_successful) {
-            $this->login_html($user, $_REQUEST['redirect_to'], $error_message);
+            $this->login_html($user, $_REQUEST['redirect_to'], $error_message, $login_method);
             exit;
         }
 
@@ -175,6 +180,8 @@ class AuthPress_Authentication_Handler
 
         if ($login_method === 'telegram') {
             return $this->handle_telegram_failed_validation($user, $code);
+        } elseif ($login_method === 'email') {
+            return $this->handle_email_failed_validation($user, $code);
         }
 
         return $this->get_generic_failed_message($login_method, $user, $code);
@@ -202,6 +209,28 @@ class AuthPress_Authentication_Handler
         return ($authcode_validation === 'expired')
             ? __('The verification code has expired. We just sent you a new code, please try again!', 'two-factor-login-telegram')
             : __('Wrong verification code, we just sent a new code, please try again!', 'two-factor-login-telegram');
+    }
+
+    private function handle_email_failed_validation($user, $code)
+    {
+        $email_otp = AuthPress_Auth_Factory::create(AuthPress_Auth_Factory::METHOD_EMAIL_OTP);
+        $authcode_validation = $email_otp->validate_authcode($code, $user->ID);
+
+        if (AuthPress_User_Manager::user_has_email($user->ID)) {
+            $auth_code = $email_otp->save_authcode($user);
+
+            $this->logger->log_telegram_action('email_code_resent', array(
+                'user_id' => $user->ID,
+                'user_login' => $user->user_login,
+                'email' => $user->user_email,
+                'success' => $auth_code !== false,
+                'reason' => ($authcode_validation === 'expired') ? 'expired_verification_code' : 'wrong_verification_code'
+            ));
+        }
+
+        return ($authcode_validation === 'expired')
+            ? __('The verification code has expired. We just sent you a new code via email, please check your inbox!', 'two-factor-login-telegram')
+            : __('Wrong verification code, we just sent a new code via email, please check your inbox!', 'two-factor-login-telegram');
     }
 
     private function get_generic_failed_message($login_method, $user, $code)
