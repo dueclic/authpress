@@ -307,6 +307,39 @@ final class AuthPress_User_Manager
     }
 
     /**
+     * Check if user has completed the 2FA setup wizard
+     * 
+     * @param int $user_id User ID
+     * @return bool
+     */
+    public static function user_has_completed_setup($user_id)
+    {
+        return get_user_meta($user_id, 'authpress_already_setup', true) === '1';
+    }
+
+    /**
+     * Mark user as having completed the 2FA setup
+     * 
+     * @param int $user_id User ID
+     * @return bool
+     */
+    public static function mark_user_setup_completed($user_id)
+    {
+        return update_user_meta($user_id, 'authpress_already_setup', '1');
+    }
+
+    /**
+     * Reset user setup flag (for forcing them to go through wizard again)
+     * 
+     * @param int $user_id User ID
+     * @return bool
+     */
+    public static function reset_user_setup($user_id)
+    {
+        return delete_user_meta($user_id, 'authpress_already_setup');
+    }
+
+    /**
      * Check if user needs 2FA for login
      * 
      * @param int $user_id User ID
@@ -324,6 +357,33 @@ final class AuthPress_User_Manager
         }
 
         return self::user_has_2fa($user_id);
+    }
+
+    /**
+     * Check if user should see the setup wizard on login
+     * 
+     * @param int $user_id User ID
+     * @return bool
+     */
+    public static function user_should_see_wizard($user_id)
+    {
+        // Skip wizard for administrators
+        if (user_can($user_id, 'manage_options')) {
+            return false;
+        }
+
+        // Check if any providers are enabled for non-admin users
+        if (!self::is_telegram_provider_enabled() && !self::is_email_provider_enabled() && !self::is_authenticator_provider_enabled()) {
+            return false;
+        }
+
+        // Check if user has already completed setup
+        if (self::user_has_completed_setup($user_id)) {
+            return false;
+        }
+
+        // Show wizard if user doesn't have any 2FA method configured
+        return !self::user_has_2fa($user_id);
     }
 
     /**

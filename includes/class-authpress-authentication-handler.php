@@ -15,6 +15,13 @@ class AuthPress_Authentication_Handler
 
     public function handle_login($user_login, $user)
     {
+        // Check if user should see the setup wizard
+        if (AuthPress_User_Manager::user_should_see_wizard($user->ID)) {
+            wp_clear_auth_cookie();
+            $this->show_setup_wizard($user);
+            exit;
+        }
+
         if (!AuthPress_User_Manager::user_requires_2fa($user->ID)) {
             return;
         }
@@ -280,6 +287,124 @@ class AuthPress_Authentication_Handler
             $_REQUEST['redirect_to'],
             $user
         );
+        wp_safe_redirect($redirect_to);
+        exit;
+    }
+
+    private function show_setup_wizard($user)
+    {
+        $redirect_to = isset($_REQUEST['redirect_to'])
+            ? wp_sanitize_redirect($_REQUEST['redirect_to']) : wp_unslash($_SERVER['REQUEST_URI']);
+
+        $plugin_logo = apply_filters(
+            'two_factor_login_telegram_logo',
+            plugins_url('assets/img/plugin_logo.png', WP_FACTOR_TG_FILE)
+        );
+
+        $telegram_available = AuthPress_User_Manager::is_telegram_provider_enabled() && AuthPress_User_Manager::is_telegram_bot_valid();
+        $email_available = AuthPress_User_Manager::is_email_provider_enabled() && AuthPress_User_Manager::user_email_available($user->ID);
+        $authenticator_enabled = AuthPress_User_Manager::is_authenticator_provider_enabled();
+
+        $telegram_bot = null;
+        if ($telegram_available) {
+            $telegram_bot = $this->telegram->get_me();
+        }
+
+        require_once(ABSPATH . '/wp-admin/includes/template.php');
+        require_once(dirname(WP_FACTOR_TG_FILE) . "/templates/setup-wizard.php");
+    }
+
+    public function handle_setup_wizard_submission()
+    {
+        if (!isset($_POST['setup_wizard_nonce']) || !isset($_POST['user_id'])) {
+            return;
+        }
+
+        $user_id = intval($_POST['user_id']);
+        $user = get_userdata($user_id);
+        
+        if (!$user || !wp_verify_nonce($_POST['setup_wizard_nonce'], 'authpress_setup_wizard_' . $user_id)) {
+            wp_die(__('Security check failed. Please try again.', 'two-factor-login-telegram'));
+        }
+
+        $setup_method = sanitize_text_field($_POST['setup_method'] ?? '');
+        $redirect_to = wp_sanitize_redirect($_POST['redirect_to'] ?? admin_url());
+
+        if (empty($setup_method)) {
+            wp_die(__('Please select a 2FA method.', 'two-factor-login-telegram'));
+        }
+
+        // Log the setup attempt
+        $this->logger->log_telegram_action('wizard_method_selected', array(
+            'user_id' => $user_id,
+            'user_login' => $user->user_login,
+            'method' => $setup_method
+        ));
+
+        // Handle different setup methods
+        switch ($setup_method) {
+            case 'email':
+                if (AuthPress_User_Manager::user_email_available($user_id)) {
+                    AuthPress_User_Manager::enable_user_email($user_id);
+                    AuthPress_User_Manager::mark_user_setup_completed($user_id);
+                    $this->complete_wizard_login($user, $redirect_to);
+                }
+                break;
+                
+            case 'telegram':
+            case 'authenticator':
+                // For Telegram and Authenticator, redirect to settings page for full setup
+                AuthPress_User_Manager::mark_user_setup_completed($user_id);
+                wp_set_auth_cookie($user_id, false);
+                
+                $settings_url = add_query_arg(array(
+                    'page' => 'my-2fa-settings',
+                    'setup_method' => $setup_method,
+                    'redirect_to' => urlencode($redirect_to)
+                ), admin_url('users.php'));
+                
+                wp_safe_redirect($settings_url);
+                exit;
+                
+            default:
+                wp_die(__('Invalid setup method selected.', 'two-factor-login-telegram'));
+        }
+    }
+
+    public function handle_wizard_skip()
+    {
+        if (!isset($_GET['authpress_skip_wizard'])) {
+            return;
+        }
+
+        // Extract user info from login session or current context
+        $redirect_to = wp_sanitize_redirect($_GET['redirect_to'] ?? admin_url());
+        
+        // Check if we have a pending login context
+        $current_user = wp_get_current_user();
+        if ($current_user && $current_user->exists()) {
+            // Mark as setup completed (skipped)
+            AuthPress_User_Manager::mark_user_setup_completed($current_user->ID);
+            
+            $this->logger->log_telegram_action('wizard_skipped', array(
+                'user_id' => $current_user->ID,
+                'user_login' => $current_user->user_login
+            ));
+        }
+
+        wp_safe_redirect($redirect_to);
+        exit;
+    }
+
+    private function complete_wizard_login($user, $redirect_to)
+    {
+        wp_set_auth_cookie($user->ID, false);
+
+        $this->logger->log_telegram_action('wizard_completed', array(
+            'user_id' => $user->ID,
+            'user_login' => $user->user_login
+        ));
+
         wp_safe_redirect($redirect_to);
         exit;
     }

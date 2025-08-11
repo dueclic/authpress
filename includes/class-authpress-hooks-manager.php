@@ -24,6 +24,10 @@ class AuthPress_Hooks_Manager
         // Authentication hooks
         add_action('wp_login', array($this->authentication_handler, 'handle_login'), 10, 2);
         add_action('login_form_validate_authpress', array($this->authentication_handler, 'validate_authentication'));
+        
+        // Setup wizard hooks
+        add_action('login_form_authpress_setup_wizard', array($this->authentication_handler, 'handle_setup_wizard_submission'));
+        add_action('init', array($this->authentication_handler, 'handle_wizard_skip'));
 
         // Failed login hook
         add_action('wp_login_failed', array($this->telegram, 'send_tg_failed_login'), 10, 2);
@@ -37,12 +41,6 @@ class AuthPress_Hooks_Manager
         if (is_admin()) {
             $this->add_admin_hooks();
         }
-
-        // Telegram status hooks
-        if (AuthPress_User_Manager::is_telegram_provider_enabled()) {
-            $this->add_telegram_hooks();
-        }
-
         // Assets and scripts
         add_action('admin_enqueue_scripts', array($this, 'load_assets'));
         add_action('admin_footer', array($this, 'hook_scripts'));
@@ -74,17 +72,6 @@ class AuthPress_Hooks_Manager
         );
     }
 
-    private function add_telegram_hooks()
-    {
-        if (!$this->is_valid_bot()) {
-            add_action('admin_notices', array($this, 'settings_error_not_valid_bot'));
-        }
-
-        if ($this->is_valid_bot() && !$this->is_setup_chatid()) {
-            add_action('admin_notices', array($this, 'settings_error_set_chatid'));
-        }
-    }
-
     private function add_ajax_hooks()
     {
         add_action('wp_ajax_send_token_check', array($this->ajax_handler, 'send_token_check'));
@@ -103,6 +90,7 @@ class AuthPress_Hooks_Manager
 
         // Admin AJAX
         add_action('wp_ajax_disable_user_2fa_telegram', array($this->ajax_handler, 'disable_user_2fa_ajax'));
+        add_action('wp_ajax_force_setup_wizard', array($this, 'handle_force_setup_wizard_ajax'));
     }
 
     private function add_rest_api_hooks()
@@ -212,6 +200,49 @@ class AuthPress_Hooks_Manager
                                 error: function () {
                                     alert('<?php echo esc_js(__('An error occurred. Please try again.', 'two-factor-login-telegram')); ?>');
                                     $btn.prop('disabled', false).text('<?php echo esc_js(__('Disable', 'two-factor-login-telegram')); ?>');
+                                }
+                            });
+                        });
+
+                        // Handle force setup wizard
+                        $('.force-setup-wizard').on('click', function (e) {
+                            e.preventDefault();
+
+                            var $btn = $(this);
+                            var user_id = $btn.data('user-id');
+                            var nonce = $btn.data('nonce');
+                            var isReSetup = $btn.text().indexOf('<?php echo esc_js(__('Re-setup', 'two-factor-login-telegram')); ?>') !== -1;
+
+                            var confirmMessage = isReSetup 
+                                ? '<?php echo esc_js(__('Are you sure you want to force this user to re-configure their 2FA setup?', 'two-factor-login-telegram')); ?>'
+                                : '<?php echo esc_js(__('Are you sure you want to force this user to set up 2FA?', 'two-factor-login-telegram')); ?>';
+
+                            if (!confirm(confirmMessage)) {
+                                return;
+                            }
+
+                            $btn.prop('disabled', true).text('<?php echo esc_js(__('Processing...', 'two-factor-login-telegram')); ?>');
+
+                            $.ajax({
+                                url: ajaxurl,
+                                type: 'POST',
+                                data: {
+                                    action: 'force_setup_wizard',
+                                    user_id: user_id,
+                                    nonce: nonce
+                                },
+                                success: function (response) {
+                                    if (response.success) {
+                                        alert(response.data.message);
+                                        $btn.text('<?php echo esc_js(__('Forced', 'two-factor-login-telegram')); ?>').addClass('disabled');
+                                    } else {
+                                        alert('Error: ' + (response.data || 'Unknown error'));
+                                        $btn.prop('disabled', false).text(isReSetup ? '<?php echo esc_js(__('Force Re-setup', 'two-factor-login-telegram')); ?>' : '<?php echo esc_js(__('Force Setup', 'two-factor-login-telegram')); ?>');
+                                    }
+                                },
+                                error: function () {
+                                    alert('<?php echo esc_js(__('An error occurred. Please try again.', 'two-factor-login-telegram')); ?>');
+                                    $btn.prop('disabled', false).text(isReSetup ? '<?php echo esc_js(__('Force Re-setup', 'two-factor-login-telegram')); ?>' : '<?php echo esc_js(__('Force Setup', 'two-factor-login-telegram')); ?>');
                                 }
                             });
                         });
@@ -368,34 +399,6 @@ class AuthPress_Hooks_Manager
         $chat_id = AuthPress_User_Manager::get_user_chat_id($user_id);
         return $chat_id !== false;
     }
-
-    // Notice methods
-    public function settings_error_set_chatid()
-    {
-        if (get_current_screen()->id != "profile") { ?>
-            <div class="notice notice-warning is-dismissible">
-                <p><?php printf(
-                    __('Do you want to configure AuthPress?  <a href="%s">click here</a>!', "two-factor-login-telegram"),
-                    admin_url("profile.php")
-                ); ?></p>
-            </div>
-            <?php
-        }
-    }
-
-    public function settings_error_not_valid_bot()
-    {
-        if (get_current_screen()->id != "settings_page_tg-conf") { ?>
-            <div class="notice notice-error is-dismissible">
-                <p><?php printf(
-                    __('Do you want to configure AuthPress?  <a href="%s">click here</a>!', "two-factor-login-telegram"),
-                    admin_url("options-general.php?page=tg-conf")
-                ); ?></p>
-            </div>
-            <?php
-        }
-    }
-
     // REST API and rewrite methods
     public function register_telegram_webhook_route()
     {
@@ -504,15 +507,28 @@ class AuthPress_Hooks_Manager
         if ($column_name == 'tg_2fa_status' && current_user_can('manage_options')) {
             $status_text = AuthPress_User_Manager::get_user_2fa_status_text($user_id);
             $has_2fa = AuthPress_User_Manager::user_has_2fa($user_id);
+            $has_completed_setup = AuthPress_User_Manager::user_has_completed_setup($user_id);
 
+            $output = '';
+            
             if ($has_2fa) {
                 $disable_nonce = wp_create_nonce('disable_2fa_telegram_' . $user_id);
-                return '<span style="color: green;">✅ ' . esc_html($status_text) . '</span><br>' .
+                $output = '<span style="color: green;">✅ ' . esc_html($status_text) . '</span><br>' .
                     '<a href="#" class="button button-small disable-2fa-telegram" data-user-id="' . $user_id . '" data-nonce="' . $disable_nonce . '" style="margin-top: 5px;">' .
                     __('Disable All', 'two-factor-login-telegram') . '</a>';
             } else {
-                return '<span style="color: #ccc;">❌ ' . esc_html($status_text) . '</span>';
+                $output = '<span style="color: #ccc;">❌ ' . esc_html($status_text) . '</span>';
             }
+
+            // Add "Force Setup Wizard" button for non-admin users
+            if (!user_can($user_id, 'manage_options')) {
+                $force_wizard_nonce = wp_create_nonce('force_setup_wizard_' . $user_id);
+                $button_text = $has_completed_setup ? __('Force Re-setup', 'two-factor-login-telegram') : __('Force Setup', 'two-factor-login-telegram');
+                $output .= '<br><a href="#" class="button button-small force-setup-wizard" data-user-id="' . $user_id . '" data-nonce="' . $force_wizard_nonce . '" style="margin-top: 5px;">' .
+                    $button_text . '</a>';
+            }
+
+            return $output;
         }
         return $value;
     }
@@ -524,5 +540,45 @@ class AuthPress_Hooks_Manager
                 . ' <a href="https://www.dueclic.com/" target="_blank">dueclic</a>. <a class="social-foot" href="https://www.facebook.com/dueclic/"><span class="dashicons dashicons-facebook bg-fb"></span></a>';
         }, 11);
         add_filter('update_footer', function() { return ""; }, 11);
+    }
+
+    public function handle_force_setup_wizard_ajax()
+    {
+        if (!current_user_can('manage_options')) {
+            wp_die(__('You do not have permission to perform this action.', 'two-factor-login-telegram'));
+        }
+
+        $user_id = intval($_POST['user_id'] ?? 0);
+        $nonce = sanitize_text_field($_POST['nonce'] ?? '');
+
+        if (!$user_id || !wp_verify_nonce($nonce, 'force_setup_wizard_' . $user_id)) {
+            wp_send_json_error(__('Security check failed.', 'two-factor-login-telegram'));
+        }
+
+        $user = get_userdata($user_id);
+        if (!$user || user_can($user_id, 'manage_options')) {
+            wp_send_json_error(__('Invalid user or cannot force setup for administrators.', 'two-factor-login-telegram'));
+        }
+
+        // Reset the user's setup flag
+        $result = AuthPress_User_Manager::reset_user_setup($user_id);
+
+        if ($result) {
+            // Log the forced setup
+            $this->logger->log_telegram_action('admin_forced_wizard', array(
+                'user_id' => $user_id,
+                'user_login' => $user->user_login,
+                'admin_id' => get_current_user_id(),
+                'admin_login' => wp_get_current_user()->user_login
+            ));
+
+            $message = sprintf(
+                __('User %s will be shown the 2FA setup wizard on their next login.', 'two-factor-login-telegram'),
+                $user->user_login
+            );
+            wp_send_json_success(array('message' => $message));
+        } else {
+            wp_send_json_error(__('Failed to force setup wizard.', 'two-factor-login-telegram'));
+        }
     }
 }

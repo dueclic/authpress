@@ -28,43 +28,103 @@ if (!empty($error_msg)) {
         background-image: url("<?php echo esc_url($plugin_logo); ?>");
     }
 
-    .method-selector {
-        margin-bottom: 20px;
+    /* Method Selector Dropdown Styles */
+    .method-selector-wrapper {
+        margin-bottom: 25px;
         text-align: center;
     }
 
-    .method-button {
-        display: inline-block;
-        margin: 0 10px;
-        padding: 10px 20px;
+    .method-label {
+        display: block;
+        margin-bottom: 8px;
+        font-size: 14px;
+        font-weight: 600;
+        color: #50575e;
+    }
+
+    .method-dropdown-container {
+        position: relative;
+        max-width: 320px;
+        margin: 0 auto;
+    }
+
+    .method-dropdown {
+        width: 100%;
+        padding: 12px 40px 12px 16px;
+        font-size: 16px;
+        font-weight: 500;
+        color: #32373c;
+        background: #fff;
         border: 2px solid #ddd;
-        border-radius: 5px;
-        background: #f9f9f9;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         cursor: pointer;
+        transition: all 0.3s ease;
+        appearance: none;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+    }
+
+    .method-dropdown:hover {
+        border-color: #0073aa;
+        box-shadow: 0 3px 8px rgba(0,115,170,0.15);
+    }
+
+    .method-dropdown:focus {
+        outline: none;
+        border-color: #005177;
+        box-shadow: 0 0 0 2px rgba(0,115,170,0.2);
+    }
+
+    .dropdown-arrow {
+        position: absolute;
+        top: 50%;
+        right: 16px;
+        transform: translateY(-50%);
+        font-size: 12px;
+        color: #50575e;
+        pointer-events: none;
+        transition: transform 0.3s ease;
+    }
+
+    .method-dropdown:focus + .dropdown-arrow,
+    .method-dropdown:hover + .dropdown-arrow {
+        transform: translateY(-50%) rotate(180deg);
+        color: #0073aa;
+    }
+
+    /* Style for dropdown options */
+    .method-dropdown option {
+        padding: 10px;
+        font-size: 16px;
+        background: #fff;
+    }
+
+    /* Animation for login sections */
+    .login-section {
+        display: none;
+        opacity: 0;
+        transform: translateY(10px);
         transition: all 0.3s ease;
     }
 
-    .method-button.active {
-        border-color: #0073aa;
-        background: #0073aa;
-        color: white;
+    .login-section.active {
+        display: block;
+        opacity: 1;
+        transform: translateY(0);
     }
 
-    .method-button:hover {
-        border-color: #0073aa;
-        background: #0073aa;
-        color: white;
+    /* Enhanced notice styling */
+    .notice {
+        padding: 12px 16px;
+        border-radius: 6px;
+        margin-bottom: 16px;
+        border-left: 4px solid #0073aa;
     }
 
-    .method-button.disabled {
-        opacity: 0.5;
-        cursor: not-allowed;
-    }
-
-    .method-button.disabled:hover {
-        border-color: #ddd;
-        background: #f9f9f9;
-        color: inherit;
+    .notice-info {
+        background: #f0f8ff;
+        color: #0073aa;
     }
 
     .login-section {
@@ -87,23 +147,31 @@ if (!empty($error_msg)) {
 
     <?php $available_methods = [$user_has_telegram, $user_has_email, $user_has_totp]; ?>
     <?php if (array_sum($available_methods) > 1): ?>
-        <!-- Method Selector -->
-        <div class="method-selector">
-            <?php if ($user_has_telegram): ?>
-                <div class="method-button <?php echo $default_method === 'telegram' ? 'active' : ''; ?>" data-method="telegram">
-                    📱 <?php _e("Telegram", "two-factor-login-telegram"); ?>
-                </div>
-            <?php endif; ?>
-            <?php if ($user_has_email): ?>
-                <div class="method-button <?php echo $default_method === 'email' ? 'active' : ''; ?>" data-method="email">
-                    📧 <?php _e("Email", "two-factor-login-telegram"); ?>
-                </div>
-            <?php endif; ?>
-            <?php if ($user_has_totp): ?>
-                <div class="method-button <?php echo $default_method === 'totp' ? 'active' : ''; ?>" data-method="totp">
-                    🔐 <?php _e("Authenticator", "two-factor-login-telegram"); ?>
-                </div>
-            <?php endif; ?>
+        <!-- Method Selector Dropdown -->
+        <div class="method-selector-wrapper">
+            <label for="method-dropdown" class="method-label">
+                <?php _e("Choose your verification method:", "two-factor-login-telegram"); ?>
+            </label>
+            <div class="method-dropdown-container">
+                <select id="method-dropdown" class="method-dropdown">
+                    <?php if ($user_has_telegram): ?>
+                        <option value="telegram" <?php echo $default_method === 'telegram' ? 'selected' : ''; ?> data-icon="📱">
+                            📱 <?php _e("Telegram", "two-factor-login-telegram"); ?>
+                        </option>
+                    <?php endif; ?>
+                    <?php if ($user_has_email): ?>
+                        <option value="email" <?php echo $default_method === 'email' ? 'selected' : ''; ?> data-icon="📧">
+                            📧 <?php _e("Email", "two-factor-login-telegram"); ?>
+                        </option>
+                    <?php endif; ?>
+                    <?php if ($user_has_totp): ?>
+                        <option value="totp" <?php echo $default_method === 'totp' ? 'selected' : ''; ?> data-icon="🔐">
+                            🔐 <?php _e("Authenticator App", "two-factor-login-telegram"); ?>
+                        </option>
+                    <?php endif; ?>
+                </select>
+                <div class="dropdown-arrow">▼</div>
+            </div>
         </div>
     <?php endif; ?>
 
@@ -189,50 +257,47 @@ document.addEventListener('DOMContentLoaded', function() {
     var totpInput = document.getElementById('totp_code');
     var recoveryInput = document.getElementById('recovery_code');
     var loginButton = document.getElementById('wp-submit');
-    var methodButtons = document.querySelectorAll('.method-button');
+    var methodDropdown = document.getElementById('method-dropdown');
 
-    // Handle method button clicks
-    methodButtons.forEach(function(button) {
-        button.addEventListener('click', function() {
-            var method = this.getAttribute('data-method');
-
-            // Update active button
-            methodButtons.forEach(function(btn) {
-                btn.classList.remove('active');
-            });
-            this.classList.add('active');
+    // Handle dropdown selection change
+    if (methodDropdown) {
+        methodDropdown.addEventListener('change', function() {
+            var method = this.value;
 
             // Update hidden input
             loginMethodInput.value = method;
 
-            // Show/hide sections
+            // Show/hide sections with animation
             telegramSection.classList.remove('active');
             emailSection.classList.remove('active');
             totpSection.classList.remove('active');
             recoverySection.classList.remove('active');
 
-            if (method === 'telegram') {
-                telegramSection.classList.add('active');
-                authcodeInput.focus();
+            // Small delay to allow for smooth transition
+            setTimeout(function() {
+                if (method === 'telegram') {
+                    telegramSection.classList.add('active');
+                    setTimeout(function() { authcodeInput.focus(); }, 100);
 
-                // Send Telegram code when user switches to Telegram method
-                if (method !== '<?php echo esc_js($default_method); ?>') {
-                    sendTelegramCode();
-                }
-            } else if (method === 'email') {
-                emailSection.classList.add('active');
-                emailInput.focus();
+                    // Send Telegram code when user switches to Telegram method
+                    if (method !== '<?php echo esc_js($default_method); ?>') {
+                        sendTelegramCode();
+                    }
+                } else if (method === 'email') {
+                    emailSection.classList.add('active');
+                    setTimeout(function() { emailInput.focus(); }, 100);
 
-                // Send email code when user switches to email method
-                if (method !== '<?php echo esc_js($default_method); ?>') {
-                    sendEmailCode();
+                    // Send email code when user switches to email method
+                    if (method !== '<?php echo esc_js($default_method); ?>') {
+                        sendEmailCode();
+                    }
+                } else if (method === 'totp') {
+                    totpSection.classList.add('active');
+                    setTimeout(function() { totpInput.focus(); }, 100);
                 }
-            } else if (method === 'totp') {
-                totpSection.classList.add('active');
-                totpInput.focus();
-            }
+            }, 150);
         });
-    });
+    }
 
     // Handle "Use Recovery Code" button click
     useRecoveryButton.addEventListener('click', function() {
@@ -241,13 +306,10 @@ document.addEventListener('DOMContentLoaded', function() {
             var defaultMethod = '<?php echo esc_js($default_method); ?>';
             loginMethodInput.value = defaultMethod;
 
-            // Update button states
-            methodButtons.forEach(function(btn) {
-                btn.classList.remove('active');
-                if (btn.getAttribute('data-method') === defaultMethod) {
-                    btn.classList.add('active');
-                }
-            });
+            // Update dropdown selection
+            if (methodDropdown) {
+                methodDropdown.value = defaultMethod;
+            }
 
             // Show appropriate section
             telegramSection.classList.remove('active');
@@ -271,6 +333,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 recoveryInput.value = '';
                 totpInput.focus();
             }
+
+            // Show dropdown if it exists
+            if (methodDropdown && methodDropdown.parentElement.parentElement) {
+                methodDropdown.parentElement.parentElement.style.display = 'block';
+            }
         } else {
             // Switch to recovery mode
             loginMethodInput.value = 'recovery';
@@ -279,10 +346,10 @@ document.addEventListener('DOMContentLoaded', function() {
             totpSection.classList.remove('active');
             recoverySection.classList.add('active');
 
-            // Update button states
-            methodButtons.forEach(function(btn) {
-                btn.classList.remove('active');
-            });
+            // Hide dropdown when in recovery mode
+            if (methodDropdown && methodDropdown.parentElement.parentElement) {
+                methodDropdown.parentElement.parentElement.style.display = 'none';
+            }
 
             useRecoveryButton.value = '<?php esc_attr_e('Back to 2FA', 'two-factor-login-telegram'); ?>';
             authcodeInput.value = '';
