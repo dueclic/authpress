@@ -4,6 +4,8 @@
  * @var array $providers
  */
 
+use Authpress\Authpress_Logs_List_Table;
+
 if (isset($_GET['tab'])) {
     $active_tab = sanitize_text_field($_GET['tab']);
 } else {

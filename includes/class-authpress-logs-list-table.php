@@ -62,7 +62,7 @@ class Authpress_Logs_List_Table extends \WP_List_Table
         $timestamp_mysql = $item['timestamp']; // es. "2025-07-22 15:40:00"
         $timezone = wp_timezone();
 
-        $datetime = DateTime::createFromFormat( 'Y-m-d H:i:s', $timestamp_mysql, $timezone );
+        $datetime = \DateTime::createFromFormat( 'Y-m-d H:i:s', $timestamp_mysql, $timezone );
 
         $date_format = get_option( 'date_format' );
         $time_format = get_option( 'time_format' );
