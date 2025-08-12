@@ -313,7 +313,7 @@ class Email_Provider extends Abstract_Provider implements Provider_Otp_Interface
      */
     public function get_icon()
     {
-        $logo = plugin_dir_url(WP_FACTOR_TG_FILE) . 'assets/email-icon.png';
+        $logo = plugin_dir_url(WP_FACTOR_TG_FILE) . '/assets/providers/email-icon.png';
         return apply_filters('authpress_provider_logo', $logo, 'email');
     }
 }

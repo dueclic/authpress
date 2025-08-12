@@ -359,7 +359,7 @@ class Telegram_Provider extends Abstract_Provider implements Provider_Otp_Interf
      */
     public function get_icon()
     {
-        $logo = plugin_dir_url(WP_FACTOR_TG_FILE) . 'assets/telegram-icon.png';
+        $logo = plugin_dir_url(WP_FACTOR_TG_FILE) . '/assets/providers/telegram-icon.png';
         return apply_filters('authpress_provider_logo', $logo, 'telegram');
     }
 }
