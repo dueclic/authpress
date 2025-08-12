@@ -33,37 +33,20 @@ if (isset($_GET['tab'])) {
             <span class="dashicons dashicons-editor-help"></span> <?php _e("FAQ", "two-factor-login-telegram"); ?>
         </a>
 
-        <?php 
-        // Show logs tab if Telegram provider is available and configured
-        $telegram_provider = AuthPress_Provider_Registry::get('telegram');
-        if ($telegram_provider && $telegram_provider->is_available()) : 
-        ?>
-            <a href="<?php echo admin_url('options-general.php?page=tg-conf&tab=logs'); ?>"
-               class="nav-tab <?php echo $active_tab == 'logs' ? 'nav-tab-active' : ''; ?>">
-                <span class="dashicons dashicons-list-view"></span> <?php _e("Logs", "two-factor-login-telegram"); ?>
-            </a>
-        <?php endif; ?>
-
-        <?php 
-        // Show suggestions tab if user has active Telegram integration
-        if ($telegram_provider && 
-            $telegram_provider->is_available() && 
-            get_the_author_meta("tg_wp_factor_chat_id", get_current_user_id()) !== false) : 
-        ?>
-            <a href="<?php echo admin_url('options-general.php?page=tg-conf&tab=suggestions'); ?>"
-               class="nav-tab <?php echo $active_tab == 'suggestions' ? 'nav-tab-active' : ''; ?>">
-                <span class="dashicons dashicons-heart"></span> <?php _e("Suggestions", "two-factor-login-telegram"); ?>
-            </a>
-        <?php endif; ?>
+        <a href="<?php echo admin_url('options-general.php?page=tg-conf&tab=logs'); ?>"
+           class="nav-tab <?php echo $active_tab == 'logs' ? 'nav-tab-active' : ''; ?>">
+            <span class="dashicons dashicons-list-view"></span> <?php _e("Logs", "two-factor-login-telegram"); ?>
+        </a>
+        <a href="<?php echo admin_url('options-general.php?page=tg-conf&tab=suggestions'); ?>"
+           class="nav-tab <?php echo $active_tab == 'suggestions' ? 'nav-tab-active' : ''; ?>">
+            <span class="dashicons dashicons-heart"></span> <?php _e("Suggestions", "two-factor-login-telegram"); ?>
+        </a>
     </h2>
 
     <div class="wpft-container">
 
         <?php
         switch($active_tab) {
-            case 'providers':
-                include dirname(__FILE__) . '/providers.php';
-                break;
             case 'logs':
                 include dirname(__FILE__) . '/logs.php';
                 break;
@@ -320,12 +303,6 @@ input:checked + .slider:before {
     font-size: 1.3em;
     display: flex;
     align-items: center;
-}
-
-.providers-category h3:before {
-    content: "📱";
-    margin-right: 8px;
-    font-size: 1.1em;
 }
 
 .providers-category:last-of-type h3:before {
