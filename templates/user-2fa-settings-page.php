@@ -41,8 +41,8 @@ if (empty($user_default_provider)) {
     $user_default_provider = $plugin->get_default_provider();
 }
 
-wp_enqueue_script('wp-factor-telegram-plugin');
-wp_enqueue_style('wp-factor-telegram-plugin');
+wp_enqueue_script('authpress-plugin');
+wp_enqueue_style('authpress-plugin');
 ?>
 
 <div class="wrap">
@@ -54,12 +54,12 @@ wp_enqueue_style('wp-factor-telegram-plugin');
         </div>
     <?php else: ?>
 
-        <div class="wp-factor-2fa-settings">
+        <div class="authpress-2fa-settings">
 
 
             <?php if ($telegram_available): ?>
                 <!-- Telegram Section -->
-                <div class="wp-factor-section">
+                <div class="authpress-section">
                     <h2><?php _e('Telegram', 'two-factor-login-telegram'); ?></h2>
 
                     <?php if ($telegram_user_enabled): ?>
@@ -71,12 +71,12 @@ wp_enqueue_style('wp-factor-telegram-plugin');
                             </p>
                         </div>
 
-                        <div class="wp-factor-telegram-actions">
+                        <div class="authpress-actions">
                             <button type="button" class="button button-primary" id="reconfigure-telegram">
                                 <?php _e('Change Chat ID', 'two-factor-login-telegram'); ?>
                             </button>
 
-                            <form method="post" action="" class="wp-factor-disable-form" style="display: inline-block; margin-left: 10px;">
+                            <form method="post" action="" class="authpress-disable-form" style="display: inline-block; margin-left: 10px;">
                                 <?php wp_nonce_field('wp_factor_disable_telegram', 'wp_factor_telegram_disable_nonce'); ?>
                                 <input type="hidden" name="wp_factor_action" value="disable_telegram">
                                 <button type="submit" class="button button-secondary" onclick="return confirm('<?php _e('Are you sure you want to disable Telegram 2FA? This will remove your Chat ID and disable Telegram authentication.', 'two-factor-login-telegram'); ?>')">
@@ -86,7 +86,7 @@ wp_enqueue_style('wp-factor-telegram-plugin');
                         </div>
 
                         <!-- Hidden reconfiguration section -->
-                        <div class="wp-factor-telegram-reconfig" id="telegram-reconfig-section" style="display: none; margin-top: 20px;">
+                        <div class="authpress-reconfig" id="telegram-reconfig-section" style="display: none; margin-top: 20px;">
                             <h4><?php _e('Reconfigure Telegram', 'two-factor-login-telegram'); ?></h4>
                             <p><?php _e('Follow the steps below to change your Telegram Chat ID:', 'two-factor-login-telegram'); ?></p>
 
@@ -159,7 +159,7 @@ wp_enqueue_style('wp-factor-telegram-plugin');
                             <p><?php _e('Configure Telegram to enable this 2FA method.', 'two-factor-login-telegram'); ?></p>
                         </div>
 
-                        <div class="wp-factor-telegram-setup">
+                        <div class="authpress-setup">
                             <h3><?php _e('Setup Telegram', 'two-factor-login-telegram'); ?></h3>
 
                             <?php
@@ -200,7 +200,7 @@ wp_enqueue_style('wp-factor-telegram-plugin');
                                 <div class="tg-progress-bar" id="tg-progress-bar"></div>
                             </div>
 
-                            <div class="wp-factor-telegram-config">
+                            <div class="authpress-config">
                                 <table class="form-table">
                                     <tr>
                                         <th>
@@ -256,7 +256,7 @@ wp_enqueue_style('wp-factor-telegram-plugin');
                                     </tr>
                                     <tr id="factor-chat-save" style="display: none;">
                                         <td colspan="3">
-                                            <form method="post" action="" class="wp-factor-telegram-save-form">
+                                            <form method="post" action="" class="authpress-save-form">
                                                 <?php wp_nonce_field('wp_factor_save_telegram', 'wp_factor_telegram_save_nonce'); ?>
                                                 <input type="hidden" name="wp_factor_action" value="save_telegram">
                                                 <input type="hidden" name="tg_chat_id" id="tg_chat_id_hidden" value="">
@@ -277,7 +277,7 @@ wp_enqueue_style('wp-factor-telegram-plugin');
 
             <?php if ($email_available): ?>
             <!-- Email Section -->
-            <div class="wp-factor-section">
+            <div class="authpress-section">
                 <h2><?php _e('Email', 'two-factor-login-telegram'); ?></h2>
 
                 <?php if ($email_user_available): ?>
@@ -291,7 +291,7 @@ wp_enqueue_style('wp-factor-telegram-plugin');
                         </div>
                         <p><?php _e('Authentication codes will be sent to your registered email address when you log in.', 'two-factor-login-telegram'); ?></p>
                         
-                        <form method="post" action="" class="wp-factor-disable-form" style="margin-top: 15px;">
+                        <form method="post" action="" class="authpress-disable-form" style="margin-top: 15px;">
                             <?php wp_nonce_field('wp_factor_disable_email', 'wp_factor_email_disable_nonce'); ?>
                             <input type="hidden" name="wp_factor_action" value="disable_email">
                             <button type="submit" class="button button-secondary" onclick="return confirm('<?php _e('Are you sure you want to disable Email 2FA?', 'two-factor-login-telegram'); ?>')">
@@ -308,7 +308,7 @@ wp_enqueue_style('wp-factor-telegram-plugin');
                         </div>
                         <p><?php _e('Enable email 2FA to receive authentication codes via email when you log in.', 'two-factor-login-telegram'); ?></p>
                         
-                        <form method="post" action="" class="wp-factor-enable-form" style="margin-top: 15px;">
+                        <form method="post" action="" class="authpress-enable-form" style="margin-top: 15px;">
                             <?php wp_nonce_field('wp_factor_enable_email', 'wp_factor_email_enable_nonce'); ?>
                             <input type="hidden" name="wp_factor_action" value="enable_email">
                             <button type="submit" class="button button-primary">
@@ -327,7 +327,7 @@ wp_enqueue_style('wp-factor-telegram-plugin');
 
             <?php if ($authenticator_enabled): ?>
             <!-- Authenticator App Section -->
-            <div class="wp-factor-section">
+            <div class="authpress-section">
                 <h2><?php _e('Authenticator App', 'two-factor-login-telegram'); ?></h2>
 
                 <?php if ($totp_enabled): ?>
@@ -335,7 +335,7 @@ wp_enqueue_style('wp-factor-telegram-plugin');
                         <p><?php _e('✅ Authenticator app is configured and active.', 'two-factor-login-telegram'); ?></p>
                     </div>
 
-                    <form method="post" action="" class="wp-factor-disable-form">
+                    <form method="post" action="" class="authpress-disable-form">
                         <?php wp_nonce_field('wp_factor_disable_totp', 'wp_factor_totp_disable_nonce'); ?>
                         <input type="hidden" name="wp_factor_action" value="disable_totp">
                         <p>
@@ -349,11 +349,11 @@ wp_enqueue_style('wp-factor-telegram-plugin');
                         <p><?php _e('Configure your authenticator app to enable this 2FA method.', 'two-factor-login-telegram'); ?></p>
                     </div>
 
-                    <div class="wp-factor-totp-setup">
+                    <div class="authpress-totp-setup">
                         <h3><?php _e('Setup Authenticator App', 'two-factor-login-telegram'); ?></h3>
 
-                        <div class="wp-factor-qr-section">
-                            <div class="wp-factor-qr-code">
+                        <div class="authpress-qr-section">
+                            <div class="authpress-qr-code">
                                 <img id="wp_factor_qr_code" src="" alt="QR Code" style="display:none;" />
                             </div>
                             <p>
@@ -364,7 +364,7 @@ wp_enqueue_style('wp-factor-telegram-plugin');
                             <input type="hidden" name="wp_factor_totp_setup_nonce" value="<?php echo wp_create_nonce('setup_totp_' . $current_user_id); ?>" />
                         </div>
 
-                        <div class="wp-factor-verification" id="wp_factor_verification_section" style="display:none;">
+                        <div class="authpress-verification" id="wp_factor_verification_section" style="display:none;">
                             <h4><?php _e('Verify Setup', 'two-factor-login-telegram'); ?></h4>
                             <p><?php _e('Enter the 6-digit code from your authenticator app to complete setup:', 'two-factor-login-telegram'); ?></p>
 
@@ -385,17 +385,17 @@ wp_enqueue_style('wp-factor-telegram-plugin');
 
             <?php if ($user_has_active_methods): ?>
             <!-- Default Provider Selection Section -->
-            <div class="wp-factor-section">
+            <div class="authpress-section">
                 <h2><?php _e('Default 2FA Method', 'two-factor-login-telegram'); ?></h2>
                 <p><?php _e('Choose which 2FA method to use by default when you log in. You can always switch to another method during login.', 'two-factor-login-telegram'); ?></p>
 
-                <form method="post" action="" class="wp-factor-default-provider-form">
+                <form method="post" action="" class="authpress-default-provider-form">
                     <?php wp_nonce_field('wp_factor_set_default_provider', 'wp_factor_default_provider_nonce'); ?>
                     <input type="hidden" name="wp_factor_action" value="set_default_provider">
 
-                    <div class="wp-factor-provider-options">
+                    <div class="authpress-provider-options">
                         <?php if ($user_has_telegram): ?>
-                            <label class="wp-factor-provider-option">
+                            <label class="authpress-provider-option">
                                 <input type="radio" name="default_provider" value="telegram"
                                        <?php checked($user_default_provider, 'telegram'); ?>>
                                 <span class="provider-icon">📱</span>
@@ -405,7 +405,7 @@ wp_enqueue_style('wp-factor-telegram-plugin');
                         <?php endif; ?>
 
                         <?php if ($user_has_email): ?>
-                            <label class="wp-factor-provider-option">
+                            <label class="authpress-provider-option">
                                 <input type="radio" name="default_provider" value="email"
                                        <?php checked($user_default_provider, 'email'); ?>>
                                 <span class="provider-icon">📧</span>
@@ -415,7 +415,7 @@ wp_enqueue_style('wp-factor-telegram-plugin');
                         <?php endif; ?>
 
                         <?php if ($user_has_totp): ?>
-                            <label class="wp-factor-provider-option">
+                            <label class="authpress-provider-option">
                                 <input type="radio" name="default_provider" value="authenticator"
                                        <?php checked($user_default_provider, 'authenticator'); ?>>
                                 <span class="provider-icon">🔐</span>
@@ -435,7 +435,7 @@ wp_enqueue_style('wp-factor-telegram-plugin');
             <?php endif; ?>
 
             <!-- Recovery Codes Section -->
-            <div class="wp-factor-section">
+            <div class="authpress-section">
                 <h2><?php _e('Recovery Codes', 'two-factor-login-telegram'); ?></h2>
 
                 <?php if ($has_recovery_codes): ?>
@@ -443,7 +443,7 @@ wp_enqueue_style('wp-factor-telegram-plugin');
                         <p><?php _e('You have recovery codes available. Keep them safe!', 'two-factor-login-telegram'); ?></p>
                     </div>
 
-                    <div class="wp-factor-recovery-codes">
+                    <div class="authpress-recovery-codes">
                         <p><?php _e('Your recovery codes are hidden for security. Regenerate them to view and save new codes.', 'two-factor-login-telegram'); ?></p>
                     </div>
 
@@ -479,7 +479,7 @@ wp_enqueue_style('wp-factor-telegram-plugin');
 <?php if ($has_providers): ?>
 <style>
 
-.wp-factor-section {
+.authpress-section {
     background: #fff;
     border: 1px solid #c3c4c7;
     border-radius: 4px;
@@ -487,18 +487,18 @@ wp_enqueue_style('wp-factor-telegram-plugin');
     margin-bottom: 20px;
 }
 
-.wp-factor-section h2 {
+.authpress-section h2 {
     margin-top: 0;
     padding-bottom: 10px;
     border-bottom: 1px solid #ddd;
 }
 
-.wp-factor-qr-code {
+.authpress-qr-code {
     text-align: center;
     margin: 20px 0;
 }
 
-.wp-factor-qr-code img {
+.authpress-qr-code img {
     border: 1px solid #ddd;
     padding: 10px;
     background: #fff;
@@ -530,11 +530,11 @@ wp_enqueue_style('wp-factor-telegram-plugin');
     }
 }
 
-.wp-factor-provider-options {
+.authpress-provider-options {
     margin: 15px 0;
 }
 
-.wp-factor-provider-option {
+.authpress-provider-option {
     display: block;
     padding: 15px;
     margin: 10px 0;
@@ -546,22 +546,22 @@ wp_enqueue_style('wp-factor-telegram-plugin');
     position: relative;
 }
 
-.wp-factor-provider-option:hover {
+.authpress-provider-option:hover {
     border-color: #0073aa;
     background: #f9f9f9;
 }
 
-.wp-factor-provider-option input[type="radio"] {
+.authpress-provider-option input[type="radio"] {
     margin: 0 10px 0 0;
     vertical-align: top;
 }
 
-.wp-factor-provider-option input[type="radio"]:checked + .provider-icon {
+.authpress-provider-option input[type="radio"]:checked + .provider-icon {
     background: #0073aa;
     color: white;
 }
 
-.wp-factor-provider-option:has(input[type="radio"]:checked) {
+.authpress-provider-option:has(input[type="radio"]:checked) {
     border-color: #0073aa;
     background: #f0f8ff;
 }
@@ -628,24 +628,24 @@ wp_enqueue_style('wp-factor-telegram-plugin');
     transition: width 0.3s ease;
 }
 
-.wp-factor-telegram-config {
+.authpress-config {
     margin-top: 20px;
 }
 
-.wp-factor-telegram-config .form-table {
+.authpress-config .form-table {
     background: #fff;
     border: 1px solid #c3c4c7;
     border-radius: 4px;
 }
 
-.wp-factor-telegram-config .form-table th {
+.authpress-config .form-table th {
     background: #f6f7f7;
     border-bottom: 1px solid #c3c4c7;
     padding: 15px;
     font-weight: 600;
 }
 
-.wp-factor-telegram-config .form-table td {
+.authpress-config .form-table td {
     padding: 15px;
     border-bottom: 1px solid #c3c4c7;
 }

@@ -112,7 +112,7 @@ class AuthPress_Hooks_Manager
         if (in_array($screen->id, ["profile", "settings_page_tg-conf", "users", "users_page_my-2fa-settings"])) {
             wp_register_style(
                 "tg_lib_css",
-                plugins_url("assets/css/wp-factor-telegram-plugin.css", dirname(__FILE__)),
+                plugins_url("assets/css/authpress-plugin.css", dirname(__FILE__)),
                 array(),
                 WP_FACTOR_PLUGIN_VERSION
             );
@@ -120,7 +120,7 @@ class AuthPress_Hooks_Manager
 
             wp_register_script(
                 "tg_lib_js",
-                plugins_url("assets/js/wp-factor-telegram-plugin.js", dirname(__FILE__)),
+                plugins_url("assets/js/authpress-plugin.js", dirname(__FILE__)),
                 array('jquery'),
                 WP_FACTOR_PLUGIN_VERSION,
                 true
@@ -152,7 +152,7 @@ class AuthPress_Hooks_Manager
             wp_enqueue_script('jquery-ui-accordion');
             wp_enqueue_script(
                 'custom-accordion',
-                plugins_url('assets/js/wp-factor-telegram-accordion.js', dirname(__FILE__)),
+                plugins_url('assets/js/authpress-accordion.js', dirname(__FILE__)),
                 array('jquery', 'jquery-ui-core', 'jquery-ui-accordion')
             );
         }

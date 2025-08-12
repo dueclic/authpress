@@ -21,7 +21,7 @@ if (!defined('ABSPATH')) {
     die;
 }
 
-define('WP_FACTOR_PLUGIN_VERSION', '3.5.4');
+define('WP_FACTOR_PLUGIN_VERSION', '3.6.0');
 
 define('WP_FACTOR_AUTHCODE_EXPIRE_SECONDS', 60 * 20);
 

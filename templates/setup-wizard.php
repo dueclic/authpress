@@ -30,7 +30,7 @@ login_header(__('2FA Setup', 'two-factor-login-telegram'), '', '');
         background-image: url("<?php echo esc_url($plugin_logo); ?>");
     }
 
-    .wp-factor-wizard {
+    .authpress-wizard {
         background: #fff;
         border-radius: 8px;
         box-shadow: 0 2px 10px rgba(0,0,0,0.1);
@@ -188,7 +188,7 @@ login_header(__('2FA Setup', 'two-factor-login-telegram'), '', '');
     }
 
     @media (max-width: 480px) {
-        .wp-factor-wizard {
+        .authpress-wizard {
             padding: 20px;
             margin: 0 10px 20px;
         }
@@ -206,7 +206,7 @@ login_header(__('2FA Setup', 'two-factor-login-telegram'), '', '');
     }
 </style>
 
-<div class="wp-factor-wizard">
+<div class="authpress-wizard">
     <div class="wizard-header">
         <h1 class="wizard-title"><?php _e('Setup AuthPress', 'two-factor-login-telegram'); ?></h1>
         <p class="wizard-subtitle"><?php _e('Choose a method to secure your account with an additional layer of protection', 'two-factor-login-telegram'); ?></p>
