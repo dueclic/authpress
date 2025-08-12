@@ -1,16 +1,19 @@
 <?php
 /**
- * Template for 2FA Setup Wizard
+ * Template for 2FA Setup Wizard - Modular approach using provider registry
  *
  * Available variables:
- * - $user: User object
+ * - $user: User object  
  * - $redirect_to: Redirect URL after setup
  * - $plugin_logo: URL of the plugin logo
- * - $telegram_available: Whether Telegram provider is available
- * - $email_available: Whether Email provider is available
- * - $authenticator_enabled: Whether Authenticator provider is available
- * - $telegram_bot: Bot info for Telegram setup
+ * - Legacy variables (for backward compatibility):
+ *   - $telegram_available: Whether Telegram provider is available
+ *   - $email_available: Whether Email provider is available  
+ *   - $authenticator_enabled: Whether Authenticator provider is available
+ *   - $telegram_bot: Bot info for Telegram setup
  */
+
+use Authpress\AuthPress_Provider_Registry;
 
 if (!defined('ABSPATH')) {
     exit;
@@ -224,46 +227,39 @@ login_header(__('2FA Setup', 'two-factor-login-telegram'), '', '');
 
         <div class="wizard-content">
             <div class="method-options">
-                <?php if ($telegram_available): ?>
-                    <label class="method-option" for="method-telegram">
-                        <input type="radio" id="method-telegram" name="setup_method" value="telegram">
+                <?php 
+                // Get all enabled and configured providers dynamically
+                $available_providers = AuthPress_Provider_Registry::get_enabled();
+                $provider_features = [
+                    'telegram' => __('Fast and convenient', 'two-factor-login-telegram'),
+                    'email' => __('Works with any email client', 'two-factor-login-telegram'),
+                    'authenticator' => __('Works without internet connection', 'two-factor-login-telegram')
+                ];
+                
+                foreach ($available_providers as $key => $provider): 
+                    // Skip recovery codes in setup wizard - it's a backup method
+                    if ($key === 'recovery_codes') continue;
+                ?>
+                    <label class="method-option" for="method-<?php echo esc_attr($key); ?>">
+                        <input type="radio" id="method-<?php echo esc_attr($key); ?>" name="setup_method" value="<?php echo esc_attr($key); ?>">
                         <span class="method-icon">
-                            <img src="<?php echo esc_url($telegram_provider->get_icon()); ?>" alt="Telegram" style="width: 24px; height: 24px;" />
+                            <img src="<?php echo esc_url($provider->get_icon()); ?>" alt="<?php echo esc_attr($provider->get_name()); ?>" style="width: 24px; height: 24px;" />
                         </span>
-                        <h3 class="method-name"><?php _e('Telegram', 'two-factor-login-telegram'); ?></h3>
+                        <h3 class="method-name"><?php echo esc_html($provider->get_name()); ?></h3>
                         <p class="method-description">
-                            <?php _e('Receive verification codes instantly on your phone via Telegram', 'two-factor-login-telegram'); ?>
+                            <?php echo esc_html($provider->get_description()); ?>
                         </p>
-                        <p class="method-pros">✓ <?php _e('Fast and convenient', 'two-factor-login-telegram'); ?></p>
+                        <?php if (isset($provider_features[$key])): ?>
+                            <p class="method-pros">✓ <?php echo esc_html($provider_features[$key]); ?></p>
+                        <?php endif; ?>
                     </label>
-                <?php endif; ?>
-
-                <?php if ($email_available): ?>
-                    <label class="method-option" for="method-email">
-                        <input type="radio" id="method-email" name="setup_method" value="email">
-                        <span class="method-icon">
-                            <img src="<?php echo esc_url($email_provider->get_icon()); ?>" alt="Email" style="width: 24px; height: 24px;" />
-                        </span>
-                        <h3 class="method-name"><?php _e('Email', 'two-factor-login-telegram'); ?></h3>
-                        <p class="method-description">
-                            <?php _e('Receive verification codes via email', 'two-factor-login-telegram'); ?>
-                        </p>
-                        <p class="method-pros">✓ <?php _e('Works with any email client', 'two-factor-login-telegram'); ?></p>
-                    </label>
-                <?php endif; ?>
-
-                <?php if ($authenticator_enabled): ?>
-                    <label class="method-option" for="method-authenticator">
-                        <input type="radio" id="method-authenticator" name="setup_method" value="authenticator">
-                        <span class="method-icon">
-                            <img src="<?php echo esc_url($totp_provider->get_icon()); ?>" alt="Authenticator" style="width: 24px; height: 24px;" />
-                        </span>
-                        <h3 class="method-name"><?php _e('Authenticator App', 'two-factor-login-telegram'); ?></h3>
-                        <p class="method-description">
-                            <?php _e('Use apps like Google Authenticator or Authy for offline code generation', 'two-factor-login-telegram'); ?>
-                        </p>
-                        <p class="method-pros">✓ <?php _e('Works without internet connection', 'two-factor-login-telegram'); ?></p>
-                    </label>
+                <?php endforeach; ?>
+                
+                <?php if (empty($available_providers)): ?>
+                    <div class="wizard-notice">
+                        <span class="dashicons dashicons-warning"></span>
+                        <?php _e('No 2FA methods are currently enabled. Please contact your administrator.', 'two-factor-login-telegram'); ?>
+                    </div>
                 <?php endif; ?>
             </div>
         </div>

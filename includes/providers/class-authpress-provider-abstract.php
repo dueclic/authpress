@@ -76,4 +76,50 @@ abstract class Abstract_Provider
      * @return string PNG icon URL
      */
     abstract public function get_icon();
+
+    /**
+     * Get the provider key/identifier
+     * @return string Provider key
+     */
+    abstract public function get_key();
+
+    /**
+     * Get the provider display name
+     * @return string Provider name
+     */
+    abstract public function get_name();
+
+    /**
+     * Get the provider description
+     * @return string Provider description
+     */
+    abstract public function get_description();
+
+    /**
+     * Check if provider is enabled
+     * @return bool True if enabled, false otherwise
+     */
+    public function is_enabled()
+    {
+        $providers = authpress_providers();
+        return isset($providers[$this->get_key()]['enabled']) && $providers[$this->get_key()]['enabled'];
+    }
+
+    /**
+     * Check if provider is configured properly
+     * @return bool True if configured, false otherwise
+     */
+    public function is_configured()
+    {
+        return $this->is_enabled();
+    }
+
+    /**
+     * Check if provider is available for use
+     * @return bool True if available, false otherwise
+     */
+    public function is_available()
+    {
+        return $this->is_enabled() && $this->is_configured();
+    }
 }

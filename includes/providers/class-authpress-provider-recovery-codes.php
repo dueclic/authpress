@@ -176,4 +176,19 @@ class Recovery_Codes_Provider extends Abstract_Provider
         $logo = plugin_dir_url(WP_FACTOR_TG_FILE) . '/assets/images/providers/recovery-codes-icon.png';
         return apply_filters('authpress_provider_logo', $logo, 'recovery-codes');
     }
+
+    public function get_key()
+    {
+        return 'recovery_codes';
+    }
+
+    public function get_name()
+    {
+        return __("Recovery Codes", "two-factor-login-telegram");
+    }
+
+    public function get_description()
+    {
+        return __("One-time backup codes for emergency access", "two-factor-login-telegram");
+    }
 }

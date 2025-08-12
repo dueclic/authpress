@@ -1,10 +1,11 @@
 <?php
 
 /**
- * @var array $providers
+ * @var array $providers Legacy providers array for backward compatibility
  */
 
 use Authpress\Authpress_Logs_List_Table;
+use Authpress\AuthPress_Provider_Registry;
 
 if (isset($_GET['tab'])) {
     $active_tab = sanitize_text_field($_GET['tab']);
@@ -32,19 +33,28 @@ if (isset($_GET['tab'])) {
             <span class="dashicons dashicons-editor-help"></span> <?php _e("FAQ", "two-factor-login-telegram"); ?>
         </a>
 
-        <?php if ($this->is_valid_bot() && $providers['telegram']['enabled']) { ?>
+        <?php 
+        // Show logs tab if Telegram provider is available and configured
+        $telegram_provider = AuthPress_Provider_Registry::get('telegram');
+        if ($telegram_provider && $telegram_provider->is_available()) : 
+        ?>
             <a href="<?php echo admin_url('options-general.php?page=tg-conf&tab=logs'); ?>"
                class="nav-tab <?php echo $active_tab == 'logs' ? 'nav-tab-active' : ''; ?>">
                 <span class="dashicons dashicons-list-view"></span> <?php _e("Logs", "two-factor-login-telegram"); ?>
             </a>
-        <?php } ?>
+        <?php endif; ?>
 
-        <?php if ($this->is_valid_bot() && $providers['telegram']['enabled'] && get_the_author_meta("tg_wp_factor_chat_id", get_current_user_id()) !== false) { ?>
+        <?php 
+        // Show suggestions tab if user has active Telegram integration
+        if ($telegram_provider && 
+            $telegram_provider->is_available() && 
+            get_the_author_meta("tg_wp_factor_chat_id", get_current_user_id()) !== false) : 
+        ?>
             <a href="<?php echo admin_url('options-general.php?page=tg-conf&tab=suggestions'); ?>"
                class="nav-tab <?php echo $active_tab == 'suggestions' ? 'nav-tab-active' : ''; ?>">
                 <span class="dashicons dashicons-heart"></span> <?php _e("Suggestions", "two-factor-login-telegram"); ?>
             </a>
-        <?php } ?>
+        <?php endif; ?>
     </h2>
 
     <div class="wpft-container">
@@ -341,30 +351,36 @@ input:checked + .slider:before {
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    const telegramToggle = document.querySelector('input[name="wp_factor_providers[telegram][enabled]"]');
-    const emailToggle = document.querySelector('input[name="wp_factor_providers[email][enabled]"]');
-    const authenticatorToggle = document.querySelector('input[name="wp_factor_providers[authenticator][enabled]"]');
+    // Find all provider toggles dynamically
+    const providerToggles = document.querySelectorAll('input[name*="wp_factor_providers"][name*="[enabled]"]');
     const defaultProviderSection = document.querySelector('.default-provider-section');
     const defaultProviderSelect = document.querySelector('#default_provider');
 
-    function updateDefaultProviderVisibility() {
-        const telegramEnabled = telegramToggle.checked;
-        const emailEnabled = emailToggle ? emailToggle.checked : false;
-        const authenticatorEnabled = authenticatorToggle.checked;
-        const enabledCount = [telegramEnabled, emailEnabled, authenticatorEnabled].filter(Boolean).length;
+    if (!defaultProviderSection || !defaultProviderSelect) {
+        return;
+    }
 
-        if (enabledCount > 1) {
+    function updateDefaultProviderVisibility() {
+        // Count enabled providers
+        const enabledProviders = [];
+        providerToggles.forEach(toggle => {
+            if (toggle.checked) {
+                // Extract provider key from name attribute
+                const matches = toggle.name.match(/wp_factor_providers\[(.+?)\]\[enabled\]/);
+                if (matches) {
+                    enabledProviders.push(matches[1]);
+                }
+            }
+        });
+
+        if (enabledProviders.length > 1) {
             defaultProviderSection.style.display = 'block';
         } else {
             defaultProviderSection.style.display = 'none';
 
-            // Set default based on which provider is enabled
-            if (telegramEnabled && !emailEnabled && !authenticatorEnabled) {
-                defaultProviderSelect.value = 'telegram';
-            } else if (!telegramEnabled && emailEnabled && !authenticatorEnabled) {
-                defaultProviderSelect.value = 'email';
-            } else if (!telegramEnabled && !emailEnabled && authenticatorEnabled) {
-                defaultProviderSelect.value = 'authenticator';
+            // Auto-set default to the only enabled provider
+            if (enabledProviders.length === 1) {
+                defaultProviderSelect.value = enabledProviders[0];
             }
         }
     }
@@ -372,10 +388,10 @@ document.addEventListener('DOMContentLoaded', function() {
     // Initial check
     updateDefaultProviderVisibility();
 
-    // Listen for changes
-    telegramToggle.addEventListener('change', updateDefaultProviderVisibility);
-    if (emailToggle) emailToggle.addEventListener('change', updateDefaultProviderVisibility);
-    authenticatorToggle.addEventListener('change', updateDefaultProviderVisibility);
+    // Listen for changes on all provider toggles
+    providerToggles.forEach(toggle => {
+        toggle.addEventListener('change', updateDefaultProviderVisibility);
+    });
 });
 </script>
 

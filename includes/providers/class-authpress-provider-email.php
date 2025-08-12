@@ -316,4 +316,19 @@ class Email_Provider extends Abstract_Provider implements Provider_Otp_Interface
         $logo = plugin_dir_url(WP_FACTOR_TG_FILE) . '/assets/images/providers/email-icon.png';
         return apply_filters('authpress_provider_logo', $logo, 'email');
     }
+
+    public function get_key()
+    {
+        return 'email';
+    }
+
+    public function get_name()
+    {
+        return __("Email", "two-factor-login-telegram");
+    }
+
+    public function get_description()
+    {
+        return __("Receive authentication codes via email messages", "two-factor-login-telegram");
+    }
 }

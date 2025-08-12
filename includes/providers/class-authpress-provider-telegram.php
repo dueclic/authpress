@@ -362,4 +362,45 @@ class Telegram_Provider extends Abstract_Provider implements Provider_Otp_Interf
         $logo = plugin_dir_url(WP_FACTOR_TG_FILE) . '/assets/images/providers/telegram-icon.png';
         return apply_filters('authpress_provider_logo', $logo, 'telegram');
     }
+
+    public function get_key()
+    {
+        return 'telegram';
+    }
+
+    public function get_name()
+    {
+        return __("Telegram", "two-factor-login-telegram");
+    }
+
+    public function get_description()
+    {
+        return __("Receive authentication codes via Telegram messages", "two-factor-login-telegram");
+    }
+
+    public function is_configured()
+    {
+        if (!$this->is_enabled()) {
+            return false;
+        }
+
+        $providers = authpress_providers();
+        $bot_token = $providers['telegram']['bot_token'] ?? '';
+        
+        if (empty($bot_token)) {
+            return false;
+        }
+        
+        // Create a temporary WP_Telegram instance to validate this specific bot token
+        $telegram = new WP_Telegram();
+        $old_token = $telegram->get_bot_token();
+        
+        $telegram->set_bot_token($bot_token);
+        $is_valid = $telegram->get_me() !== false;
+        
+        // Restore the original token
+        $telegram->set_bot_token($old_token);
+        
+        return $is_valid;
+    }
 }

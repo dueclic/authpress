@@ -39,33 +39,36 @@ final class AuthPress_User_Manager
      * Check if Telegram provider is enabled
      * 
      * @return bool
+     * @deprecated Use AuthPress_Provider_Registry::get('telegram')->is_enabled() instead
      */
     public static function is_telegram_provider_enabled()
     {
-        $providers = self::get_providers();
-        return isset($providers['telegram']['enabled']) && $providers['telegram']['enabled'];
+        $provider = AuthPress_Provider_Registry::get('telegram');
+        return $provider && $provider->is_enabled();
     }
 
     /**
      * Check if Email provider is enabled
      * 
      * @return bool
+     * @deprecated Use AuthPress_Provider_Registry::get('email')->is_enabled() instead
      */
     public static function is_email_provider_enabled()
     {
-        $providers = self::get_providers();
-        return isset($providers['email']['enabled']) && $providers['email']['enabled'];
+        $provider = AuthPress_Provider_Registry::get('email');
+        return $provider && $provider->is_enabled();
     }
 
     /**
      * Check if Authenticator provider is enabled
      * 
      * @return bool
+     * @deprecated Use AuthPress_Provider_Registry::get('authenticator')->is_enabled() instead
      */
     public static function is_authenticator_provider_enabled()
     {
-        $providers = self::get_providers();
-        return isset($providers['authenticator']['enabled']) && $providers['authenticator']['enabled'];
+        $provider = AuthPress_Provider_Registry::get('authenticator');
+        return $provider && $provider->is_enabled();
     }
 
     /**

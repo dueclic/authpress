@@ -318,4 +318,28 @@ class TOTP_Provider extends Abstract_Provider
         $logo = plugin_dir_url(WP_FACTOR_TG_FILE) . '/assets/images/providers/authenticator-icon.png';
         return apply_filters('authpress_provider_logo', $logo, 'totp');
     }
+
+    public function get_key()
+    {
+        return 'authenticator';
+    }
+
+    public function get_name()
+    {
+        return __("Authenticator App", "two-factor-login-telegram");
+    }
+
+    public function get_description()
+    {
+        return __("Google Authenticator, Authy, Microsoft Authenticator and other TOTP-compatible apps", "two-factor-login-telegram");
+    }
+
+    public function is_configured()
+    {
+        if (!$this->is_enabled()) {
+            return false;
+        }
+        
+        return true; // TOTP doesn't need external configuration
+    }
 }

@@ -63,7 +63,8 @@ final class AuthPress_Plugin
         require_once($base_path . "providers/class-authpress-provider-totp.php");
         require_once($base_path . "providers/class-authpress-provider-recovery-codes.php");
 
-        // Factory
+        // Provider registry and factory
+        require_once($base_path . "class-authpress-provider-registry.php");
         require_once($base_path . "class-authpress-auth-factory.php");
 
         // New refactored classes

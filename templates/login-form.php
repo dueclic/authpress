@@ -1,6 +1,6 @@
 <?php
 /**
- * Template for 2FA Login Form
+ * Template for 2FA Login Form - Modular approach using provider registry
  *
  * Available variables:
  * - $user: User object
@@ -9,7 +9,14 @@
  * - $plugin_logo: URL of the plugin logo
  * - $rememberme: Remember me value
  * - $nonce: Security nonce
+ * Legacy variables (for backward compatibility):
+ * - $user_has_telegram, $user_has_email, $user_has_totp
+ * - $default_method
+ * - Provider objects
  */
+
+use Authpress\AuthPress_Provider_Registry;
+use Authpress\AuthPress_User_Manager;
 
 if (!defined('ABSPATH')) {
     exit;
@@ -145,8 +152,14 @@ if (!empty($error_msg)) {
     <!-- Hidden input to track which form is being used -->
     <input type="hidden" name="login_method" id="login_method" value="<?php echo esc_attr($default_method); ?>">
 
-    <?php $available_methods = [$user_has_telegram, $user_has_email, $user_has_totp]; ?>
-    <?php if (array_sum($available_methods) > 1): ?>
+    <?php 
+    // Get user available methods using the modular system
+    $user_available_methods = AuthPress_User_Manager::get_user_available_methods($user->ID);
+    $available_count = array_sum($user_available_methods);
+    $user_default_method = AuthPress_User_Manager::get_user_effective_provider($user->ID);
+    ?>
+    
+    <?php if ($available_count > 1): ?>
         <!-- Method Selector Dropdown -->
         <div class="method-selector-wrapper">
             <label for="method-dropdown" class="method-label">
@@ -154,21 +167,26 @@ if (!empty($error_msg)) {
             </label>
             <div class="method-dropdown-container">
                 <select id="method-dropdown" class="method-dropdown">
-                    <?php if ($user_has_telegram): ?>
-                        <option value="telegram" <?php echo $default_method === 'telegram' ? 'selected' : ''; ?> data-icon="<?php echo esc_url($telegram_provider->get_icon()); ?>">
-                            <?php _e("Telegram", "two-factor-login-telegram"); ?>
+                    <?php 
+                    $enabled_providers = AuthPress_Provider_Registry::get_enabled();
+                    foreach ($enabled_providers as $key => $provider):
+                        // Map keys for backward compatibility
+                        $method_key = ($key === 'authenticator') ? 'totp' : $key;
+                        
+                        // Skip recovery codes in dropdown
+                        if ($key === 'recovery_codes') continue;
+                        
+                        // Check if user has this method available
+                        if ($key === 'telegram' && !$user_available_methods['telegram']) continue;
+                        if ($key === 'email' && !$user_available_methods['email']) continue;
+                        if ($key === 'authenticator' && !$user_available_methods['totp']) continue;
+                    ?>
+                        <option value="<?php echo esc_attr($method_key); ?>" 
+                                <?php echo $user_default_method === $method_key ? 'selected' : ''; ?> 
+                                data-icon="<?php echo esc_url($provider->get_icon()); ?>">
+                            <?php echo esc_html($provider->get_name()); ?>
                         </option>
-                    <?php endif; ?>
-                    <?php if ($user_has_email): ?>
-                        <option value="email" <?php echo $default_method === 'email' ? 'selected' : ''; ?> data-icon="<?php echo esc_url($email_provider->get_icon()); ?>">
-                            <?php _e("Email", "two-factor-login-telegram"); ?>
-                        </option>
-                    <?php endif; ?>
-                    <?php if ($user_has_totp): ?>
-                        <option value="totp" <?php echo $default_method === 'totp' ? 'selected' : ''; ?> data-icon="<?php echo esc_url($totp_provider->get_icon()); ?>">
-                            <?php _e("Authenticator App", "two-factor-login-telegram"); ?>
-                        </option>
-                    <?php endif; ?>
+                    <?php endforeach; ?>
                 </select>
                 <div class="dropdown-arrow">▼</div>
             </div>
