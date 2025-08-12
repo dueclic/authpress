@@ -97,7 +97,7 @@ final class AuthPress_Plugin
     public function migrate_legacy_settings_on_init()
     {
         $legacy_settings = get_option($this->namespace, array());
-        $providers = get_option('wp_factor_providers');
+        $providers = authpress_providers();
 
         if (isset($legacy_settings['enabled']) && $legacy_settings['enabled'] === '1') {
             $legacy_bot_token = isset($legacy_settings['bot_token']) ? $legacy_settings['bot_token'] : '';

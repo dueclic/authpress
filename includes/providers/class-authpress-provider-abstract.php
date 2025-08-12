@@ -87,7 +87,7 @@ abstract class Abstract_Provider
         if (!empty($this->icon_url)) {
             return $this->icon_url;
         }
-        
+
         // Fallback for providers that don't override this method
         return plugin_dir_url(WP_FACTOR_TG_FILE) . 'assets/icons/default-provider.png';
     }
@@ -127,11 +127,11 @@ abstract class Abstract_Provider
     {
         // Default: look for template in AuthPress main plugin directory
         $default_path = dirname(WP_FACTOR_TG_FILE) . "/templates/admin/provider-configs/{$this->get_key()}.php";
-        
+
         if (file_exists($default_path)) {
             return $default_path;
         }
-        
+
         return null;
     }
 
@@ -142,12 +142,12 @@ abstract class Abstract_Provider
     public function get_features_template_path()
     {
         // Default: look for template in AuthPress main plugin directory
-        $default_path = dirname(WP_FACTOR_TG_FILE) . "/templates/admin/provider-features/{$this->get_key()}.php";
-        
+        $default_path = dirname(__FILE__) . "/templates/admin/provider-features/{$this->get_key()}.php";
+
         if (file_exists($default_path)) {
             return $default_path;
         }
-        
+
         return null;
     }
 
@@ -159,9 +159,9 @@ abstract class Abstract_Provider
     public function is_enabled()
     {
         // Check if provider is enabled in AuthPress settings
-        $providers = get_option('wp_factor_providers', []);
+        $providers = authpress_providers();
         $enabled = isset($providers[$this->get_key()]['enabled']) && $providers[$this->get_key()]['enabled'];
-        
+
         // Allow filtering of provider enabled state
         $enabled = apply_filters("authpress_{$this->get_key()}_provider_enabled", $enabled);
         $enabled = apply_filters('authpress_provider_enabled', $enabled, $this->get_key());

@@ -177,9 +177,9 @@ if (!empty($error_msg)) {
                         if ($key === 'recovery_codes') continue;
                         
                         // Check if user has this method available
-                        if ($key === 'telegram' && !$user_available_methods['telegram']) continue;
-                        if ($key === 'email' && !$user_available_methods['email']) continue;
-                        if ($key === 'authenticator' && !$user_available_methods['totp']) continue;
+                        // Handle both hardcoded providers and external providers
+                        $available_key = ($key === 'authenticator') ? 'totp' : $key;
+                        if (!isset($user_available_methods[$available_key]) || !$user_available_methods[$available_key]) continue;
                     ?>
                         <option value="<?php echo esc_attr($method_key); ?>" 
                                 <?php echo $user_default_method === $method_key ? 'selected' : ''; ?> 
@@ -235,6 +235,31 @@ if (!empty($error_msg)) {
         </p>
     </div>
 
+    <!-- Dynamic sections for external providers -->
+    <?php 
+    foreach ($enabled_providers as $key => $provider):
+        if (in_array($key, ['telegram', 'email', 'authenticator', 'recovery_codes'])) continue;
+        
+        $available_key = $key;
+        if (!isset($user_available_methods[$available_key]) || !$user_available_methods[$available_key]) continue;
+        
+        $method_key = $key;
+        $is_active = ($default_method === $method_key) ? 'active' : '';
+    ?>
+        <div id="<?php echo esc_attr($key); ?>-login-section" class="login-section <?php echo $is_active; ?>">
+            <p class="notice notice-info">
+                <?php echo sprintf(__("Enter the code sent via %s.", "two-factor-login-telegram"), $provider->get_name()); ?>
+            </p>
+
+            <p>
+                <label for="<?php echo esc_attr($key); ?>_code" style="padding-top:1em">
+                    <?php echo sprintf(__("%s code:", "two-factor-login-telegram"), $provider->get_name()); ?>
+                </label>
+                <input type="text" name="<?php echo esc_attr($key); ?>_code" id="<?php echo esc_attr($key); ?>_code" class="input" value="" size="6" maxlength="6" placeholder="123456"/>
+            </p>
+        </div>
+    <?php endforeach; ?>
+
     <!-- Recovery Login Section -->
     <div id="recovery-login-section" class="login-section">
         <p class="notice notice-info">
@@ -285,33 +310,34 @@ document.addEventListener('DOMContentLoaded', function() {
             // Update hidden input
             loginMethodInput.value = method;
 
-            // Show/hide sections with animation
-            telegramSection.classList.remove('active');
-            emailSection.classList.remove('active');
-            totpSection.classList.remove('active');
-            recoverySection.classList.remove('active');
+            // Hide all sections
+            document.querySelectorAll('.login-section').forEach(function(section) {
+                section.classList.remove('active');
+            });
 
             // Small delay to allow for smooth transition
             setTimeout(function() {
-                if (method === 'telegram') {
-                    telegramSection.classList.add('active');
-                    setTimeout(function() { authcodeInput.focus(); }, 100);
+                var targetSection = document.getElementById(method + '-login-section');
+                if (targetSection) {
+                    targetSection.classList.add('active');
+                    
+                    // Focus on the appropriate input
+                    var input = targetSection.querySelector('input[type="text"]');
+                    if (input) {
+                        setTimeout(function() { input.focus(); }, 100);
+                    }
+                }
 
-                    // Send Telegram code when user switches to Telegram method
-                    if (method !== '<?php echo esc_js($default_method); ?>') {
+                // Send codes for methods that need them when switching methods
+                if (method !== '<?php echo esc_js($default_method); ?>') {
+                    if (method === 'telegram') {
                         sendTelegramCode();
-                    }
-                } else if (method === 'email') {
-                    emailSection.classList.add('active');
-                    setTimeout(function() { emailInput.focus(); }, 100);
-
-                    // Send email code when user switches to email method
-                    if (method !== '<?php echo esc_js($default_method); ?>') {
+                    } else if (method === 'email') {
                         sendEmailCode();
+                    } else {
+                        // Handle external providers that support code sending
+                        sendExternalProviderCode(method);
                     }
-                } else if (method === 'totp') {
-                    totpSection.classList.add('active');
-                    setTimeout(function() { totpInput.focus(); }, 100);
                 }
             }, 150);
         });
@@ -448,6 +474,45 @@ function sendEmailCode() {
     .catch(error => {
         noticeElement.innerHTML = '❌ <?php echo esc_js(__('Error sending code. Please try again.', 'two-factor-login-telegram')); ?>';
     });
+}
+
+// Function to send code for external providers
+function sendExternalProviderCode(method) {
+    // External providers should implement their own code sending logic
+    // This is a generic function that will be called for external methods
+    var userId = document.getElementById('wp-auth-id').value;
+    var nonce = document.querySelector('input[name="nonce"]').value;
+
+    // Find the method section
+    var methodSection = document.getElementById(method + '-login-section');
+    if (methodSection) {
+        var noticeElement = methodSection.querySelector('.notice');
+        if (noticeElement) {
+            noticeElement.innerHTML = '⏳ Sending ' + method + ' code...';
+        }
+
+        // Make a generic AJAX call for external providers
+        fetch('<?php echo admin_url('admin-ajax.php'); ?>', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: 'action=send_login_' + method + '_code&user_id=' + encodeURIComponent(userId) + '&nonce=' + encodeURIComponent(nonce)
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success && noticeElement) {
+                noticeElement.innerHTML = '✅ Code sent! Check your device.';
+            } else if (noticeElement) {
+                noticeElement.innerHTML = '❌ Error sending code. Please try again.';
+            }
+        })
+        .catch(error => {
+            if (noticeElement) {
+                noticeElement.innerHTML = '❌ Error sending code. Please try again.';
+            }
+        });
+    }
 }
 
 // Auto-expire token after timeout period (only for Telegram method)

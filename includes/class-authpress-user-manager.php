@@ -166,7 +166,13 @@ final class AuthPress_User_Manager
      */
     public static function user_has_2fa($user_id)
     {
-        return self::user_has_telegram($user_id) || self::user_has_email($user_id) || self::user_has_totp($user_id);
+        $methods = self::get_user_available_methods($user_id);
+        foreach ($methods as $method_available) {
+            if ($method_available) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -177,11 +183,16 @@ final class AuthPress_User_Manager
      */
     public static function get_user_available_methods($user_id)
     {
-        return [
+        $methods = [
             'telegram' => self::user_has_telegram($user_id),
             'email' => self::user_has_email($user_id),
             'totp' => self::user_has_totp($user_id)
         ];
+        
+        // Allow external providers to add their methods
+        $methods = apply_filters('authpress_user_available_methods', $methods, $user_id);
+        
+        return $methods;
     }
 
     /**
@@ -220,38 +231,33 @@ final class AuthPress_User_Manager
         // Get available methods
         $available = self::get_user_available_methods($user_id);
 
-        // Check if preferred method is available
-        if ($preferred === 'telegram' && $available['telegram']) {
-            return 'telegram';
-        }
-        if ($preferred === 'email' && $available['email']) {
-            return 'email';
-        }
-        if ($preferred === 'totp' && $available['totp']) {
-            return 'totp';
+        // Check if preferred method is available (includes custom providers)
+        if (isset($available[$preferred]) && $available[$preferred]) {
+            return $preferred;
         }
 
         // Fallback to system default if available
         $normalized_default = ($system_default === 'authenticator') ? 'totp' : $system_default;
-        if ($normalized_default === 'telegram' && $available['telegram']) {
-            return 'telegram';
-        }
-        if ($normalized_default === 'email' && $available['email']) {
-            return 'email';
-        }
-        if ($normalized_default === 'totp' && $available['totp']) {
-            return 'totp';
+        if (isset($available[$normalized_default]) && $available[$normalized_default]) {
+            return $normalized_default;
         }
 
-        // Final fallback to any available method (priority order: Telegram, Email, TOTP)
-        if ($available['telegram']) {
+        // Final fallback to any available method (priority order: Telegram, Email, TOTP, then any other)
+        if ($available['telegram'] ?? false) {
             return 'telegram';
         }
-        if ($available['email']) {
+        if ($available['email'] ?? false) {
             return 'email';
         }
-        if ($available['totp']) {
+        if ($available['totp'] ?? false) {
             return 'totp';
+        }
+        
+        // Return the first available custom provider
+        foreach ($available as $provider_key => $is_available) {
+            if ($is_available && !in_array($provider_key, ['telegram', 'email', 'totp'])) {
+                return $provider_key;
+            }
         }
 
         return null;
@@ -500,14 +506,35 @@ final class AuthPress_User_Manager
         }
         
         $methods = [];
-        if ($config['available_methods']['telegram']) {
-            $methods[] = __('Telegram', 'two-factor-login-telegram');
-        }
-        if ($config['available_methods']['email']) {
-            $methods[] = __('Email', 'two-factor-login-telegram');
-        }
-        if ($config['available_methods']['totp']) {
-            $methods[] = __('Authenticator', 'two-factor-login-telegram');
+        $method_names = [];
+        
+        // Build list of available methods and their display names
+        foreach ($config['available_methods'] as $method_key => $is_available) {
+            if ($is_available) {
+                switch ($method_key) {
+                    case 'telegram':
+                        $methods[] = __('Telegram', 'two-factor-login-telegram');
+                        $method_names[$method_key] = __('Telegram', 'two-factor-login-telegram');
+                        break;
+                    case 'email':
+                        $methods[] = __('Email', 'two-factor-login-telegram');
+                        $method_names[$method_key] = __('Email', 'two-factor-login-telegram');
+                        break;
+                    case 'totp':
+                        $methods[] = __('Authenticator', 'two-factor-login-telegram');
+                        $method_names[$method_key] = __('Authenticator', 'two-factor-login-telegram');
+                        break;
+                    default:
+                        // Handle custom providers
+                        $provider = AuthPress_Provider_Registry::get($method_key);
+                        if ($provider) {
+                            $provider_name = $provider->get_name();
+                            $methods[] = $provider_name;
+                            $method_names[$method_key] = $provider_name;
+                        }
+                        break;
+                }
+            }
         }
         
         if (empty($methods)) {
@@ -517,17 +544,11 @@ final class AuthPress_User_Manager
         $methods_text = implode(' + ', $methods);
         $default_method = $config['effective_provider'];
         
-        if ($default_method) {
-            $default_name = ($default_method === 'telegram') 
-                ? __('Telegram', 'two-factor-login-telegram')
-                : (($default_method === 'email') 
-                    ? __('Email', 'two-factor-login-telegram')
-                    : __('Authenticator', 'two-factor-login-telegram'));
-            
+        if ($default_method && isset($method_names[$default_method])) {
             return sprintf(
                 __('Enabled (%s, default: %s)', 'two-factor-login-telegram'),
                 $methods_text,
-                $default_name
+                $method_names[$default_method]
             );
         }
         

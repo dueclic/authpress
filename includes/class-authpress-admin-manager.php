@@ -22,11 +22,6 @@ class AuthPress_Admin_Manager
 
     public function show_user_2fa_page()
     {
-        // Get provider instances for icons
-        $telegram_provider = AuthPress_Auth_Factory::create(AuthPress_Auth_Factory::METHOD_TELEGRAM_OTP);
-        $email_provider = AuthPress_Auth_Factory::create(AuthPress_Auth_Factory::METHOD_EMAIL_OTP);
-        $totp_provider = AuthPress_Auth_Factory::create(AuthPress_Auth_Factory::METHOD_TOTP);
-
         require_once(dirname(WP_FACTOR_TG_FILE) . "/templates/admin/user-2fa-settings-page.php");
     }
 
@@ -183,24 +178,29 @@ class AuthPress_Admin_Manager
         if (wp_verify_nonce($_POST['wp_factor_default_provider_nonce'], 'wp_factor_set_default_provider')) {
             $default_provider = sanitize_text_field($_POST['default_provider']);
 
-            $valid_providers = [];
+            // Get all available methods for this user (includes custom providers)
             $available_methods = AuthPress_User_Manager::get_user_available_methods($user_id);
-
-            if ($available_methods['telegram']) {
-                $valid_providers[] = 'telegram';
-            }
-            if ($available_methods['email']) {
-                $valid_providers[] = 'email';
-            }
-            if ($available_methods['totp']) {
-                $valid_providers[] = 'authenticator';
+            $valid_providers = [];
+            
+            // Build list of valid providers from available methods
+            foreach ($available_methods as $method_key => $is_available) {
+                if ($is_available) {
+                    // Handle special case for totp -> authenticator mapping
+                    if ($method_key === 'totp') {
+                        $valid_providers[] = 'authenticator';
+                    } else {
+                        $valid_providers[] = $method_key;
+                    }
+                }
             }
 
             if (in_array($default_provider, $valid_providers)) {
                 update_user_meta($user_id, 'wp_factor_user_default_provider', $default_provider);
-                add_action('admin_notices', function() use ($default_provider) {
-                    $provider_name = ($default_provider === 'telegram') ? __('Telegram', 'two-factor-login-telegram') :
-                                  (($default_provider === 'email') ? __('Email', 'two-factor-login-telegram') : __('Authenticator App', 'two-factor-login-telegram'));
+                
+                // Get provider display name dynamically
+                $provider_name = $this->get_provider_display_name($default_provider);
+                
+                add_action('admin_notices', function() use ($provider_name) {
                     echo '<div class="notice notice-success is-dismissible"><p>' . sprintf(__('Default 2FA method set to %s successfully!', 'two-factor-login-telegram'), $provider_name) . '</p></div>';
                 });
             } else {
@@ -208,6 +208,27 @@ class AuthPress_Admin_Manager
                     echo '<div class="notice notice-error is-dismissible"><p>' . __('Invalid default provider selected.', 'two-factor-login-telegram') . '</p></div>';
                 });
             }
+        }
+    }
+
+    /**
+     * Get display name for a provider
+     * @param string $provider_key Provider key
+     * @return string Display name
+     */
+    private function get_provider_display_name($provider_key)
+    {
+        switch ($provider_key) {
+            case 'telegram':
+                return __('Telegram', 'two-factor-login-telegram');
+            case 'email':
+                return __('Email', 'two-factor-login-telegram');
+            case 'authenticator':
+                return __('Authenticator App', 'two-factor-login-telegram');
+            default:
+                // For custom providers, get name from provider registry
+                $provider = AuthPress_Provider_Registry::get($provider_key);
+                return $provider ? $provider->get_name() : ucfirst($provider_key);
         }
     }
 
@@ -488,6 +509,7 @@ class AuthPress_Admin_Manager
 
     public function sanitize_providers_settings($input)
     {
+
         $sanitized = array();
 
         $sanitized['authenticator'] = array(
@@ -505,7 +527,20 @@ class AuthPress_Admin_Manager
             'enabled' => isset($input['email']['enabled']) ? true : false
         );
 
-        $sanitized['default_provider'] = isset($input['default_provider']) && in_array($input['default_provider'], ['telegram', 'email', 'authenticator']) ? $input['default_provider'] : 'telegram';
+        // Allow any valid provider as default, not just hardcoded ones
+        $valid_provider_keys = [];
+        $all_providers = AuthPress_Provider_Registry::get_all();
+        foreach ($all_providers as $key => $provider) {
+            if ($provider && $provider->is_enabled()) {
+                $valid_provider_keys[] = $key;
+                // Handle totp -> authenticator mapping
+                if ($key === 'totp') {
+                    $valid_provider_keys[] = 'authenticator';
+                }
+            }
+        }
+        
+        $sanitized['default_provider'] = isset($input['default_provider']) && in_array($input['default_provider'], $valid_provider_keys) ? $input['default_provider'] : 'telegram';
 
         if ($sanitized['telegram']['enabled'] && !empty($sanitized['telegram']['bot_token'])) {
             $legacy_settings = get_option('tg_col', array());
@@ -519,7 +554,7 @@ class AuthPress_Admin_Manager
             update_option('tg_col', $legacy_settings);
         }
 
-        return $sanitized;
+        return apply_filters('authpress_providers_sanitize_before_save', $sanitized, $input);
     }
 
     public function failed_login_section_callback()

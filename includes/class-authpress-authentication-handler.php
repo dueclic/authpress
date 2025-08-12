@@ -38,6 +38,7 @@ class AuthPress_Authentication_Handler
         $user_config = AuthPress_User_Manager::get_user_2fa_config($user->ID);
         $default_method = $user_config['effective_provider'];
 
+        // Handle built-in providers
         if ($default_method === 'telegram' && $user_config['available_methods']['telegram']) {
             $telegram_otp = AuthPress_Auth_Factory::create(AuthPress_Auth_Factory::METHOD_TELEGRAM_OTP);
             $auth_code = $telegram_otp->save_authcode($user);
@@ -62,6 +63,31 @@ class AuthPress_Authentication_Handler
                 'success' => $auth_code !== false,
                 'reason' => 'default_method_email'
             ));
+        } else {
+            // Handle external providers
+            $provider = AuthPress_Provider_Registry::get($default_method);
+            if ($provider && isset($user_config['available_methods'][$default_method]) && $user_config['available_methods'][$default_method]) {
+                $codes = $provider->generate_codes($user->ID);
+                if (!empty($codes)) {
+                    $this->logger->log_telegram_action('external_code_sent', array(
+                        'user_id' => $user->ID,
+                        'user_login' => $user->user_login,
+                        'provider' => $default_method,
+                        'provider_name' => $provider->get_name(),
+                        'success' => true,
+                        'reason' => 'default_method_external'
+                    ));
+                } else {
+                    $this->logger->log_telegram_action('external_code_failed', array(
+                        'user_id' => $user->ID,
+                        'user_login' => $user->user_login,
+                        'provider' => $default_method,
+                        'provider_name' => $provider->get_name(),
+                        'success' => false,
+                        'reason' => 'code_generation_failed'
+                    ));
+                }
+            }
         }
 
         $redirect_to = isset($_REQUEST['redirect_to'])
@@ -150,8 +176,11 @@ class AuthPress_Authentication_Handler
                 return $_POST['totp_code'] ?? '';
             case 'email':
                 return $_POST['email_code'] ?? '';
-            default:
+            case 'telegram':
                 return $_POST['authcode'] ?? '';
+            default:
+                // For external providers, look for {method}_code field
+                return $_POST[$login_method . '_code'] ?? '';
         }
     }
 

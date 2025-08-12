@@ -68,9 +68,17 @@ wp_enqueue_style('authpress-plugin');
                 $provider = $data['provider'];
                 $user_has_method = $data['user_has_method'];
 
-                // Get provider-specific template file or fallback to generic
-                $template_file = sprintf('provider-%s.php', $key);
-                $template_path = dirname(WP_FACTOR_TG_FILE) .'/templates/admin/provider-templates/' . $template_file;
+                // Check if provider has custom user template path method
+                $template_path = null;
+                if (method_exists($provider, 'get_user_template_path')) {
+                    $template_path = $provider->get_user_template_path();
+                }
+                
+                // Fallback to default template location
+                if (!$template_path || !file_exists($template_path)) {
+                    $template_file = sprintf('provider-%s.php', $key);
+                    $template_path = dirname(WP_FACTOR_TG_FILE) .'/templates/admin/provider-templates/' . $template_file;
+                }
 
                 if (file_exists($template_path)) {
                     // Load provider-specific template

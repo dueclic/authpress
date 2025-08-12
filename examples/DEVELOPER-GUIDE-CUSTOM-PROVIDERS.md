@@ -184,7 +184,7 @@ class SMS_Aimon_Provider extends Abstract_Provider
     
     public function is_configured()
     {
-        $providers = get_option('wp_factor_providers', []);
+        $providers = authpress_providers();
         $config = $providers['sms_aimon'] ?? [];
         
         return !empty($config['api_key']) && !empty($config['sender_id']);
