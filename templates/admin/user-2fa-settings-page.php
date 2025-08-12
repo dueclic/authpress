@@ -19,7 +19,7 @@ $provider_data = [];
 foreach ($enabled_providers as $key => $provider) {
     $user_method_key = $key === 'authenticator' ? 'totp' : $key;
     $user_has_method = $user_config['available_methods'][$user_method_key] ?? false;
-    
+
     $provider_data[$key] = [
         'provider' => $provider,
         'key' => $key,
@@ -62,24 +62,24 @@ wp_enqueue_style('authpress-plugin');
     <?php else: ?>
 
         <div class="authpress-2fa-settings">
-            <?php 
+            <?php
             // Dynamic provider sections using registry and template files
-            foreach ($provider_data as $key => $data): 
+            foreach ($provider_data as $key => $data):
                 $provider = $data['provider'];
                 $user_has_method = $data['user_has_method'];
-                
+
                 // Get provider-specific template file or fallback to generic
                 $template_file = sprintf('provider-%s.php', $key);
-                $template_path = __DIR__ . '/../provider-templates/' . $template_file;
-                
+                $template_path = dirname(WP_FACTOR_TG_FILE) .'/templates/admin/provider-templates/' . $template_file;
+
                 if (file_exists($template_path)) {
                     // Load provider-specific template
                     include $template_path;
                 } else {
                     // Fallback to generic provider template
-                    include __DIR__ . '/../provider-templates/generic-provider.php';
+                    include dirname(WP_FACTOR_TG_FILE) .'/templates/admin/provider-templates/generic-provider.php';
                 }
-            endforeach; 
+            endforeach;
             ?>
 
             <?php if ($user_has_active_methods): ?>
@@ -93,7 +93,7 @@ wp_enqueue_style('authpress-plugin');
                     <input type="hidden" name="wp_factor_action" value="set_default_provider">
 
                     <div class="authpress-provider-options">
-                        <?php foreach ($provider_data as $key => $data): 
+                        <?php foreach ($provider_data as $key => $data):
                             if (!$data['user_has_method']) continue; // Only show enabled methods
                         ?>
                             <label class="authpress-provider-option">

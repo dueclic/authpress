@@ -1,4 +1,6 @@
 .idea/
-deploy-rsync.sh
+deploy-*.sh
 composer.lock
 vendor
+examples/*
+!examples/DEVELOPER-GUIDE-CUSTOM-PROVIDERS.md

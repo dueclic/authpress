@@ -9,12 +9,21 @@ use Authpress\AuthPress_Provider_Registry;
 // Get all available provider instances
 $available_providers = AuthPress_Provider_Registry::get_all();
 
+// Handle timing issues where external providers register after initial load
+$external_providers = apply_filters('authpress_register_providers', []);
+$missing_external_providers = array_diff(array_keys($external_providers), array_keys($available_providers));
+if (!empty($missing_external_providers)) {
+    // Force reload to catch late-registering external providers
+    AuthPress_Provider_Registry::force_reload_external_providers();
+    $available_providers = AuthPress_Provider_Registry::get_all();
+}
+
 // Group providers by category
 $provider_categories = [
     'messaging' => [
         'title' => __("Messaging Providers", "two-factor-login-telegram"),
         'description' => __("Receive authentication codes directly via messaging platforms.", "two-factor-login-telegram"),
-        'providers' => ['telegram', 'email']
+        'providers' => ['telegram', 'email', 'sms_aimon']
     ],
     'authenticator' => [
         'title' => __("Authenticator Apps", "two-factor-login-telegram"),
@@ -22,6 +31,26 @@ $provider_categories = [
         'providers' => ['authenticator']
     ]
 ];
+
+// Allow external plugins to add providers to categories
+$provider_categories = apply_filters('authpress_provider_categories', $provider_categories);
+
+// Auto-add any uncategorized providers to 'other' category
+$categorized_providers = [];
+foreach ($provider_categories as $category) {
+    $categorized_providers = array_merge($categorized_providers, $category['providers']);
+}
+
+$uncategorized_providers = array_diff(array_keys($available_providers), $categorized_providers);
+// Exclude recovery_codes from being shown in admin interface - it's a backend-only provider
+$uncategorized_providers = array_diff($uncategorized_providers, ['recovery_codes']);
+if (!empty($uncategorized_providers)) {
+    $provider_categories['other'] = [
+        'title' => __("Other Providers", "two-factor-login-telegram"),
+        'description' => __("Additional 2FA methods provided by plugins.", "two-factor-login-telegram"),
+        'providers' => $uncategorized_providers
+    ];
+}
 
 ?>
 
@@ -67,9 +96,9 @@ $provider_categories = [
 
                         <div class="provider-content">
                             <?php 
-                            // Load provider-specific configuration if it exists
-                            $config_template = dirname(WP_FACTOR_TG_FILE) . "/templates/admin/provider-configs/{$provider->get_key()}.php";
-                            if (file_exists($config_template)): 
+                            // Load provider-specific configuration template
+                            $config_template = $provider->get_config_template_path();
+                            if ($config_template && file_exists($config_template)): 
                             ?>
                                 <div class="provider-config">
                                     <h4><?php _e("Configuration:", "two-factor-login-telegram"); ?></h4>
@@ -78,9 +107,9 @@ $provider_categories = [
                             <?php endif; ?>
 
                             <?php 
-                            // Load provider-specific features if it exists
-                            $features_template = dirname(WP_FACTOR_TG_FILE) . "/templates/admin/provider-features/{$provider->get_key()}.php";
-                            if (file_exists($features_template)): 
+                            // Load provider-specific features template
+                            $features_template = $provider->get_features_template_path();
+                            if ($features_template && file_exists($features_template)): 
                             ?>
                                 <div class="provider-features">
                                     <h4><?php _e("Features:", "two-factor-login-telegram"); ?></h4>
