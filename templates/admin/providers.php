@@ -23,7 +23,7 @@ $provider_categories = [
     'messaging' => [
         'title' => __("Messaging Providers", "two-factor-login-telegram"),
         'description' => __("Receive authentication codes directly via messaging platforms.", "two-factor-login-telegram"),
-        'providers' => ['telegram', 'email', 'sms_aimon']
+        'providers' => ['telegram', 'email']
     ],
     'authenticator' => [
         'title' => __("Authenticator Apps", "two-factor-login-telegram"),
@@ -66,10 +66,10 @@ if (!empty($uncategorized_providers)) {
 
             <div class="providers-container">
                 <?php foreach ($category['providers'] as $provider_key): ?>
-                    <?php 
+                    <?php
                     $provider = $available_providers[$provider_key] ?? null;
                     if (!$provider) continue;
-                    
+
                     $is_enabled = $provider->is_enabled();
                     $is_configured = $provider->is_configured();
                     ?>
@@ -85,9 +85,9 @@ if (!empty($uncategorized_providers)) {
                             </div>
                             <div class="provider-toggle">
                                 <label class="switch">
-                                    <input type="checkbox" 
+                                    <input type="checkbox"
                                            name="wp_factor_providers[<?php echo esc_attr($provider->get_key()); ?>][enabled]"
-                                           value="1" 
+                                           value="1"
                                            <?php checked($is_enabled); ?>>
                                     <span class="slider round"></span>
                                 </label>
@@ -95,10 +95,10 @@ if (!empty($uncategorized_providers)) {
                         </div>
 
                         <div class="provider-content">
-                            <?php 
+                            <?php
                             // Load provider-specific configuration template
                             $config_template = $provider->get_config_template_path();
-                            if ($config_template && file_exists($config_template)): 
+                            if ($config_template && file_exists($config_template)):
                             ?>
                                 <div class="provider-config">
                                     <h4><?php _e("Configuration:", "two-factor-login-telegram"); ?></h4>
@@ -106,10 +106,10 @@ if (!empty($uncategorized_providers)) {
                                 </div>
                             <?php endif; ?>
 
-                            <?php 
+                            <?php
                             // Load provider-specific features template
                             $features_template = $provider->get_features_template_path();
-                            if ($features_template && file_exists($features_template)): 
+                            if ($features_template && file_exists($features_template)):
                             ?>
                                 <div class="provider-features">
                                     <h4><?php _e("Features:", "two-factor-login-telegram"); ?></h4>
@@ -119,7 +119,7 @@ if (!empty($uncategorized_providers)) {
 
                             <div class="provider-status <?php echo $is_enabled ? 'enabled' : 'disabled'; ?>">
                                 <span class="dashicons <?php echo $is_enabled ? 'dashicons-yes-alt' : 'dashicons-no-alt'; ?>"></span>
-                                <?php 
+                                <?php
                                 if ($is_enabled) {
                                     printf(__("%s provider is active", "two-factor-login-telegram"), $provider->get_name());
                                     if (!$is_configured) {
@@ -146,9 +146,9 @@ if (!empty($uncategorized_providers)) {
                 </th>
                 <td>
                     <select name="wp_factor_providers[default_provider]" id="default_provider">
-                        <?php 
+                        <?php
                         $current_default = $providers['default_provider'] ?? 'telegram';
-                        foreach ($available_providers as $key => $provider): 
+                        foreach ($available_providers as $key => $provider):
                             if ($key === 'recovery_codes') continue; // Skip recovery codes as default
                             $selected = selected($current_default, $key, false);
                         ?>

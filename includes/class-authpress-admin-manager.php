@@ -711,6 +711,10 @@ class AuthPress_Admin_Manager
                 });
             }
         }
+        
+        // Redirect back to My 2FA Settings page to prevent white page
+        wp_safe_redirect(admin_url('users.php?page=my-2fa-settings'));
+        exit;
     }
 
     /**
@@ -762,5 +766,9 @@ class AuthPress_Admin_Manager
                 });
             }
         }
+        
+        // Redirect back to My 2FA Settings page to prevent white page
+        wp_safe_redirect(admin_url('users.php?page=my-2fa-settings'));
+        exit;
     }
 }
