@@ -70,4 +70,10 @@ abstract class Abstract_Provider
      * @return bool True on success, false on failure
      */
     abstract public function delete_user_codes($user_id);
+
+    /**
+     * Get the icon URL for this provider
+     * @return string PNG icon URL
+     */
+    abstract public function get_icon();
 }

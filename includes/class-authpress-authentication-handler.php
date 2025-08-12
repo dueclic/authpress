@@ -90,6 +90,11 @@ class AuthPress_Authentication_Handler
             $default_method = $failed_method;
         }
 
+        // Get provider instances for icons
+        $telegram_provider = AuthPress_Auth_Factory::create(AuthPress_Auth_Factory::METHOD_TELEGRAM_OTP);
+        $email_provider = AuthPress_Auth_Factory::create(AuthPress_Auth_Factory::METHOD_EMAIL_OTP);
+        $totp_provider = AuthPress_Auth_Factory::create(AuthPress_Auth_Factory::METHOD_TOTP);
+
         require_once(ABSPATH . '/wp-admin/includes/template.php');
         require_once(dirname(WP_FACTOR_TG_FILE) . "/templates/login-form.php");
     }
@@ -312,6 +317,11 @@ class AuthPress_Authentication_Handler
         if ($telegram_available) {
             $telegram_bot = $this->telegram->get_me();
         }
+
+        // Get provider instances for icons
+        $telegram_provider = AuthPress_Auth_Factory::create(AuthPress_Auth_Factory::METHOD_TELEGRAM_OTP);
+        $email_provider = AuthPress_Auth_Factory::create(AuthPress_Auth_Factory::METHOD_EMAIL_OTP);
+        $totp_provider = AuthPress_Auth_Factory::create(AuthPress_Auth_Factory::METHOD_TOTP);
 
         require_once(ABSPATH . '/wp-admin/includes/template.php');
         require_once(dirname(WP_FACTOR_TG_FILE) . "/templates/setup-wizard.php");

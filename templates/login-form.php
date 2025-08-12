@@ -155,18 +155,18 @@ if (!empty($error_msg)) {
             <div class="method-dropdown-container">
                 <select id="method-dropdown" class="method-dropdown">
                     <?php if ($user_has_telegram): ?>
-                        <option value="telegram" <?php echo $default_method === 'telegram' ? 'selected' : ''; ?> data-icon="📱">
-                            📱 <?php _e("Telegram", "two-factor-login-telegram"); ?>
+                        <option value="telegram" <?php echo $default_method === 'telegram' ? 'selected' : ''; ?> data-icon="<?php echo esc_url($telegram_provider->get_icon()); ?>">
+                            <?php _e("Telegram", "two-factor-login-telegram"); ?>
                         </option>
                     <?php endif; ?>
                     <?php if ($user_has_email): ?>
-                        <option value="email" <?php echo $default_method === 'email' ? 'selected' : ''; ?> data-icon="📧">
-                            📧 <?php _e("Email", "two-factor-login-telegram"); ?>
+                        <option value="email" <?php echo $default_method === 'email' ? 'selected' : ''; ?> data-icon="<?php echo esc_url($email_provider->get_icon()); ?>">
+                            <?php _e("Email", "two-factor-login-telegram"); ?>
                         </option>
                     <?php endif; ?>
                     <?php if ($user_has_totp): ?>
-                        <option value="totp" <?php echo $default_method === 'totp' ? 'selected' : ''; ?> data-icon="🔐">
-                            🔐 <?php _e("Authenticator App", "two-factor-login-telegram"); ?>
+                        <option value="totp" <?php echo $default_method === 'totp' ? 'selected' : ''; ?> data-icon="<?php echo esc_url($totp_provider->get_icon()); ?>">
+                            <?php _e("Authenticator App", "two-factor-login-telegram"); ?>
                         </option>
                     <?php endif; ?>
                 </select>

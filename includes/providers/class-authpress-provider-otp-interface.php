@@ -2,7 +2,7 @@
 
 namespace AuthPress\Providers;
 
-interface OTP_Provider_Interface
+interface Provider_Otp_Interface
 {
     /**
      * Send an OTP code to the user

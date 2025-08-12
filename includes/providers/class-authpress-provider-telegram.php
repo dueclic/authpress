@@ -5,7 +5,7 @@ namespace AuthPress\Providers;
 use \Authpress\WP_Telegram;
 use WP_User;
 
-class Telegram_Provider extends Abstract_Provider implements OTP_Provider_Interface
+class Telegram_Provider extends Abstract_Provider implements Provider_Otp_Interface
 {
     private $telegram;
 
@@ -292,7 +292,7 @@ class Telegram_Provider extends Abstract_Provider implements OTP_Provider_Interf
     {
         $user_id = is_object($user) ? $user->ID : intval($user);
         $chat_id = \Authpress\AuthPress_User_Manager::get_user_chat_id($user_id);
-        
+
         if (!$chat_id) {
             return false;
         }
@@ -309,11 +309,11 @@ class Telegram_Provider extends Abstract_Provider implements OTP_Provider_Interf
     public function save_and_send_authcode($user, $code_length = 5)
     {
         $auth_code = $this->save_authcode($user, $code_length);
-        
+
         if ($auth_code && $this->send_otp($user, $auth_code)) {
             return $auth_code;
         }
-        
+
         return false;
     }
 
@@ -326,11 +326,11 @@ class Telegram_Provider extends Abstract_Provider implements OTP_Provider_Interf
     {
         // Generate a new code and send it
         $auth_code = $this->save_authcode($user);
-        
+
         if ($auth_code) {
             return $this->send_otp($user, $auth_code);
         }
-        
+
         return false;
     }
 
@@ -351,5 +351,15 @@ class Telegram_Provider extends Abstract_Provider implements OTP_Provider_Interf
     public function get_provider_name()
     {
         return __('Telegram', 'two-factor-login-telegram');
+    }
+
+    /**
+     * Get the icon URL for this provider
+     * @return string PNG icon URL
+     */
+    public function get_icon()
+    {
+        $logo = plugin_dir_url(WP_FACTOR_TG_FILE) . 'assets/telegram-icon.png';
+        return apply_filters('authpress_provider_logo', $logo, 'telegram');
     }
 }

@@ -166,4 +166,14 @@ class Recovery_Codes_Provider extends Abstract_Provider
         $this->delete_user_recovery_codes($user_id);
         return true;
     }
+
+    /**
+     * Get the icon URL for this provider
+     * @return string PNG icon URL
+     */
+    public function get_icon()
+    {
+        $logo = plugin_dir_url(WP_FACTOR_TG_FILE) . 'assets/recovery-codes-icon.png';
+        return apply_filters('authpress_provider_logo', $logo, 'recovery-codes');
+    }
 }

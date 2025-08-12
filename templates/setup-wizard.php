@@ -227,7 +227,9 @@ login_header(__('2FA Setup', 'two-factor-login-telegram'), '', '');
                 <?php if ($telegram_available): ?>
                     <label class="method-option" for="method-telegram">
                         <input type="radio" id="method-telegram" name="setup_method" value="telegram">
-                        <span class="method-icon">📱</span>
+                        <span class="method-icon">
+                            <img src="<?php echo esc_url($telegram_provider->get_icon()); ?>" alt="Telegram" style="width: 24px; height: 24px;" />
+                        </span>
                         <h3 class="method-name"><?php _e('Telegram', 'two-factor-login-telegram'); ?></h3>
                         <p class="method-description">
                             <?php _e('Receive verification codes instantly on your phone via Telegram', 'two-factor-login-telegram'); ?>
@@ -239,7 +241,9 @@ login_header(__('2FA Setup', 'two-factor-login-telegram'), '', '');
                 <?php if ($email_available): ?>
                     <label class="method-option" for="method-email">
                         <input type="radio" id="method-email" name="setup_method" value="email">
-                        <span class="method-icon">📧</span>
+                        <span class="method-icon">
+                            <img src="<?php echo esc_url($email_provider->get_icon()); ?>" alt="Email" style="width: 24px; height: 24px;" />
+                        </span>
                         <h3 class="method-name"><?php _e('Email', 'two-factor-login-telegram'); ?></h3>
                         <p class="method-description">
                             <?php _e('Receive verification codes via email', 'two-factor-login-telegram'); ?>
@@ -251,7 +255,9 @@ login_header(__('2FA Setup', 'two-factor-login-telegram'), '', '');
                 <?php if ($authenticator_enabled): ?>
                     <label class="method-option" for="method-authenticator">
                         <input type="radio" id="method-authenticator" name="setup_method" value="authenticator">
-                        <span class="method-icon">🔐</span>
+                        <span class="method-icon">
+                            <img src="<?php echo esc_url($totp_provider->get_icon()); ?>" alt="Authenticator" style="width: 24px; height: 24px;" />
+                        </span>
                         <h3 class="method-name"><?php _e('Authenticator App', 'two-factor-login-telegram'); ?></h3>
                         <p class="method-description">
                             <?php _e('Use apps like Google Authenticator or Authy for offline code generation', 'two-factor-login-telegram'); ?>

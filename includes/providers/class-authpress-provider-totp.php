@@ -308,4 +308,14 @@ class TOTP_Provider extends Abstract_Provider
     {
         return $this->disable_user_totp($user_id);
     }
+
+    /**
+     * Get the icon URL for this provider
+     * @return string PNG icon URL
+     */
+    public function get_icon()
+    {
+        $logo = plugin_dir_url(WP_FACTOR_TG_FILE) . 'assets/totp-icon.png';
+        return apply_filters('authpress_provider_logo', $logo, 'totp');
+    }
 }

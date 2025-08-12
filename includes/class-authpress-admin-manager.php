@@ -27,6 +27,11 @@ class AuthPress_Admin_Manager
 
     public function show_user_2fa_page()
     {
+        // Get provider instances for icons
+        $telegram_provider = AuthPress_Auth_Factory::create(AuthPress_Auth_Factory::METHOD_TELEGRAM_OTP);
+        $email_provider = AuthPress_Auth_Factory::create(AuthPress_Auth_Factory::METHOD_EMAIL_OTP);
+        $totp_provider = AuthPress_Auth_Factory::create(AuthPress_Auth_Factory::METHOD_TOTP);
+
         require_once(dirname(WP_FACTOR_TG_FILE) . "/templates/user-2fa-settings-page.php");
     }
 

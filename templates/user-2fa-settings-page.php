@@ -398,7 +398,9 @@ wp_enqueue_style('authpress-plugin');
                             <label class="authpress-provider-option">
                                 <input type="radio" name="default_provider" value="telegram"
                                        <?php checked($user_default_provider, 'telegram'); ?>>
-                                <span class="provider-icon">📱</span>
+                                <span class="provider-icon">
+                                    <img src="<?php echo esc_url($telegram_provider->get_icon()); ?>" alt="Telegram" style="width: 20px; height: 20px;" />
+                                </span>
                                 <span class="provider-name"><?php _e('Telegram', 'two-factor-login-telegram'); ?></span>
                                 <span class="provider-description"><?php _e('Receive codes via Telegram', 'two-factor-login-telegram'); ?></span>
                             </label>
@@ -408,7 +410,9 @@ wp_enqueue_style('authpress-plugin');
                             <label class="authpress-provider-option">
                                 <input type="radio" name="default_provider" value="email"
                                        <?php checked($user_default_provider, 'email'); ?>>
-                                <span class="provider-icon">📧</span>
+                                <span class="provider-icon">
+                                    <img src="<?php echo esc_url($email_provider->get_icon()); ?>" alt="Email" style="width: 20px; height: 20px;" />
+                                </span>
                                 <span class="provider-name"><?php _e('Email', 'two-factor-login-telegram'); ?></span>
                                 <span class="provider-description"><?php _e('Receive codes via email', 'two-factor-login-telegram'); ?></span>
                             </label>
@@ -418,7 +422,9 @@ wp_enqueue_style('authpress-plugin');
                             <label class="authpress-provider-option">
                                 <input type="radio" name="default_provider" value="authenticator"
                                        <?php checked($user_default_provider, 'authenticator'); ?>>
-                                <span class="provider-icon">🔐</span>
+                                <span class="provider-icon">
+                                    <img src="<?php echo esc_url($totp_provider->get_icon()); ?>" alt="Authenticator" style="width: 20px; height: 20px;" />
+                                </span>
                                 <span class="provider-name"><?php _e('Authenticator App', 'two-factor-login-telegram'); ?></span>
                                 <span class="provider-description"><?php _e('Use codes from your authenticator app', 'two-factor-login-telegram'); ?></span>
                             </label>

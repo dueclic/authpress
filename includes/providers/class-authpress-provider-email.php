@@ -4,7 +4,7 @@ namespace AuthPress\Providers;
 
 use WP_User;
 
-class Email_Provider extends Abstract_Provider implements OTP_Provider_Interface
+class Email_Provider extends Abstract_Provider implements Provider_Otp_Interface
 {
     /**
      * Send authentication code to user via email
@@ -20,19 +20,19 @@ class Email_Provider extends Abstract_Provider implements OTP_Provider_Interface
         $auth_code = $this->generate_auth_code(6);
         $normalized_for_storage = $this->normalize_code($auth_code);
         $hashed_code = $this->hash_code($normalized_for_storage);
-        
+
         error_log("Email code generation - Original: '$auth_code', Normalized for storage: '$normalized_for_storage', Hash: '$hashed_code'");
-        
+
         global $wpdb;
         $table_name = $wpdb->prefix . 'telegram_auth_codes';
-        
+
         // Clean up old codes for this user
         $wpdb->delete(
             $table_name,
             array('user_id' => $user->ID),
             array('%d')
         );
-        
+
         // Insert new code
         $result = $wpdb->insert(
             $table_name,
@@ -44,14 +44,14 @@ class Email_Provider extends Abstract_Provider implements OTP_Provider_Interface
             ),
             array('%s', '%d', '%s', '%s')
         );
-        
+
         if ($result === false) {
             return false;
         }
 
         // Send email
         $subject = sprintf(__('[%s] Two-Factor Authentication Code', 'two-factor-login-telegram'), get_bloginfo('name'));
-        
+
         $message = sprintf(
             __("Hello %s,\n\nHere's your verification code for logging into %s:\n\n%s\n\nThis code will expire in %d minutes.\n\nIf you didn't request this code, please ignore this email.\n\nBest regards,\n%s Team", 'two-factor-login-telegram'),
             $user->display_name,
@@ -60,14 +60,14 @@ class Email_Provider extends Abstract_Provider implements OTP_Provider_Interface
             WP_FACTOR_AUTHCODE_EXPIRE_SECONDS / 60,
             get_bloginfo('name')
         );
-        
+
         $headers = array('Content-Type: text/plain; charset=UTF-8');
-        
+
         $sent = wp_mail($user->user_email, $subject, $message, $headers);
-        
+
         return $sent ? $auth_code : false;
     }
-    
+
     /**
      * Validate email OTP code
      * @param string $code The code to validate
@@ -83,21 +83,21 @@ class Email_Provider extends Abstract_Provider implements OTP_Provider_Interface
 
         $normalized_code = $this->normalize_code($code);
         $hashed_code = $this->hash_code($normalized_code);
-        
+
         error_log("Email validation debug - Original: '$code', Normalized: '$normalized_code', Hash: '$hashed_code'");
-        
+
         global $wpdb;
         $table_name = $wpdb->prefix . 'telegram_auth_codes';
-        
+
         $stored_code = $wpdb->get_row($wpdb->prepare(
             "SELECT * FROM $table_name WHERE user_id = %d AND auth_code = %s AND expiration_date > %s ORDER BY creation_date DESC LIMIT 1",
             $user_id,
             $hashed_code,
             current_time('mysql')
         ));
-        
+
         error_log("Email validation debug - Query result: " . ($stored_code ? 'FOUND' : 'NOT_FOUND'));
-        
+
         if ($stored_code) {
             error_log("Email validation SUCCESS for user $user_id");
             // Delete the used code
@@ -108,11 +108,11 @@ class Email_Provider extends Abstract_Provider implements OTP_Provider_Interface
             );
             return true;
         }
-        
+
         error_log("Email validation FAILED for user $user_id - code not found or expired");
         return false;
     }
-    
+
     /**
      * Check if code is expired or invalid
      * @param string $code The code to validate
@@ -127,29 +127,29 @@ class Email_Provider extends Abstract_Provider implements OTP_Provider_Interface
 
         $normalized_code = $this->normalize_code($code);
         $hashed_code = $this->hash_code($normalized_code);
-        
+
         global $wpdb;
         $table_name = $wpdb->prefix . 'telegram_auth_codes';
-        
+
         // Check if code exists and is valid
         $stored_code = $wpdb->get_row($wpdb->prepare(
             "SELECT * FROM $table_name WHERE user_id = %d AND auth_code = %s ORDER BY creation_date DESC LIMIT 1",
             $user_id,
             $hashed_code
         ));
-        
+
         if (!$stored_code) {
             return 'invalid';
         }
-        
+
         // Check if expired
         if (strtotime($stored_code->expiration_date) < current_time('timestamp')) {
             return 'expired';
         }
-        
+
         return 'valid';
     }
-    
+
     /**
      * Save authentication code for user (used during login)
      * @param WP_User $user The user
@@ -159,7 +159,7 @@ class Email_Provider extends Abstract_Provider implements OTP_Provider_Interface
     {
         return $this->send_email_otp($user);
     }
-    
+
     /**
      * Generate new codes for a user (email doesn't need pre-generated codes)
      * @param int $user_id The user ID
@@ -171,7 +171,7 @@ class Email_Provider extends Abstract_Provider implements OTP_Provider_Interface
         // Email OTP doesn't need pre-generated codes
         return array();
     }
-    
+
     /**
      * Check if user has active codes (for email, this means having an email address)
      * @param int $user_id The user ID
@@ -182,7 +182,7 @@ class Email_Provider extends Abstract_Provider implements OTP_Provider_Interface
         $user = get_userdata($user_id);
         return $user && !empty($user->user_email);
     }
-    
+
     /**
      * Delete all codes for a user
      * @param int $user_id The user ID
@@ -192,19 +192,19 @@ class Email_Provider extends Abstract_Provider implements OTP_Provider_Interface
     {
         global $wpdb;
         $table_name = $wpdb->prefix . 'telegram_auth_codes';
-        
+
         $result = $wpdb->delete(
             $table_name,
             array('user_id' => $user_id),
             array('%d')
         );
-        
+
         return $result !== false;
     }
 
     /**
      * Send an OTP code to the user via Email
-     * @param WP_User|int $user The user object or user ID  
+     * @param WP_User|int $user The user object or user ID
      * @param string $code The OTP code to send
      * @return bool True on success, false on failure
      */
@@ -213,13 +213,13 @@ class Email_Provider extends Abstract_Provider implements OTP_Provider_Interface
         if (is_int($user)) {
             $user = get_userdata($user);
         }
-        
+
         if (!$user || !$user->user_email) {
             return false;
         }
 
         $subject = sprintf(__('[%s] Two-Factor Authentication Code', 'two-factor-login-telegram'), get_bloginfo('name'));
-        
+
         $message = sprintf(
             __("Hello %s,\n\nHere's your verification code for logging into %s:\n\n%s\n\nThis code will expire in %d minutes.\n\nIf you didn't request this code, please ignore this email.\n\nBest regards,\n%s Team", 'two-factor-login-telegram'),
             $user->display_name,
@@ -228,9 +228,9 @@ class Email_Provider extends Abstract_Provider implements OTP_Provider_Interface
             WP_FACTOR_AUTHCODE_EXPIRE_SECONDS / 60,
             get_bloginfo('name')
         );
-        
+
         $headers = array('Content-Type: text/plain; charset=UTF-8');
-        
+
         return wp_mail($user->user_email, $subject, $message, $headers);
     }
 
@@ -245,20 +245,20 @@ class Email_Provider extends Abstract_Provider implements OTP_Provider_Interface
         if (is_int($user)) {
             $user = get_userdata($user);
         }
-        
+
         if (!$user || !$user->user_email) {
             return false;
         }
 
         $auth_code = $this->generate_auth_code($code_length);
         $hashed_code = $this->hash_code($auth_code);
-        
+
         global $wpdb;
         $table_name = $wpdb->prefix . 'telegram_auth_codes';
-        
+
         $creation_date = current_time('mysql');
         $expiration_date = date('Y-m-d H:i:s', strtotime($creation_date) + WP_FACTOR_AUTHCODE_EXPIRE_SECONDS);
-        
+
         $result = $wpdb->insert(
             $table_name,
             array(
@@ -269,11 +269,11 @@ class Email_Provider extends Abstract_Provider implements OTP_Provider_Interface
             ),
             array('%s', '%d', '%s', '%s')
         );
-        
+
         if ($result && $this->send_otp($user, $auth_code)) {
             return $auth_code;
         }
-        
+
         return false;
     }
 
@@ -305,5 +305,15 @@ class Email_Provider extends Abstract_Provider implements OTP_Provider_Interface
     public function get_provider_name()
     {
         return __('Email', 'two-factor-login-telegram');
+    }
+
+    /**
+     * Get the icon URL for this provider
+     * @return string PNG icon URL
+     */
+    public function get_icon()
+    {
+        $logo = plugin_dir_url(WP_FACTOR_TG_FILE) . 'assets/email-icon.png';
+        return apply_filters('authpress_provider_logo', $logo, 'email');
     }
 }
