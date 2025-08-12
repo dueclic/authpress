@@ -70,12 +70,65 @@ class AuthPress_Admin_Manager
             case 'set_default_provider':
                 $this->handle_set_default_provider($current_user_id);
                 break;
+
+            default:
+                // Handle generic provider disable/enable actions
+                if (strpos($action, 'disable_') === 0) {
+                    $provider_key = substr($action, 8); // Remove "disable_" prefix
+                    $this->handle_generic_disable_provider($current_user_id, $provider_key);
+                } elseif (strpos($action, 'enable_') === 0) {
+                    $provider_key = substr($action, 7); // Remove "enable_" prefix
+                    $this->handle_generic_enable_provider($current_user_id, $provider_key);
+                }
+                break;
         }
+    }
+
+    /**
+     * Check if a provider can be disabled (not default method)
+     * 
+     * @param int $user_id User ID
+     * @param string $provider_key Provider key to check
+     * @return bool True if can be disabled, false otherwise
+     */
+    private function can_disable_provider($user_id, $provider_key)
+    {
+        $user_default_provider = get_user_meta($user_id, 'wp_factor_user_default_provider', true);
+        if (empty($user_default_provider)) {
+            $plugin = AuthPress_Plugin::get_instance();
+            $user_default_provider = $plugin->get_default_provider();
+        }
+        
+        // Handle authenticator/totp mapping
+        if ($provider_key === 'totp' || $provider_key === 'authenticator') {
+            return !($user_default_provider === 'authenticator' || $user_default_provider === 'totp');
+        }
+        
+        return $user_default_provider !== $provider_key;
+    }
+
+    /**
+     * Show error notice for attempting to disable default provider
+     * 
+     * @param string $provider_name Human readable provider name
+     */
+    private function show_default_provider_disable_error($provider_name)
+    {
+        add_action('admin_notices', function() use ($provider_name) {
+            echo '<div class="notice notice-error is-dismissible"><p>' . 
+                sprintf(__('Cannot disable %s because it is set as your default 2FA method. Please change your default method first.', 'two-factor-login-telegram'), $provider_name) . 
+                '</p></div>';
+        });
     }
 
     private function handle_disable_totp($user_id)
     {
         if (wp_verify_nonce($_POST['wp_factor_totp_disable_nonce'], 'wp_factor_disable_totp')) {
+            if (!$this->can_disable_provider($user_id, 'totp')) {
+                $this->show_default_provider_disable_error(__('Authenticator app', 'two-factor-login-telegram'));
+                return;
+            }
+            
             $totp = AuthPress_Auth_Factory::create(AuthPress_Auth_Factory::METHOD_TOTP);
             if ($totp->disable_user_totp($user_id)) {
                 add_action('admin_notices', function() {
@@ -88,6 +141,11 @@ class AuthPress_Admin_Manager
     private function handle_disable_telegram($user_id)
     {
         if (wp_verify_nonce($_POST['wp_factor_telegram_disable_nonce'], 'wp_factor_disable_telegram')) {
+            if (!$this->can_disable_provider($user_id, 'telegram')) {
+                $this->show_default_provider_disable_error(__('Telegram', 'two-factor-login-telegram'));
+                return;
+            }
+            
             update_user_meta($user_id, 'tg_wp_factor_enabled', '0');
             delete_user_meta($user_id, 'tg_wp_factor_chat_id');
             add_action('admin_notices', function() {
@@ -114,6 +172,11 @@ class AuthPress_Admin_Manager
     private function handle_disable_email($user_id)
     {
         if (wp_verify_nonce($_POST['wp_factor_email_disable_nonce'], 'wp_factor_disable_email')) {
+            if (!$this->can_disable_provider($user_id, 'email')) {
+                $this->show_default_provider_disable_error(__('Email', 'two-factor-login-telegram'));
+                return;
+            }
+            
             AuthPress_User_Manager::disable_user_email($user_id);
             add_action('admin_notices', function() {
                 echo '<div class="notice notice-success is-dismissible"><p>' . __('Email 2FA has been disabled successfully.', 'two-factor-login-telegram') . '</p></div>';
@@ -597,5 +660,107 @@ class AuthPress_Admin_Manager
         $telegram->set_bot_token($old_token);
 
         return $is_valid;
+    }
+
+    /**
+     * Handle generic provider disable action
+     * 
+     * @param int $user_id User ID
+     * @param string $provider_key Provider key
+     */
+    private function handle_generic_disable_provider($user_id, $provider_key)
+    {
+        // Verify nonce
+        $nonce_field = 'wp_factor_' . $provider_key . '_disable_nonce';
+        $nonce_action = 'wp_factor_disable_' . $provider_key;
+        
+        if (!wp_verify_nonce($_POST[$nonce_field], $nonce_action)) {
+            return;
+        }
+        
+        // Skip handled providers (they have specific handlers)
+        if (in_array($provider_key, ['telegram', 'email', 'totp', 'authenticator'])) {
+            return;
+        }
+        
+        // Check if provider can be disabled
+        if (!$this->can_disable_provider($user_id, $provider_key)) {
+            $provider_name = $this->get_provider_display_name($provider_key);
+            $this->show_default_provider_disable_error($provider_name);
+            return;
+        }
+        
+        // Get provider from registry
+        $provider = AuthPress_Provider_Registry::get($provider_key);
+        if (!$provider) {
+            add_action('admin_notices', function() {
+                echo '<div class="notice notice-error is-dismissible"><p>' . __('Provider not found.', 'two-factor-login-telegram') . '</p></div>';
+            });
+            return;
+        }
+        
+        // Call provider's disable method if it exists
+        if (method_exists($provider, 'disable_user_method')) {
+            $success = $provider->disable_user_method($user_id);
+            if ($success) {
+                $provider_name = $provider->get_name();
+                add_action('admin_notices', function() use ($provider_name) {
+                    echo '<div class="notice notice-success is-dismissible"><p>' . 
+                        sprintf(__('%s 2FA has been disabled successfully.', 'two-factor-login-telegram'), $provider_name) . 
+                        '</p></div>';
+                });
+            }
+        }
+    }
+
+    /**
+     * Handle generic provider enable action
+     * 
+     * @param int $user_id User ID
+     * @param string $provider_key Provider key
+     */
+    private function handle_generic_enable_provider($user_id, $provider_key)
+    {
+        // Verify nonce
+        $nonce_field = 'wp_factor_' . $provider_key . '_enable_nonce';
+        $nonce_action = 'wp_factor_enable_' . $provider_key;
+        
+        if (!wp_verify_nonce($_POST[$nonce_field], $nonce_action)) {
+            return;
+        }
+        
+        // Skip handled providers (they have specific handlers)
+        if (in_array($provider_key, ['telegram', 'email', 'totp', 'authenticator'])) {
+            return;
+        }
+        
+        // Get provider from registry
+        $provider = AuthPress_Provider_Registry::get($provider_key);
+        if (!$provider) {
+            add_action('admin_notices', function() {
+                echo '<div class="notice notice-error is-dismissible"><p>' . __('Provider not found.', 'two-factor-login-telegram') . '</p></div>';
+            });
+            return;
+        }
+        
+        // Call provider's enable method if it exists
+        if (method_exists($provider, 'enable_user_method')) {
+            $success = $provider->enable_user_method($user_id);
+            if ($success) {
+                $provider_name = $provider->get_name();
+                add_action('admin_notices', function() use ($provider_name) {
+                    echo '<div class="notice notice-success is-dismissible"><p>' . 
+                        sprintf(__('%s 2FA has been enabled successfully.', 'two-factor-login-telegram'), $provider_name) . 
+                        '</p></div>';
+                });
+            } else {
+                $provider_name = $provider->get_name();
+                add_action('admin_notices', function() use ($provider_name) {
+                    echo '<div class="notice notice-error is-dismissible"><p>' . 
+                        sprintf(__('Failed to enable %s 2FA.', 'two-factor-login-telegram'), $provider_name) . 
+                        '</p></div>';
+                });
+            }
+        }
     }
 }
