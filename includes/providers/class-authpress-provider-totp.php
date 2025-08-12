@@ -315,7 +315,7 @@ class TOTP_Provider extends Abstract_Provider
      */
     public function get_icon()
     {
-        $logo = plugin_dir_url(WP_FACTOR_TG_FILE) . '/assets/providers/totp-icon.png';
+        $logo = plugin_dir_url(WP_FACTOR_TG_FILE) . '/assets/images/providers/authenticator-icon.png';
         return apply_filters('authpress_provider_logo', $logo, 'totp');
     }
 }

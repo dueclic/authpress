@@ -58,7 +58,7 @@ class AuthPress_Auth_Factory
     /**
      * Get the appropriate auth method based on login method
      * @param string $login_method The login method from form data
-     * @return AuthPress_Auth_Method|null
+     * @return Abstract_Provider|null
      */
     public static function getByLoginMethod($login_method)
     {
@@ -85,7 +85,7 @@ class AuthPress_Auth_Factory
      * @param string $login_method The login method
      * @return bool True if valid, false otherwise
      */
-    public static function validateByMethod($code, $user_id, $login_method = 'telegram')
+    public static function validateByMethod($code, $user_id, $login_method = 'telegram'): bool
     {
         $auth_method = self::getByLoginMethod($login_method);
         if (!$auth_method) {

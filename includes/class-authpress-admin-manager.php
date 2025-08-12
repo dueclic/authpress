@@ -20,11 +20,6 @@ class AuthPress_Admin_Manager
         require_once(dirname(WP_FACTOR_TG_FILE) . "/templates/configuration.php");
     }
 
-    public function show_telegram_logs()
-    {
-        require_once(dirname(WP_FACTOR_TG_FILE) . "/templates/logs-page.php");
-    }
-
     public function show_user_2fa_page()
     {
         // Get provider instances for icons
@@ -560,12 +555,12 @@ class AuthPress_Admin_Manager
 
         $telegram = new WP_Telegram();
         $old_token = $telegram->get_bot_token();
-        
+
         $telegram->set_bot_token($bot_token);
         $is_valid = $telegram->get_me() !== false;
-        
+
         $telegram->set_bot_token($old_token);
-        
+
         return $is_valid;
     }
 }
