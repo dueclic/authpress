@@ -45,7 +45,7 @@ class AuthPress_Authentication_Handler
 
             $result = $this->telegram->send_tg_token($auth_code, $user_config['chat_id'], $user->ID);
 
-            $this->logger->log_telegram_action('auth_code_sent', array(
+            $this->logger->log_action('auth_code_sent', array(
                 'user_id' => $user->ID,
                 'user_login' => $user->user_login,
                 'chat_id' => $user_config['chat_id'],
@@ -56,7 +56,7 @@ class AuthPress_Authentication_Handler
             $email_otp = AuthPress_Auth_Factory::create(AuthPress_Auth_Factory::METHOD_EMAIL_OTP);
             $auth_code = $email_otp->save_authcode($user);
 
-            $this->logger->log_telegram_action('email_code_sent', array(
+            $this->logger->log_action('email_code_sent', array(
                 'user_id' => $user->ID,
                 'user_login' => $user->user_login,
                 'email' => $user->user_email,
@@ -69,7 +69,7 @@ class AuthPress_Authentication_Handler
             if ($provider && isset($user_config['available_methods'][$default_method]) && $user_config['available_methods'][$default_method]) {
                 $codes = $provider->generate_codes($user->ID);
                 if (!empty($codes)) {
-                    $this->logger->log_telegram_action('external_code_sent', array(
+                    $this->logger->log_action('external_code_sent', array(
                         'user_id' => $user->ID,
                         'user_login' => $user->user_login,
                         'provider' => $default_method,
@@ -78,7 +78,7 @@ class AuthPress_Authentication_Handler
                         'reason' => 'default_method_external'
                     ));
                 } else {
-                    $this->logger->log_telegram_action('external_code_failed', array(
+                    $this->logger->log_action('external_code_failed', array(
                         'user_id' => $user->ID,
                         'user_login' => $user->user_login,
                         'provider' => $default_method,
@@ -204,7 +204,7 @@ class AuthPress_Authentication_Handler
             ($login_method === 'totp' ? 'totp_code_login_success' :
             ($login_method === 'email' ? 'email_code_login_success' : 'telegram_code_login_success'));
 
-        $this->logger->log_telegram_action($log_action, array(
+        $this->logger->log_action($log_action, array(
             'user_id' => $user->ID,
             'user_login' => $user->user_login,
             'method' => $login_method,
@@ -243,7 +243,7 @@ class AuthPress_Authentication_Handler
             $auth_code = $telegram_otp->save_authcode($user);
             $result = $this->telegram->send_tg_token($auth_code, $chat_id, $user->ID);
 
-            $this->logger->log_telegram_action('auth_code_resent', array(
+            $this->logger->log_action('auth_code_resent', array(
                 'user_id' => $user->ID,
                 'user_login' => $user->user_login,
                 'chat_id' => $chat_id,
@@ -265,7 +265,7 @@ class AuthPress_Authentication_Handler
         if (AuthPress_User_Manager::user_has_email($user->ID)) {
             $auth_code = $email_otp->save_authcode($user);
 
-            $this->logger->log_telegram_action('email_code_resent', array(
+            $this->logger->log_action('email_code_resent', array(
                 'user_id' => $user->ID,
                 'user_login' => $user->user_login,
                 'email' => $user->user_email,
@@ -289,15 +289,16 @@ class AuthPress_Authentication_Handler
 
         switch ($login_method) {
             case 'recovery':
-                $this->logger->log_telegram_action('recovery_code_login_failed', $log_data);
+                $this->logger->log_action('recovery_code_login_failed', $log_data);
                 return __('Invalid recovery code. Please check and try again.', 'two-factor-login-telegram');
             case 'totp':
-                $this->logger->log_telegram_action('totp_code_login_failed', $log_data);
+                $this->logger->log_action('totp_code_login_failed', $log_data);
                 return __('Invalid authenticator code. Please check and try again.', 'two-factor-login-telegram');
             case 'email':
-                $this->logger->log_telegram_action('email_code_login_failed', $log_data);
+                $this->logger->log_action('email_code_login_failed', $log_data);
                 return __('Invalid email code. Please check your email and try again.', 'two-factor-login-telegram');
             default:
+                $this->logger->log_action($login_method.'_code_login_failed', $log_data);
                 return __('Invalid verification code. Please try again.', 'two-factor-login-telegram');
         }
     }
@@ -377,7 +378,7 @@ class AuthPress_Authentication_Handler
         }
 
         // Log the setup attempt
-        $this->logger->log_telegram_action('wizard_method_selected', array(
+        $this->logger->log_action('wizard_method_selected', array(
             'user_id' => $user_id,
             'user_login' => $user->user_login,
             'method' => $setup_method
@@ -428,7 +429,7 @@ class AuthPress_Authentication_Handler
             // Mark as setup completed (skipped)
             AuthPress_User_Manager::mark_user_setup_completed($current_user->ID);
 
-            $this->logger->log_telegram_action('wizard_skipped', array(
+            $this->logger->log_action('wizard_skipped', array(
                 'user_id' => $current_user->ID,
                 'user_login' => $current_user->user_login
             ));
@@ -442,7 +443,7 @@ class AuthPress_Authentication_Handler
     {
         wp_set_auth_cookie($user->ID, false);
 
-        $this->logger->log_telegram_action('wizard_completed', array(
+        $this->logger->log_action('wizard_completed', array(
             'user_id' => $user->ID,
             'user_login' => $user->user_login
         ));

@@ -4,7 +4,7 @@ namespace Authpress;
 
 class AuthPress_Logger
 {
-    public function log_telegram_action($action, $data = array())
+    public function log_action($action, $data = array())
     {
         global $wpdb;
 

@@ -61,7 +61,7 @@ class AuthPress_AJAX_Handler
 
         $send = $this->telegram->send_with_keyboard($validation_message, $_POST['chat_id'], $reply_markup);
 
-        $this->logger->log_telegram_action('validation_code_sent', array(
+        $this->logger->log_action('validation_code_sent', array(
             'chat_id' => $_POST['chat_id'],
             'success' => $send !== false,
             'error' => $send === false ? $this->telegram->lastError : null
@@ -187,7 +187,7 @@ class AuthPress_AJAX_Handler
             wp_send_json_error(['message' => __('Failed to generate TOTP secret.', 'two-factor-login-telegram')]);
         }
 
-        $this->logger->log_telegram_action('totp_setup_requested', array(
+        $this->logger->log_action('totp_setup_requested', array(
             'user_id' => $user_id,
             'user_login' => wp_get_current_user()->user_login
         ));
@@ -217,14 +217,14 @@ class AuthPress_AJAX_Handler
         if ($totp->verify_setup_code($code, $user_id)) {
             $totp->enable_user_totp($user_id);
 
-            $this->logger->log_telegram_action('totp_enabled', array(
+            $this->logger->log_action('totp_enabled', array(
                 'user_id' => $user_id,
                 'user_login' => wp_get_current_user()->user_login
             ));
 
             wp_send_json_success(['message' => __('Authenticator app enabled successfully!', 'two-factor-login-telegram')]);
         } else {
-            $this->logger->log_telegram_action('totp_verification_failed', array(
+            $this->logger->log_action('totp_verification_failed', array(
                 'user_id' => $user_id,
                 'user_login' => wp_get_current_user()->user_login,
                 'attempted_code' => substr($code, 0, 2) . '****'
@@ -249,7 +249,7 @@ class AuthPress_AJAX_Handler
         $totp = AuthPress_Auth_Factory::create(AuthPress_Auth_Factory::METHOD_TOTP);
 
         if ($totp->disable_user_totp($user_id)) {
-            $this->logger->log_telegram_action('totp_disabled', array(
+            $this->logger->log_action('totp_disabled', array(
                 'user_id' => $user_id,
                 'user_login' => wp_get_current_user()->user_login
             ));
@@ -283,7 +283,7 @@ class AuthPress_AJAX_Handler
 
         $result = $this->telegram->send_tg_token($auth_code, $chat_id, $user_id);
 
-        $this->logger->log_telegram_action('auth_code_sent_on_request', array(
+        $this->logger->log_action('auth_code_sent_on_request', array(
             'user_id' => $user_id,
             'user_login' => $user->user_login,
             'chat_id' => $chat_id,
@@ -318,7 +318,7 @@ class AuthPress_AJAX_Handler
         $email_otp = AuthPress_Auth_Factory::create(AuthPress_Auth_Factory::METHOD_EMAIL_OTP);
         $auth_code = $email_otp->save_authcode($user);
 
-        $this->logger->log_telegram_action('email_code_sent_on_request', array(
+        $this->logger->log_action('email_code_sent_on_request', array(
             'user_id' => $user_id,
             'user_login' => $user->user_login,
             'email' => $user->user_email,
@@ -352,7 +352,7 @@ class AuthPress_AJAX_Handler
         $user = get_userdata($user_id);
         $current_user = wp_get_current_user();
 
-        $this->logger->log_telegram_action('admin_disabled_2fa', array(
+        $this->logger->log_action('admin_disabled_2fa', array(
             'disabled_user_id' => $user_id,
             'disabled_user_login' => $user ? $user->user_login : 'unknown',
             'admin_user_id' => $current_user->ID,

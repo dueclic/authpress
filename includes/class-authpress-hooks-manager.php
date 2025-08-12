@@ -24,7 +24,7 @@ class AuthPress_Hooks_Manager
         // Authentication hooks
         add_action('wp_login', array($this->authentication_handler, 'handle_login'), 10, 2);
         add_action('login_form_validate_authpress', array($this->authentication_handler, 'validate_authentication'));
-        
+
         // Setup wizard hooks
         add_action('login_form_authpress_setup_wizard', array($this->authentication_handler, 'handle_setup_wizard_submission'));
         add_action('init', array($this->authentication_handler, 'handle_wizard_skip'));
@@ -213,7 +213,7 @@ class AuthPress_Hooks_Manager
                             var nonce = $btn.data('nonce');
                             var isReSetup = $btn.text().indexOf('<?php echo esc_js(__('Re-setup', 'two-factor-login-telegram')); ?>') !== -1;
 
-                            var confirmMessage = isReSetup 
+                            var confirmMessage = isReSetup
                                 ? '<?php echo esc_js(__('Are you sure you want to force this user to re-configure their 2FA setup?', 'two-factor-login-telegram')); ?>'
                                 : '<?php echo esc_js(__('Are you sure you want to force this user to set up 2FA?', 'two-factor-login-telegram')); ?>';
 
@@ -448,13 +448,13 @@ class AuthPress_Hooks_Manager
             $update = json_decode($input, true);
         }
 
-        $this->logger->log_telegram_action('webhook_received', array(
+        $this->logger->log_action('webhook_received', array(
             'raw_input' => $input,
             'parsed_update' => $update
         ));
 
         if (!$update || !isset($update['message'])) {
-            $this->logger->log_telegram_action('webhook_error', array('error' => 'Invalid update or missing message'));
+            $this->logger->log_action('webhook_error', array('error' => 'Invalid update or missing message'));
             return new WP_Error('invalid_webhook', 'Invalid webhook data', array('status' => 400));
         }
 
@@ -462,7 +462,7 @@ class AuthPress_Hooks_Manager
         $chat_id = $message['chat']['id'];
         $text = isset($message['text']) ? $message['text'] : '';
 
-        $this->logger->log_telegram_action('message_received', array(
+        $this->logger->log_action('message_received', array(
             'chat_id' => $chat_id,
             'text' => $text,
             'from' => $message['from'] ?? null
@@ -478,7 +478,7 @@ class AuthPress_Hooks_Manager
 
             $result = $this->telegram->send_with_keyboard($response_text, $chat_id);
 
-            $this->logger->log_telegram_action('get_id_response', array(
+            $this->logger->log_action('get_id_response', array(
                 'chat_id' => $chat_id,
                 'response_sent' => $result !== false
             ));
@@ -510,7 +510,7 @@ class AuthPress_Hooks_Manager
             $has_completed_setup = AuthPress_User_Manager::user_has_completed_setup($user_id);
 
             $output = '';
-            
+
             if ($has_2fa) {
                 $disable_nonce = wp_create_nonce('disable_2fa_telegram_' . $user_id);
                 $output = '<span style="color: green;">✅ ' . esc_html($status_text) . '</span><br>' .
@@ -565,7 +565,7 @@ class AuthPress_Hooks_Manager
 
         if ($result) {
             // Log the forced setup
-            $this->logger->log_telegram_action('admin_forced_wizard', array(
+            $this->logger->log_action('admin_forced_wizard', array(
                 'user_id' => $user_id,
                 'user_login' => $user->user_login,
                 'admin_id' => get_current_user_id(),

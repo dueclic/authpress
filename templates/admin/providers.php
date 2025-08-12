@@ -9,15 +9,6 @@ use Authpress\AuthPress_Provider_Registry;
 // Get all available provider instances
 $available_providers = AuthPress_Provider_Registry::get_all();
 
-// Handle timing issues where external providers register after initial load
-$external_providers = apply_filters('authpress_register_providers', []);
-$missing_external_providers = array_diff(array_keys($external_providers), array_keys($available_providers));
-if (!empty($missing_external_providers)) {
-    // Force reload to catch late-registering external providers
-    AuthPress_Provider_Registry::force_reload_external_providers();
-    $available_providers = AuthPress_Provider_Registry::get_all();
-}
-
 // Group providers by category
 $provider_categories = [
     'messaging' => [

@@ -152,13 +152,13 @@ if (!empty($error_msg)) {
     <!-- Hidden input to track which form is being used -->
     <input type="hidden" name="login_method" id="login_method" value="<?php echo esc_attr($default_method); ?>">
 
-    <?php 
+    <?php
     // Get user available methods using the modular system
     $user_available_methods = AuthPress_User_Manager::get_user_available_methods($user->ID);
     $available_count = array_sum($user_available_methods);
     $user_default_method = AuthPress_User_Manager::get_user_effective_provider($user->ID);
     ?>
-    
+
     <?php if ($available_count > 1): ?>
         <!-- Method Selector Dropdown -->
         <div class="method-selector-wrapper">
@@ -167,22 +167,22 @@ if (!empty($error_msg)) {
             </label>
             <div class="method-dropdown-container">
                 <select id="method-dropdown" class="method-dropdown">
-                    <?php 
+                    <?php
                     $enabled_providers = AuthPress_Provider_Registry::get_enabled();
                     foreach ($enabled_providers as $key => $provider):
                         // Map keys for backward compatibility
                         $method_key = ($key === 'authenticator') ? 'totp' : $key;
-                        
+
                         // Skip recovery codes in dropdown
                         if ($key === 'recovery_codes') continue;
-                        
+
                         // Check if user has this method available
                         // Handle both hardcoded providers and external providers
                         $available_key = ($key === 'authenticator') ? 'totp' : $key;
                         if (!isset($user_available_methods[$available_key]) || !$user_available_methods[$available_key]) continue;
                     ?>
-                        <option value="<?php echo esc_attr($method_key); ?>" 
-                                <?php echo $user_default_method === $method_key ? 'selected' : ''; ?> 
+                        <option value="<?php echo esc_attr($method_key); ?>"
+                                <?php echo $default_method === $method_key ? 'selected' : ''; ?>
                                 data-icon="<?php echo esc_url($provider->get_icon()); ?>">
                             <?php echo esc_html($provider->get_name()); ?>
                         </option>
@@ -236,13 +236,13 @@ if (!empty($error_msg)) {
     </div>
 
     <!-- Dynamic sections for external providers -->
-    <?php 
+    <?php
     foreach ($enabled_providers as $key => $provider):
         if (in_array($key, ['telegram', 'email', 'authenticator', 'recovery_codes'])) continue;
-        
+
         $available_key = $key;
         if (!isset($user_available_methods[$available_key]) || !$user_available_methods[$available_key]) continue;
-        
+
         $method_key = $key;
         $is_active = ($default_method === $method_key) ? 'active' : '';
     ?>
@@ -320,7 +320,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 var targetSection = document.getElementById(method + '-login-section');
                 if (targetSection) {
                     targetSection.classList.add('active');
-                    
+
                     // Focus on the appropriate input
                     var input = targetSection.querySelector('input[type="text"]');
                     if (input) {
@@ -329,7 +329,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
 
                 // Send codes for methods that need them when switching methods
-                if (method !== '<?php echo esc_js($default_method); ?>') {
+                if (method !== '<?php echo esc_js($user_default_method); ?>') {
+
+                    if (method === 'totp' || method === 'authenticator') {
+                        return;
+                    }
+
                     if (method === 'telegram') {
                         sendTelegramCode();
                     } else if (method === 'email') {
