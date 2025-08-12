@@ -17,7 +17,7 @@ class AuthPress_Admin_Manager
     public function configure_admin_page()
     {
         $providers = authpress_providers();
-        require_once(dirname(WP_FACTOR_TG_FILE) . "/templates/configuration.php");
+        require_once(dirname(WP_FACTOR_TG_FILE) . "/templates/admin/configuration.php");
     }
 
     public function show_user_2fa_page()
@@ -27,7 +27,7 @@ class AuthPress_Admin_Manager
         $email_provider = AuthPress_Auth_Factory::create(AuthPress_Auth_Factory::METHOD_EMAIL_OTP);
         $totp_provider = AuthPress_Auth_Factory::create(AuthPress_Auth_Factory::METHOD_TOTP);
 
-        require_once(dirname(WP_FACTOR_TG_FILE) . "/templates/user-2fa-settings-page.php");
+        require_once(dirname(WP_FACTOR_TG_FILE) . "/templates/admin/user-2fa-settings-page.php");
     }
 
     public function handle_2fa_settings_forms()

@@ -1,0 +1,33 @@
+<?php
+/**
+ * Suggestions tab view
+ */
+?>
+
+<h2><?php _e("Suggestions", "two-factor-login-telegram"); ?></h2>
+
+<div id="wpft-suggestions">
+    <p>
+        <?php _e("We would love to hear your feedback and suggestions! You can share them with us in three ways:", "two-factor-login-telegram"); ?>
+    </p>
+    <ol>
+        <li>
+            <?php _e('Send us an email at <a href="mailto:info@dueclic.com">info@dueclic.com</a>.',
+                "two-factor-login-telegram"); ?>
+        </li>
+        <li>
+            <?php
+            printf(__('Visit the <a href="%s" target="_blank">support section on WordPress.org</a>.',
+                "two-factor-login-telegram"),
+                'https://wordpress.org/support/plugin/two-factor-login-telegram/');
+            ?>
+        </li>
+        <li>
+            <?php
+            printf(__('Submit your issues or ideas on our <a href="%s" target="_blank">GitHub project page</a>.',
+                "two-factor-login-telegram"),
+                'https://github.com/debba/wp-two-factor-authentication-with-telegram/issues');
+            ?>
+        </li>
+    </ol>
+</div>
