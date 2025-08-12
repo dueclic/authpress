@@ -77,17 +77,14 @@ class AuthPress_Authentication_Handler
             $rememberme = 1;
         }
 
-        $plugin_logo = apply_filters(
-            'two_factor_login_telegram_logo',
-            plugins_url('assets/img/plugin_logo.png', WP_FACTOR_TG_FILE)
-        );
+        $plugin_logo = authpress_logo();
 
         $user_config = AuthPress_User_Manager::get_user_2fa_config($user->ID);
         $user_has_telegram = $user_config['available_methods']['telegram'];
         $user_has_email = $user_config['available_methods']['email'];
         $user_has_totp = $user_config['available_methods']['totp'];
         $default_method = $user_config['effective_provider'];
-        
+
         // If validation failed, set the failed method as the active method
         if ($failed_method !== null && $failed_method !== 'recovery') {
             $default_method = $failed_method;
@@ -172,7 +169,7 @@ class AuthPress_Authentication_Handler
         $log_action = ($login_method === 'recovery') ? 'recovery_code_login_success' :
             ($login_method === 'totp' ? 'totp_code_login_success' :
             ($login_method === 'email' ? 'email_code_login_success' : 'telegram_code_login_success'));
-        
+
         $this->logger->log_telegram_action($log_action, array(
             'user_id' => $user->ID,
             'user_login' => $user->user_login,
@@ -183,7 +180,15 @@ class AuthPress_Authentication_Handler
 
     private function handle_failed_validation($login_method, $user, $code)
     {
-        do_action('wp_factor_telegram_failed', $user->user_login);
+        do_action_deprecated(
+            'wp_factor_telegram_failed',
+            array($user->user_login),
+            '3.6.0',
+            'authpress_login_failed',
+            __('The action wp_factor_telegram_failed is deprecated. Use authpress_login_failed instead.', 'two-factor-login-telegram')
+        );
+
+        do_action('authpress_login_failed', $user->user_login, $login_method);
 
         if ($login_method === 'telegram') {
             return $this->handle_telegram_failed_validation($user, $code);
@@ -275,7 +280,8 @@ class AuthPress_Authentication_Handler
         $recovery_codes = AuthPress_Auth_Factory::create(AuthPress_Auth_Factory::METHOD_RECOVERY_CODES);
         if (!$recovery_codes->has_recovery_codes($user->ID)) {
             $codes = $recovery_codes->regenerate_recovery_codes($user->ID);
-            $plugin_logo = apply_filters('two_factor_login_telegram_logo', plugins_url('assets/img/plugin_logo.png', WP_FACTOR_TG_FILE));
+            $plugin_logo = authpress_logo();
+
             $redirect_to = apply_filters('login_redirect', $_REQUEST['redirect_to'], $_REQUEST['redirect_to'], $user);
             require_once(dirname(WP_FACTOR_TG_FILE) . '/templates/recovery-codes-wizard.php');
             exit;
@@ -296,10 +302,7 @@ class AuthPress_Authentication_Handler
         $redirect_to = isset($_REQUEST['redirect_to'])
             ? wp_sanitize_redirect($_REQUEST['redirect_to']) : wp_unslash($_SERVER['REQUEST_URI']);
 
-        $plugin_logo = apply_filters(
-            'two_factor_login_telegram_logo',
-            plugins_url('assets/img/plugin_logo.png', WP_FACTOR_TG_FILE)
-        );
+        $plugin_logo = authpress_logo();
 
         $telegram_available = AuthPress_User_Manager::is_telegram_provider_enabled() && AuthPress_User_Manager::is_telegram_bot_valid();
         $email_available = AuthPress_User_Manager::is_email_provider_enabled() && AuthPress_User_Manager::user_email_available($user->ID);
@@ -322,7 +325,7 @@ class AuthPress_Authentication_Handler
 
         $user_id = intval($_POST['user_id']);
         $user = get_userdata($user_id);
-        
+
         if (!$user || !wp_verify_nonce($_POST['setup_wizard_nonce'], 'authpress_setup_wizard_' . $user_id)) {
             wp_die(__('Security check failed. Please try again.', 'two-factor-login-telegram'));
         }
@@ -350,22 +353,22 @@ class AuthPress_Authentication_Handler
                     $this->complete_wizard_login($user, $redirect_to);
                 }
                 break;
-                
+
             case 'telegram':
             case 'authenticator':
                 // For Telegram and Authenticator, redirect to settings page for full setup
                 AuthPress_User_Manager::mark_user_setup_completed($user_id);
                 wp_set_auth_cookie($user_id, false);
-                
+
                 $settings_url = add_query_arg(array(
                     'page' => 'my-2fa-settings',
                     'setup_method' => $setup_method,
                     'redirect_to' => urlencode($redirect_to)
                 ), admin_url('users.php'));
-                
+
                 wp_safe_redirect($settings_url);
                 exit;
-                
+
             default:
                 wp_die(__('Invalid setup method selected.', 'two-factor-login-telegram'));
         }
@@ -379,13 +382,13 @@ class AuthPress_Authentication_Handler
 
         // Extract user info from login session or current context
         $redirect_to = wp_sanitize_redirect($_GET['redirect_to'] ?? admin_url());
-        
+
         // Check if we have a pending login context
         $current_user = wp_get_current_user();
         if ($current_user && $current_user->exists()) {
             // Mark as setup completed (skipped)
             AuthPress_User_Manager::mark_user_setup_completed($current_user->ID);
-            
+
             $this->logger->log_telegram_action('wizard_skipped', array(
                 'user_id' => $current_user->ID,
                 'user_login' => $current_user->user_login

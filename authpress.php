@@ -61,6 +61,23 @@ function authpress_providers()
     return apply_filters('authpress_providers', $authpress_providers);
 }
 
+function authpress_logo() {
+
+    $plugin_logo = plugins_url('assets/img/plugin_logo.png', WP_FACTOR_TG_FILE);
+
+    $plugin_logo = apply_filters_deprecated(
+        'two_factor_login_telegram_logo',
+        array($plugin_logo),
+        '3.6.0',
+        'authpress_logo',
+        __('two_factor_login_telegram_logo filter is deprecated. Use authpress_logo instead.', 'two-factor-login-telegram')
+    );
+
+    $plugin_logo = apply_filters('authpress_logo', $plugin_logo);
+
+    return $plugin_logo;
+}
+
 function authpress_tg_provider_bot_token_valid($bot_token)
 {
     if (empty($bot_token)) {

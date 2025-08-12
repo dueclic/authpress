@@ -158,7 +158,7 @@ class AuthPress_AJAX_Handler
         $recovery_codes = AuthPress_Auth_Factory::create(AuthPress_Auth_Factory::METHOD_RECOVERY_CODES);
         $codes = $recovery_codes->regenerate_recovery_codes($user_id, 8, 10);
 
-        $plugin_logo = apply_filters('two_factor_login_telegram_logo', plugins_url('assets/img/plugin_logo.png', WP_FACTOR_TG_FILE));
+        $plugin_logo = authpress_logo();
         $redirect_to = $_POST['redirect_to'] ?? admin_url('profile.php');
         ob_start();
         define('IS_PROFILE_PAGE', true);

@@ -15,8 +15,7 @@ $title = __('Verification Code Expired', 'two-factor-login-telegram');
 $message = __('The verification code has expired. Please request a new code to login.', 'two-factor-login-telegram');
 
 // Get plugin logo
-$plugin_logo = apply_filters('two_factor_login_telegram_logo',
-    plugins_url('assets/img/plugin_logo.png', WP_FACTOR_TG_FILE));
+$plugin_logo = authpress_logo();
 
 // Set HTTP response code
 http_response_code(400);
@@ -29,7 +28,7 @@ http_response_code(400);
     <title><?php echo esc_html($title); ?> - <?php bloginfo('name'); ?></title>
     <?php wp_head(); ?>
     <style>
-        body { 
+        body {
             font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;
             margin: 0;
             padding: 20px;
