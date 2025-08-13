@@ -295,4 +295,4 @@ input:checked + .slider:before {
 </style>
 
 
-<?php do_action("tft_copyright"); ?>
+<?php do_action("authpress_copyright"); ?>
