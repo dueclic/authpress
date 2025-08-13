@@ -61,6 +61,16 @@ function authpress_providers()
     return apply_filters('authpress_providers', $authpress_providers);
 }
 
+function authpress_provider_config(
+    $provider_name
+){
+    $providers = authpress_providers();
+    if (isset($providers[$provider_name])) {
+        return $providers[$provider_name];
+    }
+    return null;
+}
+
 function authpress_logo() {
 
     $plugin_logo = plugins_url('assets/img/plugin_logo.png', WP_FACTOR_TG_FILE);
