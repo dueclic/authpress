@@ -110,13 +110,22 @@ class AuthPress_Hooks_Manager
     {
         $screen = get_current_screen();
         if (in_array($screen->id, ["profile", "settings_page_authpress-conf", "users", "users_page_my-2fa-settings"])) {
+
             wp_register_style(
-                "tg_lib_css",
+                "authpress_css",
                 plugins_url("assets/css/authpress-plugin.css", dirname(__FILE__)),
                 array(),
                 WP_FACTOR_PLUGIN_VERSION
             );
-            wp_enqueue_style("tg_lib_css");
+            wp_enqueue_style("authpress_css");
+
+            wp_register_style(
+                    "authpress_ui_css",
+                    plugins_url("assets/css/authpress-ui.css", dirname(__FILE__)),
+                    array(),
+                    WP_FACTOR_PLUGIN_VERSION
+            );
+            wp_enqueue_style("authpress_ui_css");
 
             wp_register_script(
                 "tg_lib_js",

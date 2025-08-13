@@ -11,16 +11,16 @@ $available_providers = AuthPress_Provider_Registry::get_all();
 
 // Group providers by category
 $provider_categories = [
-    'messaging' => [
-        'title' => __("Messaging Providers", "two-factor-login-telegram"),
-        'description' => __("Receive authentication codes directly via messaging platforms.", "two-factor-login-telegram"),
-        'providers' => ['telegram', 'email']
-    ],
-    'authenticator' => [
-        'title' => __("Authenticator Apps", "two-factor-login-telegram"),
-        'description' => __("Time-based One-Time Password apps that generate codes offline.", "two-factor-login-telegram"),
-        'providers' => ['authenticator']
-    ]
+        'messaging' => [
+                'title' => __("Messaging Providers", "two-factor-login-telegram"),
+                'description' => __("Receive authentication codes directly via messaging platforms.", "two-factor-login-telegram"),
+                'providers' => ['telegram', 'email']
+        ],
+        'authenticator' => [
+                'title' => __("Authenticator Apps", "two-factor-login-telegram"),
+                'description' => __("Time-based One-Time Password apps that generate codes offline.", "two-factor-login-telegram"),
+                'providers' => ['authenticator']
+        ]
 ];
 
 // Allow external plugins to add providers to categories
@@ -37,25 +37,50 @@ $uncategorized_providers = array_diff(array_keys($available_providers), $categor
 $uncategorized_providers = array_diff($uncategorized_providers, ['recovery_codes']);
 if (!empty($uncategorized_providers)) {
     $provider_categories['other'] = [
-        'title' => __("Other Providers", "two-factor-login-telegram"),
-        'description' => __("Additional 2FA methods provided by plugins.", "two-factor-login-telegram"),
-        'providers' => $uncategorized_providers
+            'title' => __("Other Providers", "two-factor-login-telegram"),
+            'description' => __("Additional 2FA methods provided by plugins.", "two-factor-login-telegram"),
+            'providers' => $uncategorized_providers
     ];
 }
 
 ?>
 
-<h2><?php _e("2FA Methods Configuration", "two-factor-login-telegram"); ?></h2>
+<div class="authpress-ui ap-container">
+    <?php do_action('authpress_providers_page_header'); ?>
 
-<form method="post" action="options.php">
-    <?php settings_fields('wp_factor_providers'); ?>
+    <?php
+    $page_title = apply_filters('authpress_providers_page_title', __("2FA Methods Configuration", "two-factor-login-telegram"));
+    $page_subtitle = apply_filters('authpress_providers_page_subtitle', __("Manage 2FA methods and configure provider delivery settings.", "two-factor-login-telegram"));
+    ?>
 
-    <?php foreach ($provider_categories as $category_key => $category): ?>
-        <div class="providers-category">
-            <h3><?php echo esc_html($category['title']); ?></h3>
-            <p class="providers-description"><?php echo esc_html($category['description']); ?></p>
+    <div class="ap-topbar">
+        <div>
+            <h1 class="ap-title m-0"><?php echo esc_html($page_title); ?></h1>
+            <?php if ($page_subtitle): ?>
+                <p class="ap-subtitle"><?php echo esc_html($page_subtitle); ?></p>
+            <?php endif; ?>
+        </div>
+        <?php do_action('authpress_providers_page_topbar_nav'); ?>
+    </div>
 
-            <div class="providers-container">
+    <?php do_action('authpress_providers_page_notices'); ?>
+
+    <form method="post" action="<?php echo admin_url('options.php'); ?>">
+        <?php settings_fields('wp_factor_providers'); ?>
+        <?php do_action('authpress_providers_form_start'); ?>
+
+        <?php foreach ($provider_categories as $category_key => $category): ?>
+            <?php
+            $category_title = apply_filters('authpress_provider_category_title', $category['title'], $category_key, $category);
+            $category_description = apply_filters('authpress_provider_category_description', $category['description'], $category_key, $category);
+            ?>
+
+            <h3 class="ap-heading"><?php echo esc_html($category_title); ?></h3>
+            <?php if ($category_description): ?>
+                <p class="ap-text mb-16"><?php echo esc_html($category_description); ?></p>
+            <?php endif; ?>
+
+            <div class="ap-grid mb-24 <?php echo apply_filters('authpress_provider_settings_grid_cls', '', $category_key); ?>">
                 <?php foreach ($category['providers'] as $provider_key): ?>
                     <?php
                     $provider = $available_providers[$provider_key] ?? null;
@@ -63,83 +88,176 @@ if (!empty($uncategorized_providers)) {
 
                     $is_enabled = $provider->is_enabled();
                     $is_configured = $provider->is_configured();
+
+                    $col_class = apply_filters('authpress_provider_card_col_class', 'ap-col-6', $provider, $provider_key, $category_key);
+                    $card_classes = apply_filters('authpress_provider_card_classes', 'provider-card', $provider, $provider_key, $category_key);
+                    $header_style = apply_filters('authpress_provider_header_style', '', $provider, $provider_key, $category_key);
                     ?>
 
-                    <div class="provider-card <?php echo $is_enabled ? 'enabled' : 'disabled'; ?>">
-                        <div class="provider-header">
-                            <div class="provider-icon">
-                                <img src="<?php echo esc_url($provider->get_icon()); ?>" alt="<?php echo esc_attr($provider->get_name()); ?>" style="width: 32px; height: 32px;">
-                            </div>
-                            <div class="provider-info">
-                                <h3><?php echo esc_html($provider->get_name()); ?></h3>
-                                <p><?php echo esc_html($provider->get_description()); ?></p>
-                            </div>
-                            <div class="provider-toggle">
-                                <label class="switch">
-                                    <input type="checkbox"
-                                           name="wp_factor_providers[<?php echo esc_attr($provider->get_key()); ?>][enabled]"
-                                           value="1"
-                                           <?php checked($is_enabled); ?>>
-                                    <span class="slider round"></span>
-                                </label>
-                            </div>
-                        </div>
+                    <section class="<?php echo $card_classes; ?> <?php echo $col_class; ?> <?php echo $is_enabled ? 'enabled' : 'disabled'; ?>"
+                             aria-labelledby="provider-<?php echo esc_attr($provider_key); ?>">
 
-                        <div class="provider-content">
+                        <?php do_action('authpress_provider_card_before_header', $provider, $provider_key, $category_key); ?>
+
+                        <header class="provider-card__header" <?php echo $header_style ? 'style="' . esc_attr($header_style) . '"' : ''; ?>>
+                            <div class="provider-card__title" id="provider-<?php echo esc_attr($provider_key); ?>-title">
+                                <?php
+                                $icon_html = apply_filters('authpress_provider_icon_html',
+                                    '<span class="icon-circle" aria-hidden="true">📨</span>',
+                                    $provider, $provider_key, $category_key
+                                );
+                                echo $icon_html;
+                                ?>
+                                <span><?php echo esc_html($provider->get_name()); ?></span>
+                            </div>
+
+                            <?php $toggle_label = apply_filters('authpress_provider_toggle_label',
+                                sprintf(__('Enable %s', 'two-factor-login-telegram'), $provider->get_name()),
+                                $provider, $provider_key, $category_key
+                            ); ?>
+
+                            <label class="ap-switch" aria-label="<?php echo esc_attr($toggle_label); ?>">
+                                <input type="checkbox"
+                                       name="wp_factor_providers[<?php echo esc_attr($provider->get_key()); ?>][enabled]"
+                                       value="1"
+                                       <?php checked($is_enabled); ?>>
+                                <span class="ap-slider"></span>
+                            </label>
+                        </header>
+
+                        <?php do_action('authpress_provider_card_after_header', $provider, $provider_key, $category_key); ?>
+
+                        <div class="provider-card__body">
                             <?php
-                            // Load provider-specific configuration template
+                            $provider_description = apply_filters('authpress_provider_description',
+                                $provider->get_description(),
+                                $provider, $provider_key, $category_key
+                            );
+                            ?>
+
+                            <p class="ap-text mb-16"><?php echo esc_html($provider_description); ?></p>
+
+                            <?php do_action('authpress_provider_settings_pre_content', $provider_key, $provider); ?>
+                            <?php do_action('authpress_provider_settings_' . $provider_key . '_pre_content', $provider); ?>
+
+                            <?php
+                            do_action('authpress_provider_settings_content_start', $provider_key, $provider);
+                            do_action('authpress_provider_settings_' . $provider_key . '_content_start', $provider);
+                            ?>
+
+                            <?php
                             $config_template = $provider->get_config_template_path();
                             if ($config_template && file_exists($config_template)):
-                            ?>
-                                <div class="provider-config">
-                                    <h4><?php _e("Configuration:", "two-factor-login-telegram"); ?></h4>
+                                ?>
+                                <div class="provider-config ap-form">
+                                    <?php
+                                    $config_heading = apply_filters('authpress_provider_config_heading',
+                                        __("Configuration:", "two-factor-login-telegram"),
+                                        $provider, $provider_key, $category_key
+                                    );
+                                    if ($config_heading):
+                                    ?>
+                                        <h4 class="ap-label"><?php echo esc_html($config_heading); ?></h4>
+                                    <?php endif; ?>
                                     <?php include $config_template; ?>
                                 </div>
                             <?php endif; ?>
 
                             <?php
-                            // Load provider-specific features template
                             $features_template = $provider->get_features_template_path();
                             if ($features_template && file_exists($features_template)):
-                            ?>
+                                ?>
                                 <div class="provider-features">
-                                    <h4><?php _e("Features:", "two-factor-login-telegram"); ?></h4>
+                                    <?php
+                                    $features_heading = apply_filters('authpress_provider_features_heading',
+                                        __("Features:", "two-factor-login-telegram"),
+                                        $provider, $provider_key, $category_key
+                                    );
+                                    if ($features_heading):
+                                    ?>
+                                        <h4 class="ap-label"><?php echo esc_html($features_heading); ?></h4>
+                                    <?php endif; ?>
                                     <?php include $features_template; ?>
                                 </div>
                             <?php endif; ?>
 
-                            <div class="provider-status <?php echo $is_enabled ? 'enabled' : 'disabled'; ?>">
-                                <span class="dashicons <?php echo $is_enabled ? 'dashicons-yes-alt' : 'dashicons-no-alt'; ?>"></span>
-                                <?php
-                                if ($is_enabled) {
-                                    printf(__("%s provider is active", "two-factor-login-telegram"), $provider->get_name());
-                                    if (!$is_configured) {
-                                        echo ' <span class="warning">' . __("(requires configuration)", "two-factor-login-telegram") . '</span>';
-                                    }
-                                } else {
-                                    printf(__("%s provider is disabled", "two-factor-login-telegram"), $provider->get_name());
-                                }
-                                ?>
-                            </div>
+                            <?php
+                            do_action('authpress_provider_settings_content_end', $provider_key, $provider);
+                            do_action('authpress_provider_settings_' . $provider_key . '_content_end', $provider);
+                            ?>
                         </div>
-                    </div>
+
+                        <?php do_action('authpress_provider_card_before_footer', $provider, $provider_key, $category_key); ?>
+
+                        <footer class="provider-card__footer">
+                            <?php
+                            $status_text = $is_enabled
+                                ? sprintf(__("✅ %s provider is active", "two-factor-login-telegram"), $provider->get_name())
+                                : sprintf(__("❌ %s provider is disabled", "two-factor-login-telegram"), $provider->get_name());
+
+                            if ($is_enabled && !$is_configured) {
+                                $status_text .= ' <span class="ap-text--small">(' . __("requires configuration", "two-factor-login-telegram") . ')</span>';
+                            }
+
+                            $status_text = apply_filters('authpress_provider_status_text', $status_text, $provider, $provider_key, $category_key, $is_enabled, $is_configured);
+                            ?>
+                            <span class="ap-text"><?php echo $status_text; ?></span>
+
+                            <?php do_action('authpress_provider_footer_actions', $provider, $provider_key, $category_key); ?>
+                        </footer>
+
+                        <?php do_action('authpress_provider_card_after_footer', $provider, $provider_key, $category_key); ?>
+
+                        <?php
+                        do_action('authpress_provider_settings_post_content', $provider_key, $provider);
+                        do_action('authpress_provider_settings_' . $provider_key . '_post_content', $provider);
+                        ?>
+
+                    </section>
                 <?php endforeach; ?>
             </div>
+        <?php endforeach; ?>
+
+        <?php do_action('authpress_providers_form_before_submit'); ?>
+
+        <div class="save-bar">
+            <?php
+            $submit_text = apply_filters('authpress_providers_submit_text', __('Save Providers Configuration', 'two-factor-login-telegram'));
+            $cancel_text = apply_filters('authpress_providers_cancel_text', __('Cancel', 'two-factor-login-telegram'));
+            ?>
+
+            <?php if (apply_filters('authpress_providers_show_cancel_button', false)): ?>
+                <button type="button" class="ap-button ap-button--secondary"><?php echo esc_html($cancel_text); ?></button>
+            <?php endif; ?>
+
+            <input type="submit" class="ap-button ap-button--primary" value="<?php echo esc_attr($submit_text); ?>"/>
         </div>
-    <?php endforeach; ?>
 
-    <p class="submit">
-        <input type="submit" class="button-primary" value="<?php _e('Save Providers Configuration', 'two-factor-login-telegram'); ?>" />
-    </p>
-</form>
+        <?php do_action('authpress_providers_form_end'); ?>
+    </form>
 
-<div class="providers-info">
-    <h3><?php _e("About 2FA Providers", "two-factor-login-telegram"); ?></h3>
-    <p>
-        <?php _e("You can enable one or both providers. Users will be able to choose which method to use for their 2FA setup.", "two-factor-login-telegram"); ?>
-    </p>
-    <p>
-        <strong><?php _e("Recommendation:", "two-factor-login-telegram"); ?></strong>
-        <?php _e("Enable both providers to give users flexibility and backup options.", "two-factor-login-telegram"); ?>
-    </p>
+    <?php
+    $show_info_section = apply_filters('authpress_providers_show_info_section', true);
+    if ($show_info_section):
+        $info_title = apply_filters('authpress_providers_info_title', __("About 2FA Providers", "two-factor-login-telegram"));
+        $info_description = apply_filters('authpress_providers_info_description',
+            __("You can enable one or both providers. Users will be able to choose which method to use for their 2FA setup.", "two-factor-login-telegram")
+        );
+        $info_recommendation = apply_filters('authpress_providers_info_recommendation',
+            __("Enable both providers to give users flexibility and backup options.", "two-factor-login-telegram")
+        );
+    ?>
+        <div class="providers-info">
+            <h3 class="ap-heading"><?php echo esc_html($info_title); ?></h3>
+            <p class="ap-text"><?php echo esc_html($info_description); ?></p>
+            <p class="ap-text">
+                <strong><?php _e("Recommendation:", "two-factor-login-telegram"); ?></strong>
+                <?php echo esc_html($info_recommendation); ?>
+            </p>
+
+            <?php do_action('authpress_providers_info_section_content'); ?>
+        </div>
+    <?php endif; ?>
+
+    <?php do_action('authpress_providers_page_footer'); ?>
 </div>
