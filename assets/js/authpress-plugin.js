@@ -11,7 +11,7 @@ var AuthPress_Plugin = function ($) {
     var $twenabled = $("#tg_wp_factor_enabled");
     var $twconfig = $("#tg-2fa-configuration");
     var $tweditbtn = $("#tg-edit-chat-id");
-    var $twconfigrow = $(".tg-configured-row");
+    var $twconfigrow = $(".authpress-configured-row");
 
     var $twfcr = $("#factor-chat-response");
     var $twfconf = $("#factor-chat-confirm");

@@ -70,7 +70,7 @@ class Authpress_Logs_List_Table extends \WP_List_Table
         $formatted_timestamp = wp_date( $date_format . ' ' . $time_format, $datetime->getTimestamp(), $timezone );
 
         $delete_url = wp_nonce_url(
-            admin_url('options-general.php?page=tg-conf&tab=logs&action=delete&log_id=' . $item['id']),
+            admin_url('options-general.php?page=authpress-conf&tab=logs&action=delete&log_id=' . $item['id']),
             'delete_log_' . $item['id']
         );
 

@@ -14,12 +14,6 @@
         "bacon/bacon-qr-code": "^2.0",
         "symfony/polyfill-iconv": "^1.0"
     },
-    "autoload": {
-        "psr-4": {
-            "Authpress\\": "includes/",
-            "AuthPress\\Providers\\": "includes/providers/"
-        }
-    },
     "config": {
         "vendor-dir": "vendor",
         "optimize-autoloader": true

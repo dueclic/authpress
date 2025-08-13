@@ -46,7 +46,7 @@ if (file_exists(dirname(__FILE__) . '/vendor/autoload.php')) {
     require_once(dirname(__FILE__) . '/vendor/autoload.php');
 }
 
-require_once("includes/class-authpress-plugin.php");
+require_once(dirname(__FILE__) . "/includes/class-authpress-plugin.php");
 
 function authpress_providers()
 {
@@ -87,23 +87,4 @@ function authpress_logo() {
 
     return $plugin_logo;
 }
-
-function authpress_tg_provider_bot_token_valid($bot_token)
-{
-    if (empty($bot_token)) {
-        return false;
-    }
-
-    // Check if token has the expected Telegram bot token format
-    // Telegram bot tokens are typically in format: 123456789:ABCdefGHIjklMNOpqrsTUVwxyz
-    return preg_match('/^\d+:[A-Za-z0-9_-]+$/', $bot_token);
-}
-
-
-function WFT()
-{
-    return \Authpress\AuthPress_Plugin::get_instance();
-}
-
-WFT();
 

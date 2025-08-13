@@ -109,7 +109,7 @@ class AuthPress_Hooks_Manager
     public function load_assets()
     {
         $screen = get_current_screen();
-        if (in_array($screen->id, ["profile", "settings_page_tg-conf", "users", "users_page_my-2fa-settings"])) {
+        if (in_array($screen->id, ["profile", "settings_page_authpress-conf", "users", "users_page_my-2fa-settings"])) {
             wp_register_style(
                 "tg_lib_css",
                 plugins_url("assets/css/authpress-plugin.css", dirname(__FILE__)),
@@ -161,7 +161,7 @@ class AuthPress_Hooks_Manager
     public function hook_scripts()
     {
         $screen = get_current_screen();
-        if (in_array($screen->id, ["profile", "settings_page_tg-conf", "users", "users_page_my-2fa-settings"])): ?>
+        if (in_array($screen->id, ["profile", "settings_page_authpress-conf", "users", "users_page_my-2fa-settings"])): ?>
             <script>
                 (function ($) {
                     $(document).ready(function () {

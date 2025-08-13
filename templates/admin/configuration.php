@@ -24,20 +24,20 @@ if (isset($_GET['tab'])) {
     </div>
 
     <h2 class="wpft-tab-wrapper nav-tab-wrapper">
-        <a href="<?php echo admin_url('options-general.php?page=tg-conf&tab=providers'); ?>"
+        <a href="<?php echo admin_url('options-general.php?page=authpress-conf&tab=providers'); ?>"
            class="nav-tab <?php echo $active_tab == 'providers' ? 'nav-tab-active' : ''; ?>">
             <span class="dashicons dashicons-admin-plugins"></span> <?php _e("Providers", "two-factor-login-telegram"); ?>
         </a>
-        <a href="<?php echo admin_url('options-general.php?page=tg-conf&tab=howto'); ?>"
+        <a href="<?php echo admin_url('options-general.php?page=authpress-conf&tab=howto'); ?>"
            class="nav-tab <?php echo $active_tab == 'howto' ? 'nav-tab-active' : ''; ?>">
             <span class="dashicons dashicons-editor-help"></span> <?php _e("FAQ", "two-factor-login-telegram"); ?>
         </a>
 
-        <a href="<?php echo admin_url('options-general.php?page=tg-conf&tab=logs'); ?>"
+        <a href="<?php echo admin_url('options-general.php?page=authpress-conf&tab=logs'); ?>"
            class="nav-tab <?php echo $active_tab == 'logs' ? 'nav-tab-active' : ''; ?>">
             <span class="dashicons dashicons-list-view"></span> <?php _e("Logs", "two-factor-login-telegram"); ?>
         </a>
-        <a href="<?php echo admin_url('options-general.php?page=tg-conf&tab=suggestions'); ?>"
+        <a href="<?php echo admin_url('options-general.php?page=authpress-conf&tab=suggestions'); ?>"
            class="nav-tab <?php echo $active_tab == 'suggestions' ? 'nav-tab-active' : ''; ?>">
             <span class="dashicons dashicons-heart"></span> <?php _e("Suggestions", "two-factor-login-telegram"); ?>
         </a>
