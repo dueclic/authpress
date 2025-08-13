@@ -113,8 +113,7 @@ final class AuthPress_Plugin
                             'failed_login_reports' => false,
                             'report_chat_id' => ''
                         ),
-                        'email' => array('enabled' => true),
-                        'default_provider' => 'telegram'
+                        'email' => array('enabled' => true)
                     );
 
                     if (isset($legacy_settings['chat_id']) && !empty($legacy_settings['chat_id'])) {
@@ -132,10 +131,5 @@ final class AuthPress_Plugin
                 }
             }
         }
-    }
-
-    public function get_default_provider()
-    {
-        return AuthPress_User_Manager::get_system_default_provider();
     }
 }

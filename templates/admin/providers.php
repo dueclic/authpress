@@ -128,34 +128,6 @@ if (!empty($uncategorized_providers)) {
         </div>
     <?php endforeach; ?>
 
-    <div class="default-provider-section">
-        <h3><?php _e("Default Provider Settings", "two-factor-login-telegram"); ?></h3>
-        <table class="form-table">
-            <tr>
-                <th scope="row">
-                    <label for="default_provider"><?php _e("Default 2FA Method", "two-factor-login-telegram"); ?></label>
-                </th>
-                <td>
-                    <select name="wp_factor_providers[default_provider]" id="default_provider">
-                        <?php
-                        $current_default = $providers['default_provider'] ?? 'telegram';
-                        foreach ($available_providers as $key => $provider):
-                            if ($key === 'recovery_codes') continue; // Skip recovery codes as default
-                            $selected = selected($current_default, $key, false);
-                        ?>
-                            <option value="<?php echo esc_attr($key); ?>" <?php echo $selected; ?>>
-                                <?php echo esc_html($provider->get_name()); ?>
-                            </option>
-                        <?php endforeach; ?>
-                    </select>
-                    <p class="description">
-                        <?php _e("Choose which 2FA method will be selected by default during login. Users can still switch between available methods.", "two-factor-login-telegram"); ?>
-                    </p>
-                </td>
-            </tr>
-        </table>
-    </div>
-
     <p class="submit">
         <input type="submit" class="button-primary" value="<?php _e('Save Providers Configuration', 'two-factor-login-telegram'); ?>" />
     </p>

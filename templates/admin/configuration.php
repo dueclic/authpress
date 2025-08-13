@@ -260,45 +260,6 @@ input:checked + .slider:before {
     color: #666;
 }
 
-.default-provider-section {
-    background: #f0f6fc;
-    border: 1px solid #c7d2fe;
-    border-radius: 8px;
-    padding: 20px;
-    margin: 20px 0;
-}
-
-.default-provider-section h3 {
-    margin: 0 0 20px 0;
-    color: #1e40af;
-    display: flex;
-    align-items: center;
-}
-
-.default-provider-section h3:before {
-    content: "⚙️";
-    margin-right: 8px;
-    font-size: 1.2em;
-}
-
-.default-provider-section .form-table th {
-    padding: 15px 10px 15px 0;
-    color: #1f2937;
-    font-weight: 600;
-}
-
-.default-provider-section select {
-    min-width: 200px;
-    padding: 6px 12px;
-    border-radius: 4px;
-    border: 1px solid #d1d5db;
-}
-
-.default-provider-section .description {
-    font-style: italic;
-    color: #6b7280;
-    margin-top: 8px;
-}
 
 .providers-category {
     margin: 30px 0;
@@ -333,50 +294,5 @@ input:checked + .slider:before {
 }
 </style>
 
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Find all provider toggles dynamically
-    const providerToggles = document.querySelectorAll('input[name*="wp_factor_providers"][name*="[enabled]"]');
-    const defaultProviderSection = document.querySelector('.default-provider-section');
-    const defaultProviderSelect = document.querySelector('#default_provider');
-
-    if (!defaultProviderSection || !defaultProviderSelect) {
-        return;
-    }
-
-    function updateDefaultProviderVisibility() {
-        // Count enabled providers
-        const enabledProviders = [];
-        providerToggles.forEach(toggle => {
-            if (toggle.checked) {
-                // Extract provider key from name attribute
-                const matches = toggle.name.match(/wp_factor_providers\[(.+?)\]\[enabled\]/);
-                if (matches) {
-                    enabledProviders.push(matches[1]);
-                }
-            }
-        });
-
-        if (enabledProviders.length > 1) {
-            defaultProviderSection.style.display = 'block';
-        } else {
-            defaultProviderSection.style.display = 'none';
-
-            // Auto-set default to the only enabled provider
-            if (enabledProviders.length === 1) {
-                defaultProviderSelect.value = enabledProviders[0];
-            }
-        }
-    }
-
-    // Initial check
-    updateDefaultProviderVisibility();
-
-    // Listen for changes on all provider toggles
-    providerToggles.forEach(toggle => {
-        toggle.addEventListener('change', updateDefaultProviderVisibility);
-    });
-});
-</script>
 
 <?php do_action("tft_copyright"); ?>

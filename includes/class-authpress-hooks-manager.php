@@ -57,7 +57,7 @@ class AuthPress_Hooks_Manager
         }
 
         // Footer hooks
-        add_action("tft_copyright", array($this, "change_copyright"));
+        add_action("authpress_copyright", array($this, "change_copyright"));
     }
 
     private function add_admin_hooks()

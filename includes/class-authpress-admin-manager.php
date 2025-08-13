@@ -85,7 +85,7 @@ class AuthPress_Admin_Manager
     }
 
     /**
-     * Check if a provider can be disabled (not default method)
+     * Check if a provider can be disabled (cannot disable user's default method unless it's the last active one)
      *
      * @param int $user_id User ID
      * @param string $provider_key Provider key to check
@@ -94,25 +94,47 @@ class AuthPress_Admin_Manager
     private function can_disable_provider($user_id, $provider_key)
     {
         $user_default_provider = get_user_meta($user_id, 'wp_factor_user_default_provider', true);
+        
+        // If no user default is set, any provider can be disabled
         if (empty($user_default_provider)) {
-            $plugin = AuthPress_Plugin::get_instance();
-            $user_default_provider = $plugin->get_default_provider();
+            return true;
         }
-
-        // Handle authenticator/totp mapping
+        
+        // Check if this provider is the user's default method
+        $is_default_provider = false;
         if ($provider_key === 'totp' || $provider_key === 'authenticator') {
-            return !($user_default_provider === 'authenticator' || $user_default_provider === 'totp');
+            $is_default_provider = ($user_default_provider === 'authenticator' || $user_default_provider === 'totp');
+        } else {
+            $is_default_provider = ($user_default_provider === $provider_key);
         }
-
-        return $user_default_provider !== $provider_key;
+        
+        // If it's not the default provider, it can always be disabled
+        if (!$is_default_provider) {
+            return true;
+        }
+        
+        // If it IS the default provider, check if it's the last active method
+        // Get all available methods for this user
+        $available_methods = AuthPress_User_Manager::get_user_available_methods($user_id);
+        
+        // Count enabled methods (excluding recovery codes as they're backup only)
+        $enabled_count = 0;
+        foreach ($available_methods as $method_key => $is_available) {
+            if ($is_available && $method_key !== 'recovery_codes') {
+                $enabled_count++;
+            }
+        }
+        
+        // Allow disabling default provider if it's the last active method (user wants to disable all 2FA)
+        return $enabled_count <= 1;
     }
 
     /**
-     * Show error notice for attempting to disable default provider
+     * Show error notice for attempting to disable the user's default 2FA method
      *
      * @param string $provider_name Human readable provider name
      */
-    private function show_default_provider_disable_error($provider_name)
+    private function show_provider_disable_error($provider_name)
     {
         add_action('admin_notices', function() use ($provider_name) {
             echo '<div class="notice notice-error is-dismissible"><p>' .
@@ -125,7 +147,7 @@ class AuthPress_Admin_Manager
     {
         if (wp_verify_nonce($_POST['wp_factor_totp_disable_nonce'], 'wp_factor_disable_totp')) {
             if (!$this->can_disable_provider($user_id, 'totp')) {
-                $this->show_default_provider_disable_error(__('Authenticator app', 'two-factor-login-telegram'));
+                $this->show_provider_disable_error(__('Authenticator app', 'two-factor-login-telegram'));
                 return;
             }
 
@@ -142,7 +164,7 @@ class AuthPress_Admin_Manager
     {
         if (wp_verify_nonce($_POST['wp_factor_telegram_disable_nonce'], 'wp_factor_disable_telegram')) {
             if (!$this->can_disable_provider($user_id, 'telegram')) {
-                $this->show_default_provider_disable_error(__('Telegram', 'two-factor-login-telegram'));
+                $this->show_provider_disable_error(__('Telegram', 'two-factor-login-telegram'));
                 return;
             }
 
@@ -173,7 +195,7 @@ class AuthPress_Admin_Manager
     {
         if (wp_verify_nonce($_POST['wp_factor_email_disable_nonce'], 'wp_factor_disable_email')) {
             if (!$this->can_disable_provider($user_id, 'email')) {
-                $this->show_default_provider_disable_error(__('Email', 'two-factor-login-telegram'));
+                $this->show_provider_disable_error(__('Email', 'two-factor-login-telegram'));
                 return;
             }
 
@@ -590,21 +612,6 @@ class AuthPress_Admin_Manager
             'enabled' => isset($input['email']['enabled']) ? true : false
         );
 
-        // Allow any valid provider as default, not just hardcoded ones
-        $valid_provider_keys = [];
-        $all_providers = AuthPress_Provider_Registry::get_all();
-        foreach ($all_providers as $key => $provider) {
-            if ($provider && $provider->is_enabled()) {
-                $valid_provider_keys[] = $key;
-                // Handle totp -> authenticator mapping
-                if ($key === 'totp') {
-                    $valid_provider_keys[] = 'authenticator';
-                }
-            }
-        }
-
-        $sanitized['default_provider'] = isset($input['default_provider']) && in_array($input['default_provider'], $valid_provider_keys) ? $input['default_provider'] : 'telegram';
-
         if ($sanitized['telegram']['enabled'] && !empty($sanitized['telegram']['bot_token'])) {
             $legacy_settings = get_option('tg_col', array());
             $legacy_settings['bot_token'] = $sanitized['telegram']['bot_token'];
@@ -680,7 +687,7 @@ class AuthPress_Admin_Manager
         // Check if provider can be disabled
         if (!$this->can_disable_provider($user_id, $provider_key)) {
             $provider_name = $this->get_provider_display_name($provider_key);
-            $this->show_default_provider_disable_error($provider_name);
+            $this->show_provider_disable_error($provider_name);
             return;
         }
 
