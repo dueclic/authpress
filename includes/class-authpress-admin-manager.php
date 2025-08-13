@@ -2,6 +2,8 @@
 
 namespace Authpress;
 
+use AuthPress\Providers\Abstract_Provider;
+
 class AuthPress_Admin_Manager
 {
     private $namespace = "tg_col";
@@ -85,6 +87,22 @@ class AuthPress_Admin_Manager
     }
 
     /**
+     * Apply different col class according to provider
+     * @param string $cls
+     * @param Abstract_Provider $provider
+     * @param string $provider_key
+     * @param string $category_key
+     * @return string
+     */
+
+    public function provider_card_col_class($cls, $provider, $provider_key, $category_key){
+        if ($provider_key === 'authenticator' || $provider_key === 'totp'){
+            return 'ap-col-12';
+        }
+        return $cls;
+    }
+
+    /**
      * Check if a provider can be disabled (cannot disable user's default method unless it's the last active one)
      *
      * @param int $user_id User ID
@@ -94,12 +112,12 @@ class AuthPress_Admin_Manager
     private function can_disable_provider($user_id, $provider_key)
     {
         $user_default_provider = get_user_meta($user_id, 'wp_factor_user_default_provider', true);
-        
+
         // If no user default is set, any provider can be disabled
         if (empty($user_default_provider)) {
             return true;
         }
-        
+
         // Check if this provider is the user's default method
         $is_default_provider = false;
         if ($provider_key === 'totp' || $provider_key === 'authenticator') {
@@ -107,16 +125,16 @@ class AuthPress_Admin_Manager
         } else {
             $is_default_provider = ($user_default_provider === $provider_key);
         }
-        
+
         // If it's not the default provider, it can always be disabled
         if (!$is_default_provider) {
             return true;
         }
-        
+
         // If it IS the default provider, check if it's the last active method
         // Get all available methods for this user
         $available_methods = AuthPress_User_Manager::get_user_available_methods($user_id);
-        
+
         // Count enabled methods (excluding recovery codes as they're backup only)
         $enabled_count = 0;
         foreach ($available_methods as $method_key => $is_available) {
@@ -124,7 +142,7 @@ class AuthPress_Admin_Manager
                 $enabled_count++;
             }
         }
-        
+
         // Allow disabling default provider if it's the last active method (user wants to disable all 2FA)
         return $enabled_count <= 1;
     }

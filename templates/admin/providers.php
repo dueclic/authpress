@@ -127,7 +127,7 @@ if (!empty($uncategorized_providers)) {
 
                         <?php do_action('authpress_provider_card_after_header', $provider, $provider_key, $category_key); ?>
 
-                        <div class="provider-card__body">
+                        <div class="provider-card__body" id="provider-<?php echo esc_attr($provider_key); ?>-body">
                             <?php
                             $provider_description = apply_filters('authpress_provider_description',
                                 $provider->get_description(),
@@ -143,44 +143,37 @@ if (!empty($uncategorized_providers)) {
                             <?php
                             do_action('authpress_provider_settings_content_start', $provider_key, $provider);
                             do_action('authpress_provider_settings_' . $provider_key . '_content_start', $provider);
-                            ?>
 
-                            <?php
-                            $config_template = $provider->get_config_template_path();
-                            if ($config_template && file_exists($config_template)):
-                                ?>
-                                <div class="provider-config ap-form">
-                                    <?php
-                                    $config_heading = apply_filters('authpress_provider_config_heading',
-                                        __("Configuration:", "two-factor-login-telegram"),
-                                        $provider, $provider_key, $category_key
-                                    );
-                                    if ($config_heading):
-                                    ?>
-                                        <h4 class="ap-label"><?php echo esc_html($config_heading); ?></h4>
-                                    <?php endif; ?>
-                                    <?php include $config_template; ?>
-                                </div>
-                            <?php endif; ?>
-
-                            <?php
                             $features_template = $provider->get_features_template_path();
                             if ($features_template && file_exists($features_template)):
                                 ?>
                                 <div class="provider-features">
                                     <?php
                                     $features_heading = apply_filters('authpress_provider_features_heading',
-                                        __("Features:", "two-factor-login-telegram"),
-                                        $provider, $provider_key, $category_key
+                                            __("Features:", "two-factor-login-telegram"),
+                                            $provider, $provider_key, $category_key
                                     );
                                     if ($features_heading):
-                                    ?>
+                                        ?>
                                         <h4 class="ap-label"><?php echo esc_html($features_heading); ?></h4>
                                     <?php endif; ?>
                                     <?php include $features_template; ?>
                                 </div>
                             <?php endif; ?>
 
+
+                            <?php
+                            $config_template = $provider->get_config_template_path();
+                            if ($config_template && file_exists($config_template)):
+                                ?>
+                                <button type="button" class="provider-card__toggle" aria-expanded="false" aria-controls="provider-<?php echo esc_attr($provider_key); ?>-config">
+                                    <span class="provider-card__arrow">▼</span>
+                                    <span><?php _e('Configuration', 'two-factor-login-telegram'); ?></span>
+                                </button>
+                                <div class="provider-config ap-form" id="provider-<?php echo esc_attr($provider_key); ?>-config" style="display: none;">
+                                    <?php include $config_template; ?>
+                                </div>
+                            <?php endif; ?>
                             <?php
                             do_action('authpress_provider_settings_content_end', $provider_key, $provider);
                             do_action('authpress_provider_settings_' . $provider_key . '_content_end', $provider);
@@ -261,3 +254,25 @@ if (!empty($uncategorized_providers)) {
 
     <?php do_action('authpress_providers_page_footer'); ?>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const toggleButtons = document.querySelectorAll('.provider-card__toggle');
+
+    toggleButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const targetId = this.getAttribute('aria-controls');
+            const targetElement = document.getElementById(targetId);
+            const isExpanded = this.getAttribute('aria-expanded') === 'true';
+
+            if (isExpanded) {
+                targetElement.style.display = 'none';
+                this.setAttribute('aria-expanded', 'false');
+            } else {
+                targetElement.style.display = 'block';
+                this.setAttribute('aria-expanded', 'true');
+            }
+        });
+    });
+});
+</script>

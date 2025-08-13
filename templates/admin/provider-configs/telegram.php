@@ -8,7 +8,6 @@
 $telegram_settings = $providers['telegram'] ?? [];
 ?>
 
-<p class="ap-text mb-16"><?php _e("Receive authentication codes via Telegram messages.", "two-factor-login-telegram"); ?></p>
 <div class="ap-form">
     <div class="ap-form__group">
         <label class="ap-label" for="telegram_bot_token"><?php _e("Bot Token", "two-factor-login-telegram"); ?></label>
