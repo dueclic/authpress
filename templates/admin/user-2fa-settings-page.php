@@ -50,6 +50,13 @@ $user_has_active_methods = $user_config['has_2fa'];
 
 wp_enqueue_script('authpress-plugin');
 wp_enqueue_style('authpress-plugin');
+
+// Enqueue AuthPress UI Kit
+$uikit_path = dirname(WP_FACTOR_TG_FILE) . '/uikit/authpress-ui-kit.css';
+$uikit_url = plugin_dir_url(WP_FACTOR_TG_FILE) . 'uikit/authpress-ui-kit.css';
+if (file_exists($uikit_path)) {
+    wp_enqueue_style('authpress-ui-kit', $uikit_url, array(), filemtime($uikit_path));
+}
 ?>
 
 <div class="wrap">
