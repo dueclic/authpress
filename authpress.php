@@ -88,3 +88,10 @@ function authpress_logo() {
     return $plugin_logo;
 }
 
+function WFT()
+{
+    return \Authpress\AuthPress_Plugin::get_instance();
+}
+
+WFT();
+

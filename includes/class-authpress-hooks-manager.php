@@ -379,20 +379,6 @@ class AuthPress_Hooks_Manager
         $wpdb->query("DELETE FROM $wpdb->options WHERE option_name LIKE '_transient_" . WP_FACTOR_TG_GETME_TRANSIENT . "%'");
         $wpdb->query("DELETE FROM $wpdb->options WHERE option_name LIKE '_transient_timeout_" . WP_FACTOR_TG_GETME_TRANSIENT . "%'");
     }
-
-    // Utility methods
-    private function is_valid_bot()
-    {
-        $valid_bot_transient = WP_FACTOR_TG_GETME_TRANSIENT;
-
-        if (($is_valid_bot = get_transient($valid_bot_transient)) === false) {
-            $is_valid_bot = $this->telegram->get_me() !== false;
-            set_transient($valid_bot_transient, $is_valid_bot, 60 * 60 * 24);
-        }
-
-        return boolval($is_valid_bot);
-    }
-
     // REST API and rewrite methods
     public function register_telegram_webhook_route()
     {

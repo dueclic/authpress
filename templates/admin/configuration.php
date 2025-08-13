@@ -37,6 +37,10 @@ if (isset($_GET['tab'])) {
            class="nav-tab <?php echo $active_tab == 'logs' ? 'nav-tab-active' : ''; ?>">
             <span class="dashicons dashicons-list-view"></span> <?php _e("Logs", "two-factor-login-telegram"); ?>
         </a>
+        <a href="<?php echo admin_url('options-general.php?page=authpress-conf&tab=settings'); ?>"
+           class="nav-tab <?php echo $active_tab == 'settings' ? 'nav-tab-active' : ''; ?>">
+            <span class="dashicons dashicons-admin-settings"></span> <?php _e("Settings", "two-factor-login-telegram"); ?>
+        </a>
         <a href="<?php echo admin_url('options-general.php?page=authpress-conf&tab=suggestions'); ?>"
            class="nav-tab <?php echo $active_tab == 'suggestions' ? 'nav-tab-active' : ''; ?>">
             <span class="dashicons dashicons-heart"></span> <?php _e("Suggestions", "two-factor-login-telegram"); ?>
@@ -52,6 +56,9 @@ if (isset($_GET['tab'])) {
                 break;
             case 'howto':
                 include dirname(__FILE__) . '/howto.php';
+                break;
+            case 'settings':
+                include dirname(__FILE__) . '/settings.php';
                 break;
             case 'suggestions':
                 include dirname(__FILE__) . '/suggestions.php';

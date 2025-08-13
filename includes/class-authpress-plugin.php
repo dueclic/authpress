@@ -12,6 +12,8 @@ final class AuthPress_Plugin
     private $hooks_manager;
     private $logger;
 
+    private $namespace = 'tg_col';
+
     public static function get_instance()
     {
         if (
@@ -130,18 +132,6 @@ final class AuthPress_Plugin
                 }
             }
         }
-    }
-
-    public function is_valid_bot()
-    {
-        $valid_bot_transient = WP_FACTOR_TG_GETME_TRANSIENT;
-
-        if (($is_valid_bot = get_transient($valid_bot_transient)) === false) {
-            $is_valid_bot = $this->telegram->get_me() !== false;
-            set_transient($valid_bot_transient, $is_valid_bot, 60 * 60 * 24);
-        }
-
-        return boolval($is_valid_bot);
     }
 
     public function get_default_provider()

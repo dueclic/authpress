@@ -639,12 +639,6 @@ class AuthPress_Admin_Manager
         return array_merge($plugin_links, $links);
     }
 
-    public function is_valid_bot()
-    {
-        $plugin = AuthPress_Plugin::get_instance();
-        return $plugin->is_valid_bot();
-    }
-
     public function is_valid_bot_for_providers($bot_token)
     {
         if (empty($bot_token)) {

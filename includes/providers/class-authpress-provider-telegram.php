@@ -386,21 +386,34 @@ class Telegram_Provider extends Abstract_Provider implements Provider_Otp_Interf
 
         $providers = authpress_providers();
         $bot_token = $providers['telegram']['bot_token'] ?? '';
-        
+
         if (empty($bot_token)) {
             return false;
         }
-        
+
         // Create a temporary WP_Telegram instance to validate this specific bot token
         $telegram = new WP_Telegram();
         $old_token = $telegram->get_bot_token();
-        
+
         $telegram->set_bot_token($bot_token);
         $is_valid = $telegram->get_me() !== false;
-        
+
         // Restore the original token
         $telegram->set_bot_token($old_token);
-        
+
         return $is_valid;
+    }
+
+
+    public function is_valid_bot()
+    {
+        $valid_bot_transient = WP_FACTOR_TG_GETME_TRANSIENT;
+
+        if (($is_valid_bot = get_transient($valid_bot_transient)) === false) {
+            $is_valid_bot = $this->telegram->get_me() !== false;
+            set_transient($valid_bot_transient, $is_valid_bot, 60 * 60 * 24);
+        }
+
+        return boolval($is_valid_bot);
     }
 }

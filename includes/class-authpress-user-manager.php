@@ -4,7 +4,7 @@ namespace Authpress;
 
 /**
  * Centralized user authentication management for AuthPress
- * 
+ *
  * This class handles all user authentication logic, provider availability checks,
  * and configuration validation in a single, consistent place.
  */
@@ -24,7 +24,7 @@ final class AuthPress_User_Manager
 
     /**
      * Get providers configuration with caching
-     * 
+     *
      * @return array
      */
     private static function get_providers()
@@ -37,7 +37,7 @@ final class AuthPress_User_Manager
 
     /**
      * Check if Telegram provider is enabled
-     * 
+     *
      * @return bool
      * @deprecated Use AuthPress_Provider_Registry::get('telegram')->is_enabled() instead
      */
@@ -49,7 +49,7 @@ final class AuthPress_User_Manager
 
     /**
      * Check if Email provider is enabled
-     * 
+     *
      * @return bool
      * @deprecated Use AuthPress_Provider_Registry::get('email')->is_enabled() instead
      */
@@ -61,7 +61,7 @@ final class AuthPress_User_Manager
 
     /**
      * Check if Authenticator provider is enabled
-     * 
+     *
      * @return bool
      * @deprecated Use AuthPress_Provider_Registry::get('authenticator')->is_enabled() instead
      */
@@ -73,21 +73,18 @@ final class AuthPress_User_Manager
 
     /**
      * Check if Telegram bot is valid with caching
-     * 
+     *
      * @return bool
      */
     public static function is_telegram_bot_valid()
     {
-        if (self::$bot_valid_cache === null) {
-            $plugin = AuthPress_Plugin::get_instance();
-            self::$bot_valid_cache = $plugin->is_valid_bot();
-        }
-        return self::$bot_valid_cache;
+        $provider = AuthPress_Provider_Registry::get('telegram');
+        return $provider && $provider->is_valid_bot();
     }
 
     /**
      * Check if user has Telegram configured and available
-     * 
+     *
      * @param int $user_id User ID
      * @return bool
      */
@@ -99,23 +96,23 @@ final class AuthPress_User_Manager
 
         $enabled = get_the_author_meta("tg_wp_factor_enabled", $user_id) === "1";
         $chat_id = get_user_meta($user_id, "tg_wp_factor_chat_id", true);
-        
+
         // More strict validation: chat_id must be a non-empty string and enabled must be exactly "1"
         $has_valid_config = $enabled && is_string($chat_id) && trim($chat_id) !== '';
-        
+
         // Clean up orphaned configuration: if enabled but no valid chat_id, disable it
         if ($enabled && (!is_string($chat_id) || trim($chat_id) === '')) {
             update_user_meta($user_id, 'tg_wp_factor_enabled', '0');
             delete_user_meta($user_id, 'tg_wp_factor_chat_id');
             return false;
         }
-        
+
         return $has_valid_config;
     }
 
     /**
      * Check if user has Email configured and available
-     * 
+     *
      * @param int $user_id User ID
      * @return bool
      */
@@ -137,7 +134,7 @@ final class AuthPress_User_Manager
 
     /**
      * Check if user has TOTP configured and available
-     * 
+     *
      * @param int $user_id User ID
      * @return bool
      */
@@ -154,13 +151,13 @@ final class AuthPress_User_Manager
 
         $enabled = $totp->is_user_totp_enabled($user_id);
         $secret = $totp->get_user_secret($user_id);
-        
+
         return $enabled && !empty($secret);
     }
 
     /**
      * Check if user has any 2FA method configured
-     * 
+     *
      * @param int $user_id User ID
      * @return bool
      */
@@ -177,7 +174,7 @@ final class AuthPress_User_Manager
 
     /**
      * Get available 2FA methods for a user
-     * 
+     *
      * @param int $user_id User ID
      * @return array Available methods ['telegram' => bool, 'email' => bool, 'totp' => bool]
      */
@@ -188,16 +185,16 @@ final class AuthPress_User_Manager
             'email' => self::user_has_email($user_id),
             'totp' => self::user_has_totp($user_id)
         ];
-        
+
         // Allow external providers to add their methods
         $methods = apply_filters('authpress_user_available_methods', $methods, $user_id);
-        
+
         return $methods;
     }
 
     /**
      * Get system default provider
-     * 
+     *
      * @return string
      */
     public static function get_system_default_provider()
@@ -208,7 +205,7 @@ final class AuthPress_User_Manager
 
     /**
      * Get effective default provider for a user
-     * 
+     *
      * @param int $user_id User ID
      * @return string|null The effective provider or null if no methods available
      */
@@ -216,13 +213,13 @@ final class AuthPress_User_Manager
     {
         // Get user preference
         $user_preference = get_user_meta($user_id, 'wp_factor_user_default_provider', true);
-        
+
         // Get system default
         $system_default = self::get_system_default_provider();
-        
+
         // Determine preferred provider
         $preferred = !empty($user_preference) ? $user_preference : $system_default;
-        
+
         // Normalize authenticator -> totp
         if ($preferred === 'authenticator') {
             $preferred = 'totp';
@@ -252,7 +249,7 @@ final class AuthPress_User_Manager
         if ($available['totp'] ?? false) {
             return 'totp';
         }
-        
+
         // Return the first available custom provider
         foreach ($available as $provider_key => $is_available) {
             if ($is_available && !in_array($provider_key, ['telegram', 'email', 'totp'])) {
@@ -265,7 +262,7 @@ final class AuthPress_User_Manager
 
     /**
      * Check if user has email available for 2FA (regardless of enabled status)
-     * 
+     *
      * @param int $user_id User ID
      * @return bool
      */
@@ -281,7 +278,7 @@ final class AuthPress_User_Manager
 
     /**
      * Enable email 2FA for user
-     * 
+     *
      * @param int $user_id User ID
      * @return bool
      */
@@ -295,7 +292,7 @@ final class AuthPress_User_Manager
 
     /**
      * Disable email 2FA for user
-     * 
+     *
      * @param int $user_id User ID
      * @return bool
      */
@@ -306,7 +303,7 @@ final class AuthPress_User_Manager
 
     /**
      * Get user's Telegram chat ID
-     * 
+     *
      * @param int $user_id User ID
      * @return string|false Chat ID or false if not set
      */
@@ -317,7 +314,7 @@ final class AuthPress_User_Manager
 
     /**
      * Check if user has completed the 2FA setup wizard
-     * 
+     *
      * @param int $user_id User ID
      * @return bool
      */
@@ -328,7 +325,7 @@ final class AuthPress_User_Manager
 
     /**
      * Mark user as having completed the 2FA setup
-     * 
+     *
      * @param int $user_id User ID
      * @return bool
      */
@@ -339,7 +336,7 @@ final class AuthPress_User_Manager
 
     /**
      * Reset user setup flag (for forcing them to go through wizard again)
-     * 
+     *
      * @param int $user_id User ID
      * @return bool
      */
@@ -350,7 +347,7 @@ final class AuthPress_User_Manager
 
     /**
      * Check if user needs 2FA for login
-     * 
+     *
      * @param int $user_id User ID
      * @return bool
      */
@@ -370,7 +367,7 @@ final class AuthPress_User_Manager
 
     /**
      * Check if user should see the setup wizard on login
-     * 
+     *
      * @param int $user_id User ID
      * @return bool
      */
@@ -397,7 +394,7 @@ final class AuthPress_User_Manager
 
     /**
      * Get user's 2FA configuration summary
-     * 
+     *
      * @param int $user_id User ID
      * @return array Configuration summary
      */
@@ -405,7 +402,7 @@ final class AuthPress_User_Manager
     {
         $available = self::get_user_available_methods($user_id);
         $effective_provider = self::get_user_effective_provider($user_id);
-        
+
         return [
             'has_2fa' => self::user_has_2fa($user_id),
             'requires_2fa' => self::user_requires_2fa($user_id),
@@ -431,16 +428,16 @@ final class AuthPress_User_Manager
 
     /**
      * Helper: Get all users with 2FA enabled
-     * 
+     *
      * @param string $method Filter by specific method ('telegram', 'totp', 'any')
      * @return array Array of user IDs
      */
     public static function get_users_with_2fa($method = 'any')
     {
         global $wpdb;
-        
+
         $user_ids = [];
-        
+
         if ($method === 'telegram' || $method === 'any') {
             // Get users with Telegram enabled
             $telegram_users = $wpdb->get_col("
@@ -449,14 +446,14 @@ final class AuthPress_User_Manager
                 WHERE meta_key = 'tg_wp_factor_enabled' 
                 AND meta_value = '1'
             ");
-            
+
             foreach ($telegram_users as $user_id) {
                 if (self::user_has_telegram($user_id)) {
                     $user_ids[] = (int)$user_id;
                 }
             }
         }
-        
+
         if ($method === 'totp' || $method === 'any') {
             // Get users with TOTP enabled
             $totp_users = $wpdb->get_col("
@@ -465,20 +462,20 @@ final class AuthPress_User_Manager
                 WHERE meta_key = 'wp_factor_totp_enabled' 
                 AND meta_value = '1'
             ");
-            
+
             foreach ($totp_users as $user_id) {
                 if (self::user_has_totp($user_id)) {
                     $user_ids[] = (int)$user_id;
                 }
             }
         }
-        
+
         return array_unique($user_ids);
     }
 
     /**
      * Helper: Quick check if 2FA should be enforced for login
-     * 
+     *
      * @param WP_User $user The user object
      * @return bool
      */
@@ -487,27 +484,27 @@ final class AuthPress_User_Manager
         if (!$user || !$user->exists()) {
             return false;
         }
-        
+
         return self::user_requires_2fa($user->ID);
     }
 
     /**
      * Helper: Get human-readable status for user 2FA
-     * 
+     *
      * @param int $user_id User ID
      * @return string Status description
      */
     public static function get_user_2fa_status_text($user_id)
     {
         $config = self::get_user_2fa_config($user_id);
-        
+
         if (!$config['has_2fa']) {
             return __('Disabled', 'two-factor-login-telegram');
         }
-        
+
         $methods = [];
         $method_names = [];
-        
+
         // Build list of available methods and their display names
         foreach ($config['available_methods'] as $method_key => $is_available) {
             if ($is_available) {
@@ -536,14 +533,14 @@ final class AuthPress_User_Manager
                 }
             }
         }
-        
+
         if (empty($methods)) {
             return __('Misconfigured', 'two-factor-login-telegram');
         }
-        
+
         $methods_text = implode(' + ', $methods);
         $default_method = $config['effective_provider'];
-        
+
         if ($default_method && isset($method_names[$default_method])) {
             return sprintf(
                 __('Enabled (%s, default: %s)', 'two-factor-login-telegram'),
@@ -551,7 +548,7 @@ final class AuthPress_User_Manager
                 $method_names[$default_method]
             );
         }
-        
+
         return sprintf(__('Enabled (%s)', 'two-factor-login-telegram'), $methods_text);
     }
 }
