@@ -5,7 +5,6 @@ namespace Authpress;
 final class AuthPress_Plugin
 {
     private static $instance;
-    private $namespace = "tg_col";
     private $telegram;
     private $authentication_handler;
     private $admin_manager;
@@ -143,5 +142,10 @@ final class AuthPress_Plugin
         }
 
         return boolval($is_valid_bot);
+    }
+
+    public function get_default_provider()
+    {
+        return AuthPress_User_Manager::get_system_default_provider();
     }
 }

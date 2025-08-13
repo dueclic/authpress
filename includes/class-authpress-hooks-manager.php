@@ -393,12 +393,6 @@ class AuthPress_Hooks_Manager
         return boolval($is_valid_bot);
     }
 
-    private function is_setup_chatid()
-    {
-        $user_id = get_current_user_id();
-        $chat_id = AuthPress_User_Manager::get_user_chat_id($user_id);
-        return $chat_id !== false;
-    }
     // REST API and rewrite methods
     public function register_telegram_webhook_route()
     {
@@ -487,11 +481,6 @@ class AuthPress_Hooks_Manager
         return rest_ensure_response(array('status' => 'ok'));
     }
 
-    private function handle_telegram_confirmation_direct($user_id, $token, $nonce)
-    {
-        // Implementation would be moved from the main plugin class
-        // For brevity, I'm not including the full implementation here
-    }
 
     // User list table methods
     public function add_2fa_telegram_column($columns)
