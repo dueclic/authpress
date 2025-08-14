@@ -2,5 +2,5 @@
 deploy-*.sh
 composer.lock
 vendor
-examples/*
-!examples/DEVELOPER-GUIDE-CUSTOM-PROVIDERS.md
+custom_providers/*
+!custom_providers/DEVELOPER-GUIDE-CUSTOM-PROVIDERS.md

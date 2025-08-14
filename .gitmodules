@@ -1,0 +1,3 @@
+[submodule "custom_providers/authpress-sms-aimon"]
+	path = custom_providers/authpress-sms-aimon
+	url = https://github.com/dueclic/authpress-sms-aimon.git
