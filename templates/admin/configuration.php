@@ -12,63 +12,64 @@ if (isset($_GET['tab'])) {
 
 ?>
 
-<div class="wrap">
+<div class="authpress-ui ap-wpbody-content">
+    <div class="ap-container">
 
-    <div class="heading-top">
-        <div class="cover-tg-plugin">
+    <div class="ap-topbar">
+        <div class="ap-logo-section">
+            <img src="<?php echo plugin_dir_url(dirname(dirname(__FILE__))); ?>assets/img/plugin_logo.png"
+                 alt="AuthPress"
+                 class="ap-logo"
+                 width="120"
+                 height="auto">
+            <span class="ap-logo-text">AuthPress</span>
         </div>
-        <h1><?php _e("AuthPress", "two-factor-login-telegram"); ?> - <?php _e("Configuration", "two-factor-login-telegram"); ?></h1>
+        <nav class="ap-tabs" aria-label="Secondary">
+            <a href="<?php echo admin_url('options-general.php?page=authpress-conf&tab=providers'); ?>"
+               class="ap-tab <?php echo $active_tab == 'providers' ? 'ap-tab--active' : ''; ?>">
+                <?php _e("Providers", "two-factor-login-telegram"); ?>
+            </a>
+            <a href="<?php echo admin_url('options-general.php?page=authpress-conf&tab=howto'); ?>"
+               class="ap-tab <?php echo $active_tab == 'howto' ? 'ap-tab--active' : ''; ?>">
+                <?php _e("FAQ", "two-factor-login-telegram"); ?>
+            </a>
+            <a href="<?php echo admin_url('options-general.php?page=authpress-conf&tab=logs'); ?>"
+               class="ap-tab <?php echo $active_tab == 'logs' ? 'ap-tab--active' : ''; ?>">
+                <?php _e("Logs", "two-factor-login-telegram"); ?>
+            </a>
+            <a href="<?php echo admin_url('options-general.php?page=authpress-conf&tab=settings'); ?>"
+               class="ap-tab <?php echo $active_tab == 'settings' ? 'ap-tab--active' : ''; ?>">
+                <?php _e("Settings", "two-factor-login-telegram"); ?>
+            </a>
+            <a href="<?php echo admin_url('options-general.php?page=authpress-conf&tab=suggestions'); ?>"
+               class="ap-tab <?php echo $active_tab == 'suggestions' ? 'ap-tab--active' : ''; ?>">
+                <?php _e("Suggestions", "two-factor-login-telegram"); ?>
+            </a>
+        </nav>
     </div>
 
-    <h2 class="wpft-tab-wrapper nav-tab-wrapper">
-        <a href="<?php echo admin_url('options-general.php?page=authpress-conf&tab=providers'); ?>"
-           class="nav-tab <?php echo $active_tab == 'providers' ? 'nav-tab-active' : ''; ?>">
-            <span class="dashicons dashicons-admin-plugins"></span> <?php _e("Providers", "two-factor-login-telegram"); ?>
-        </a>
-        <a href="<?php echo admin_url('options-general.php?page=authpress-conf&tab=howto'); ?>"
-           class="nav-tab <?php echo $active_tab == 'howto' ? 'nav-tab-active' : ''; ?>">
-            <span class="dashicons dashicons-editor-help"></span> <?php _e("FAQ", "two-factor-login-telegram"); ?>
-        </a>
-
-        <a href="<?php echo admin_url('options-general.php?page=authpress-conf&tab=logs'); ?>"
-           class="nav-tab <?php echo $active_tab == 'logs' ? 'nav-tab-active' : ''; ?>">
-            <span class="dashicons dashicons-list-view"></span> <?php _e("Logs", "two-factor-login-telegram"); ?>
-        </a>
-        <a href="<?php echo admin_url('options-general.php?page=authpress-conf&tab=settings'); ?>"
-           class="nav-tab <?php echo $active_tab == 'settings' ? 'nav-tab-active' : ''; ?>">
-            <span class="dashicons dashicons-admin-settings"></span> <?php _e("Settings", "two-factor-login-telegram"); ?>
-        </a>
-        <a href="<?php echo admin_url('options-general.php?page=authpress-conf&tab=suggestions'); ?>"
-           class="nav-tab <?php echo $active_tab == 'suggestions' ? 'nav-tab-active' : ''; ?>">
-            <span class="dashicons dashicons-heart"></span> <?php _e("Suggestions", "two-factor-login-telegram"); ?>
-        </a>
-    </h2>
-
-    <div class="wpft-container">
-
-        <?php
-        switch($active_tab) {
-            case 'logs':
-                include dirname(__FILE__) . '/logs.php';
-                break;
-            case 'howto':
-                include dirname(__FILE__) . '/howto.php';
-                break;
-            case 'settings':
-                include dirname(__FILE__) . '/settings.php';
-                break;
-            case 'suggestions':
-                include dirname(__FILE__) . '/suggestions.php';
-                break;
-            default:
-                include dirname(__FILE__) . '/providers.php';
-                break;
-        }
-        ?>
-
+    <?php
+    switch($active_tab) {
+        case 'logs':
+            include dirname(__FILE__) . '/logs.php';
+            break;
+        case 'howto':
+            include dirname(__FILE__) . '/howto.php';
+            break;
+        case 'settings':
+            include dirname(__FILE__) . '/settings.php';
+            break;
+        case 'suggestions':
+            include dirname(__FILE__) . '/suggestions.php';
+            break;
+        default:
+            include dirname(__FILE__) . '/providers.php';
+            break;
+    }
+    ?>
     </div>
+    <?php do_action("authpress_copyright"); ?>
 
 </div>
 
 
-<?php do_action("authpress_copyright"); ?>

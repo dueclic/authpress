@@ -77,13 +77,15 @@
 
 /* Container */
 .ap-container {
-    max-width: 1100px;
-    width: 95vw;
     margin: 32px auto;
     padding: var(--ap-space-xl) var(--ap-space-lg);
     background: var(--ap-white);
     border-radius: var(--ap-radius-lg);
     box-shadow: var(--ap-shadow-md);
+}
+
+.ap-wpbody-content {
+    padding-right: 20px;
 }
 
 .ap-container--narrow {
@@ -262,7 +264,6 @@
     margin-bottom: var(--ap-space-sm);
     font-size: 14px;
     font-weight: 600;
-    color: var(--ap-dark-gray);
 }
 
 .ap-input {
@@ -455,6 +456,25 @@
     margin-bottom: 24px;
 }
 
+.ap-logo-section {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.ap-logo {
+    max-height: 40px;
+    width: auto;
+    object-fit: contain;
+}
+
+.ap-logo-text {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--ap-dark-gray);
+    letter-spacing: -0.5px;
+}
+
 .ap-tabs {
     display: flex;
     gap: 8px;
@@ -506,8 +526,131 @@
     overflow: hidden;
     box-shadow: var(--ap-shadow-sm);
     background: var(--ap-white);
+    transition: var(--ap-transition);
 }
 
+/* Messaging providers - full gradient cards exactly like mockup */
+.provider-card.messaging-provider {
+    border: none;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    border-radius: 16px;
+}
+
+/* Telegram provider - purple gradient */
+.provider-card.messaging-provider.telegram-provider {
+    background: linear-gradient(135deg, #6366F1 0%, #8B5CF6 100%);
+}
+
+.provider-card.messaging-provider.telegram-provider .provider-card__header {
+    background: transparent;
+    color: white;
+    border-bottom: none;
+    padding: 20px 20px 16px 20px;
+}
+
+.provider-card.messaging-provider.telegram-provider .provider-card__body {
+    background: transparent;
+    color: white;
+    padding: 0 20px 16px 20px;
+}
+
+.provider-card.messaging-provider.telegram-provider .provider-card__body .ap-text {
+    color: #ffffff;
+}
+
+.provider-card.messaging-provider.telegram-provider .provider-card__footer {
+    background: transparent;
+    border-top: none;
+    color: white;
+    padding: 0 20px 20px 20px;
+}
+
+.provider-card.messaging-provider .provider-card__footer .ap-text {
+    color: #fff;
+}
+
+/* Email provider - blue-teal gradient */
+.provider-card.messaging-provider.email-provider {
+    background: linear-gradient(135deg, #3B82F6 0%, #06B6D4 100%);
+}
+
+.provider-card.messaging-provider.email-provider .provider-card__header {
+    background: transparent;
+    color: white;
+    border-bottom: none;
+    padding: 20px 20px 16px 20px;
+}
+
+.provider-card.messaging-provider.email-provider .provider-card__body {
+    background: transparent;
+    color: white;
+    padding: 0 20px 16px 20px;
+}
+
+.provider-card.messaging-provider.email-provider .provider-card__body .ap-text {
+    color: #ffffff;
+}
+
+.provider-card.messaging-provider.email-provider .provider-card__footer {
+    background: transparent;
+    border-top: none;
+    color: white;
+    padding: 0 20px 20px 20px;
+}
+
+/* Authenticator Apps - clean white card with subtle border */
+.provider-card.authenticator-provider {
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    border-radius: 12px;
+}
+
+.provider-card.authenticator-provider .provider-card__header {
+    background: #ffffff;
+    color: var(--ap-dark-gray);
+    border-bottom: none;
+    padding: 20px;
+}
+
+.provider-card.authenticator-provider .provider-card__body {
+    background: #ffffff;
+    padding: 0 20px 16px 20px;
+}
+
+.provider-card.authenticator-provider .provider-card__footer {
+    background: #ffffff;
+    border-top: none;
+    padding: 0 20px 20px 20px;
+}
+
+/* Other Providers - clean white card with subtle border */
+.provider-card.other-provider {
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    border-radius: 12px;
+}
+
+.provider-card.other-provider .provider-card__header {
+    background: #ffffff;
+    color: var(--ap-dark-gray);
+    border-bottom: none;
+    padding: 20px;
+}
+
+.provider-card.other-provider .provider-card__body {
+    background: #ffffff;
+    padding: 0 20px 16px 20px;
+}
+
+.provider-card.other-provider .provider-card__footer {
+    background: #ffffff;
+    border-top: none;
+    padding: 0 20px 20px 20px;
+}
+
+/* Default header for backwards compatibility */
 .provider-card__header {
     display: flex;
     align-items: center;
@@ -567,7 +710,43 @@
 
 .provider-card__body {
     padding: 16px;
-    border-top: 1px solid #e0e0e0;
+}
+
+/* Configuration section styling for messaging providers */
+.provider-card.messaging-provider .provider-config {
+    border-radius: 12px;
+    margin: 16px 0 0 0;
+    backdrop-filter: blur(10px);
+}
+
+.provider-card.messaging-provider .provider-config .ap-label {
+    color: #ffffff;
+    font-weight: 600;
+}
+
+
+.provider-card.messaging-provider .provider-config .ap-button {
+    background: rgba(255, 255, 255, 0.2);
+    color: #ffffff;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    transition: all 0.2s ease;
+}
+
+.provider-card.messaging-provider .provider-config .ap-button:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: translateY(-1px);
+}
+
+/* Configuration toggle button styling for messaging providers */
+.provider-card.messaging-provider .provider-card__toggle {
+    background: rgba(255, 255, 255, 0.1);
+    color: #ffffff;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    font-weight: 500;
+}
+
+.provider-card.messaging-provider .provider-card__toggle:hover {
+    background: rgba(255, 255, 255, 0.2);
 }
 
 /* Switch control */

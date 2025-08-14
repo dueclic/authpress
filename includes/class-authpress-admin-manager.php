@@ -96,7 +96,7 @@ class AuthPress_Admin_Manager
      */
 
     public function provider_card_col_class($cls, $provider, $provider_key, $category_key){
-        if ($provider_key === 'authenticator' || $provider_key === 'totp'){
+        if ($provider_key === 'authenticator' || $provider_key === 'totp' || $category_key === 'other'){
             return 'ap-col-12';
         }
         return $cls;

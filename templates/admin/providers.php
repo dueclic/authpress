@@ -45,7 +45,7 @@ if (!empty($uncategorized_providers)) {
 
 ?>
 
-<div class="authpress-ui ap-container">
+<div class="providers-page">
     <?php do_action('authpress_providers_page_header'); ?>
 
     <?php
@@ -90,7 +90,17 @@ if (!empty($uncategorized_providers)) {
                     $is_configured = $provider->is_configured();
 
                     $col_class = apply_filters('authpress_provider_card_col_class', 'ap-col-6', $provider, $provider_key, $category_key);
-                    $card_classes = apply_filters('authpress_provider_card_classes', 'provider-card', $provider, $provider_key, $category_key);
+
+                    // Build CSS classes based on category and provider
+                    $base_classes = 'provider-card';
+                    $category_class = $category_key . '-provider';
+                    $provider_class = $provider_key . '-provider';
+
+                    $card_classes = apply_filters('authpress_provider_card_classes',
+                        trim($base_classes . ' ' . $category_class . ' ' . $provider_class),
+                        $provider, $provider_key, $category_key
+                    );
+
                     $header_style = apply_filters('authpress_provider_header_style', '', $provider, $provider_key, $category_key);
                     ?>
 
