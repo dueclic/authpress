@@ -538,7 +538,7 @@
 
 /* Telegram provider - purple gradient */
 .provider-card.messaging-provider.telegram-provider {
-    background: linear-gradient(135deg, #6366F1 0%, #8B5CF6 100%);
+    background: linear-gradient(135deg,#6366f1,#7c3aed);
 }
 
 .provider-card.messaging-provider.telegram-provider .provider-card__header {
@@ -571,7 +571,7 @@
 
 /* Email provider - blue-teal gradient */
 .provider-card.messaging-provider.email-provider {
-    background: linear-gradient(135deg, #3B82F6 0%, #06B6D4 100%);
+    background: linear-gradient(135deg,#06b6d4,#10b981);
 }
 
 .provider-card.messaging-provider.email-provider .provider-card__header {

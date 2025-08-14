@@ -148,11 +148,7 @@ if (!empty($uncategorized_providers)) {
                             <p class="ap-text mb-16"><?php echo esc_html($provider_description); ?></p>
 
                             <?php do_action('authpress_provider_settings_pre_content', $provider_key, $provider); ?>
-                            <?php do_action('authpress_provider_settings_' . $provider_key . '_pre_content', $provider); ?>
-
-                            <?php
-                            do_action('authpress_provider_settings_content_start', $provider_key, $provider);
-                            do_action('authpress_provider_settings_' . $provider_key . '_content_start', $provider);
+                            <?php do_action('authpress_provider_settings_' . $provider_key . '_pre_content', $provider);
 
                             $features_template = $provider->get_features_template_path();
                             if ($features_template && file_exists($features_template)):
@@ -194,10 +190,7 @@ if (!empty($uncategorized_providers)) {
 
                         <footer class="provider-card__footer">
                             <?php
-                            $status_text = $is_enabled
-                                ? sprintf(__("✅ %s provider is active", "two-factor-login-telegram"), $provider->get_name())
-                                : sprintf(__("❌ %s provider is disabled", "two-factor-login-telegram"), $provider->get_name());
-
+                            $status_text = "";
                             if ($is_enabled && !$is_configured) {
                                 $status_text .= ' <span class="ap-text--small">(' . __("requires configuration", "two-factor-login-telegram") . ')</span>';
                             }
