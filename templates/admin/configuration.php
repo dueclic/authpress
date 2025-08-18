@@ -17,7 +17,7 @@ if (isset($_GET['tab'])) {
 
     <div class="ap-topbar">
         <div class="ap-logo-section">
-            <img src="<?php echo plugin_dir_url(dirname(dirname(__FILE__))); ?>assets/img/plugin_logo.png"
+            <img src="<?php echo plugins_url("assets/img/plugin_logo.png", WP_FACTOR_TG_FILE); ?>"
                  alt="AuthPress"
                  class="ap-logo"
                  width="120"

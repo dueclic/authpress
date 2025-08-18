@@ -114,7 +114,7 @@ class AuthPress_Hooks_Manager
 
             wp_register_style(
                 "authpress_css",
-                plugins_url("assets/css/authpress-plugin.css", dirname(__FILE__)),
+                plugins_url("assets/css/authpress-plugin.css", WP_FACTOR_TG_FILE),
                 array(),
                 WP_FACTOR_PLUGIN_VERSION
             );
@@ -122,7 +122,7 @@ class AuthPress_Hooks_Manager
 
             wp_register_style(
                     "authpress_ui_css",
-                    plugins_url("assets/css/authpress-ui.css", dirname(__FILE__)),
+                    plugins_url("assets/css/authpress-ui.css", WP_FACTOR_TG_FILE),
                     array(),
                     WP_FACTOR_PLUGIN_VERSION
             );
@@ -130,7 +130,7 @@ class AuthPress_Hooks_Manager
 
             wp_register_script(
                 "tg_lib_js",
-                plugins_url("assets/js/authpress-plugin.js", dirname(__FILE__)),
+                plugins_url("assets/js/authpress-plugin.js", WP_FACTOR_TG_FILE),
                 array('jquery'),
                 WP_FACTOR_PLUGIN_VERSION,
                 true
@@ -162,7 +162,7 @@ class AuthPress_Hooks_Manager
             wp_enqueue_script('jquery-ui-accordion');
             wp_enqueue_script(
                 'custom-accordion',
-                plugins_url('assets/js/authpress-accordion.js', dirname(__FILE__)),
+                plugins_url('assets/js/authpress-accordion.js', WP_FACTOR_TG_FILE),
                 array('jquery', 'jquery-ui-core', 'jquery-ui-accordion')
             );
         }

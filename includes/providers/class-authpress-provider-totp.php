@@ -171,7 +171,6 @@ class TOTP_Provider extends Abstract_Provider
 
             return 'data:image/svg+xml;base64,' . base64_encode($svg);
         } catch (\Exception $e) {
-            error_log('AuthPress: Bacon QR Code generation failed: ' . $e->getMessage());
             // Fallback to external service
             return 'https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=' . rawurlencode($otpauth_url);
         }
@@ -339,7 +338,7 @@ class TOTP_Provider extends Abstract_Provider
         if (!$this->is_enabled()) {
             return false;
         }
-        
+
         return true; // TOTP doesn't need external configuration
     }
 }

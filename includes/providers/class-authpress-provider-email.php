@@ -21,8 +21,6 @@ class Email_Provider extends Abstract_Provider implements Provider_Otp_Interface
         $normalized_for_storage = $this->normalize_code($auth_code);
         $hashed_code = $this->hash_code($normalized_for_storage);
 
-        error_log("Email code generation - Original: '$auth_code', Normalized for storage: '$normalized_for_storage', Hash: '$hashed_code'");
-
         global $wpdb;
         $table_name = $wpdb->prefix . 'telegram_auth_codes';
 
@@ -77,14 +75,11 @@ class Email_Provider extends Abstract_Provider implements Provider_Otp_Interface
     public function validate_code($code, $user_id)
     {
         if (empty($code) || empty($user_id)) {
-            error_log("Email validation failed: empty code or user_id - Code: '$code', User ID: '$user_id'");
             return false;
         }
 
         $normalized_code = $this->normalize_code($code);
         $hashed_code = $this->hash_code($normalized_code);
-
-        error_log("Email validation debug - Original: '$code', Normalized: '$normalized_code', Hash: '$hashed_code'");
 
         global $wpdb;
         $table_name = $wpdb->prefix . 'telegram_auth_codes';
@@ -96,10 +91,7 @@ class Email_Provider extends Abstract_Provider implements Provider_Otp_Interface
             current_time('mysql')
         ));
 
-        error_log("Email validation debug - Query result: " . ($stored_code ? 'FOUND' : 'NOT_FOUND'));
-
         if ($stored_code) {
-            error_log("Email validation SUCCESS for user $user_id");
             // Delete the used code
             $wpdb->delete(
                 $table_name,
@@ -109,7 +101,6 @@ class Email_Provider extends Abstract_Provider implements Provider_Otp_Interface
             return true;
         }
 
-        error_log("Email validation FAILED for user $user_id - code not found or expired");
         return false;
     }
 

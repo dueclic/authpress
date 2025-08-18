@@ -461,11 +461,9 @@ public function send_code($code, $user_id, $options = [])
             do_action('authpress_sms_code_sent', $user_id, $result);
             return true;
         } else {
-            error_log("SMS send failed: " . $result['error']);
             return false;
         }
     } catch (Exception $e) {
-        error_log("SMS provider exception: " . $e->getMessage());
         return false;
     }
 }

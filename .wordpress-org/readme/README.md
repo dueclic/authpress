@@ -4,7 +4,7 @@ Tags: 2fa, authentication, telegram, authenticate, security
 Requires at least: 6.0
 Requires PHP: 7.0
 Tested up to: 6.8
-Stable tag: 3.5.4
+Stable tag: 3.6.0
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
