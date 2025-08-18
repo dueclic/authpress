@@ -152,6 +152,22 @@ abstract class Abstract_Provider
     }
 
     /**
+     * Get the path to provider's features template
+     * @return string|null Template path or null if no template
+     */
+    public function get_login_template_path()
+    {
+        // Default: look for template in AuthPress main plugin directory
+        $default_path = dirname(WP_FACTOR_TG_FILE) . "/templates/provider-login/{$this->get_key()}.php";
+
+        if (file_exists($default_path)) {
+            return $default_path;
+        }
+
+        return dirname(WP_FACTOR_TG_FILE) . "/templates/provider-login.php";
+    }
+
+    /**
      * Check if provider is enabled
      * Uses WordPress filters to allow customization
      * @return bool True if enabled, false otherwise

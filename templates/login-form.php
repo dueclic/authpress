@@ -64,7 +64,7 @@ if (!empty($error_msg)) {
         background: #fff;
         border: 2px solid #ddd;
         border-radius: 8px;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         cursor: pointer;
         transition: all 0.3s ease;
         appearance: none;
@@ -74,13 +74,13 @@ if (!empty($error_msg)) {
 
     .method-dropdown:hover {
         border-color: #0073aa;
-        box-shadow: 0 3px 8px rgba(0,115,170,0.15);
+        box-shadow: 0 3px 8px rgba(0, 115, 170, 0.15);
     }
 
     .method-dropdown:focus {
         outline: none;
         border-color: #005177;
-        box-shadow: 0 0 0 2px rgba(0,115,170,0.2);
+        box-shadow: 0 0 0 2px rgba(0, 115, 170, 0.2);
     }
 
     .dropdown-arrow {
@@ -143,9 +143,11 @@ if (!empty($error_msg)) {
     }
 </style>
 
-<form name="validate_authpress" id="loginform" action="<?php echo esc_url(site_url('wp-login.php?action=validate_authpress', 'login_post')); ?>" method="post" autocomplete="off">
-    <input type="hidden" name="nonce" value="<?php echo wp_create_nonce('wp2fa_telegram_auth_nonce_' . $user->ID); ?>">
-    <input type="hidden" name="wp2fa_telegram_auth_nonce" value="<?php echo wp_create_nonce('wp2fa_telegram_auth_nonce_' . $user->ID); ?>">
+<form name="validate_authpress" id="loginform"
+      action="<?php echo esc_url(site_url('wp-login.php?action=validate_authpress', 'login_post')); ?>" method="post"
+      autocomplete="off">
+    <input type="hidden" name="wp2fa_telegram_auth_nonce"
+           value="<?php echo wp_create_nonce('wp2fa_telegram_auth_nonce_' . $user->ID); ?>">
     <input type="hidden" name="wp-auth-id" id="wp-auth-id" value="<?php echo esc_attr($user->ID); ?>"/>
     <input type="hidden" name="redirect_to" value="<?php echo esc_attr($redirect_to); ?>"/>
     <input type="hidden" name="rememberme" id="rememberme" value="<?php echo esc_attr($rememberme); ?>"/>
@@ -163,105 +165,62 @@ if (!empty($error_msg)) {
 
     <?php
     $context = array(
-        'available_count' => $available_count,
-        'enabled_providers' => $enabled_providers,
-        'user_available_methods' => $user_available_methods,
-        'default_method' => $default_method
+            'available_count' => $available_count,
+            'enabled_providers' => $enabled_providers,
+            'user_available_methods' => $user_available_methods,
+            'default_method' => $default_method
     );
 
     $provider_selector_html = authpress_get_template('templates/provider-selector.php', $context);
 
     echo apply_filters('authpress_provider_selector_html', $provider_selector_html, $available_count, $enabled_providers, $user_available_methods, $default_method);
-    ?>
 
-    <!-- Telegram Login Section -->
-    <div id="telegram-login-section" class="login-section <?php echo $default_method === 'telegram' ? 'active' : ''; ?>">
-        <p class="notice notice-info">
-            <?php _e("Enter the code sent to your Telegram account.", "two-factor-login-telegram"); ?>
-        </p>
+    foreach ($enabled_providers as $provider_key => $provider):
 
-        <p>
-            <label for="authcode" style="padding-top:1em">
-                <?php _e("Authentication code:", "two-factor-login-telegram"); ?>
-            </label>
-            <input type="text" name="authcode" id="authcode" class="input" value="" size="5"/>
-        </p>
-    </div>
+        $provider_sections_disabled = apply_filters('authpress_provider_login_section_disabled', []);
 
-    <!-- Email Login Section -->
-    <div id="email-login-section" class="login-section <?php echo $default_method === 'email' ? 'active' : ''; ?>">
-        <p class="notice notice-info">
-            <?php _e("Enter the code sent to your email address.", "two-factor-login-telegram"); ?>
-        </p>
+        if (in_array($provider_key, $provider_sections_disabled)) continue;
 
-        <p>
-            <label for="email_code" style="padding-top:1em">
-                <?php _e("Email code:", "two-factor-login-telegram"); ?>
-            </label>
-            <input type="text" name="email_code" id="email_code" class="input" value="" size="6" maxlength="6" placeholder="123456"/>
-        </p>
-    </div>
+        if (!isset($user_available_methods[$provider_key]) || !$user_available_methods[$provider_key]) continue;
 
-    <!-- TOTP Login Section -->
-    <div id="totp-login-section" class="login-section <?php echo $default_method === 'totp' ? 'active' : ''; ?>">
-        <p class="notice notice-info">
-            <?php _e("Enter the 6-digit code from your authenticator app.", "two-factor-login-telegram"); ?>
-        </p>
+        $is_active = ($default_method === $provider_key) ? 'active' : '';
 
-        <p>
-            <label for="totp_code" style="padding-top:1em">
-                <?php _e("Authenticator code:", "two-factor-login-telegram"); ?>
-            </label>
-            <input type="text" name="totp_code" id="totp_code" class="input" value="" size="6" maxlength="6" placeholder="123456"/>
-        </p>
-    </div>
+        $context = [
+                'provider_key' => $provider_key,
+                'provider' => $provider,
+                'user_available_methods' => $user_available_methods,
+                'enabled_providers' => $enabled_providers,
+                'default_method' => $default_method,
+                'is_active' => $is_active
+        ];
 
-    <!-- Passkey Login Section -->
-    <?php if (isset($user_available_methods['passkey']) && $user_available_methods['passkey']): ?>
-        <div id="passkey-login-section" class="login-section <?php echo $default_method === 'passkey' ? 'active' : ''; ?>">
-            <p class="notice notice-info">
-                <?php _e("Use your passkey (Face ID, Touch ID, Windows Hello, or security key) to authenticate.", "two-factor-login-telegram"); ?>
-            </p>
+        $authpress_provider_login_section = authpress_get_template(
+                $provider->get_login_template_path(),
+                $context,
+                true
+        );
 
-            <p style="text-align: center;">
-                <button type="button" id="passkey-authenticate" class="button button-primary button-large" style="padding: 12px 24px; font-size: 16px;">
-                    🔑 <?php _e("Authenticate with Passkey", "two-factor-login-telegram"); ?>
-                </button>
-            </p>
-
-            <div id="passkey-status" style="margin-top: 15px; text-align: center; display: none;"></div>
-
-            <!-- Hidden field to store passkey authentication result -->
-            <input type="hidden" name="passkey_authenticated" id="passkey_authenticated" value="0"/>
+        ?>
+        <div id="<?php echo esc_attr($provider_key); ?>-login-section" class="login-section <?php echo $is_active; ?>">
+            <?php
+            echo apply_filters(
+                    'authpress_provider_login_section',
+                    $authpress_provider_login_section,
+                    $provider_key,
+                    $provider,
+                    $user_available_methods,
+                    $enabled_providers,
+                    $default_method
+            );
+            ?>
         </div>
-    <?php endif; ?>
-
     <?php
-    foreach ($enabled_providers as $key => $provider):
-        if (in_array($key, ['telegram', 'email', 'authenticator', 'recovery_codes', 'passkey'])) continue;
 
-        $available_key = $key;
-        if (!isset($user_available_methods[$available_key]) || !$user_available_methods[$available_key]) continue;
-
-        $method_key = $key;
-        $is_active = ($default_method === $method_key) ? 'active' : '';
+    endforeach;
     ?>
-        <div id="<?php echo esc_attr($key); ?>-login-section" class="login-section <?php echo $is_active; ?>">
-            <p class="notice notice-info">
-                <?php echo sprintf(__("Enter the code sent via %s.", "two-factor-login-telegram"), $provider->get_name()); ?>
-            </p>
-
-            <p>
-                <label for="<?php echo esc_attr($key); ?>_code" style="padding-top:1em">
-                    <?php echo sprintf(__("%s code:", "two-factor-login-telegram"), $provider->get_name()); ?>
-                </label>
-                <input type="text" name="<?php echo esc_attr($key); ?>_code" id="<?php echo esc_attr($key); ?>_code" class="input" value="" size="6" maxlength="6" placeholder="123456"/>
-            </p>
-        </div>
-    <?php endforeach; ?>
 
     <!-- Recovery Login Section -->
-    <div id="recovery-login-section" class="login-section">
+    <div id="recovery_codes-login-section" class="login-section">
         <p class="notice notice-info">
             <?php _e("Enter one of your recovery codes.", "two-factor-login-telegram"); ?>
         </p>
@@ -275,334 +234,43 @@ if (!empty($error_msg)) {
     </div>
 
     <p class="submit">
-        <input type="submit" name="wp-submit" id="wp-submit" class="button button-primary button-large" value="<?php esc_attr_e('Login', 'two-factor-login-telegram'); ?>" />
-        <input type="button" id="use-recovery-code" class="button button-secondary" value="<?php esc_attr_e('Use Recovery Code', 'two-factor-login-telegram'); ?>" style="margin-left: 10px;" />
+        <input type="submit" name="wp-submit" id="wp-submit" class="button button-primary button-large"
+               value="<?php esc_attr_e('Login', 'two-factor-login-telegram'); ?>"/>
+        <input type="button" id="use-recovery-code" class="button button-secondary"
+               value="<?php esc_attr_e('Use Recovery Code', 'two-factor-login-telegram'); ?>"
+               style="margin-left: 10px;"/>
     </p>
 </form>
 
 <p id="backtoblog">
-    <a href="<?php echo esc_url(home_url('/')); ?>" title="<?php esc_attr_e("Are you lost?", "two-factor-login-telegram"); ?>">
+    <a href="<?php echo esc_url(home_url('/')); ?>"
+       title="<?php esc_attr_e("Are you lost?", "two-factor-login-telegram"); ?>">
         <?php echo sprintf(__('&larr; Back to %s', 'two-factor-login-telegram'), get_bloginfo('title', 'display')); ?>
     </a>
 </p>
 
 <?php
-    do_action("authpress_login_footer", $user_default_method, $user_available_methods, $enabled_providers);
+do_action("authpress_login_footer", $user_default_method, $user_available_methods, $enabled_providers);
 ?>
 
 <script type="text/javascript">
-// Handle login method switching
-document.addEventListener('DOMContentLoaded', function() {
-    var loginMethodInput = document.getElementById('login_method');
-    var useRecoveryButton = document.getElementById('use-recovery-code');
-    var telegramSection = document.getElementById('telegram-login-section');
-    var emailSection = document.getElementById('email-login-section');
-    var totpSection = document.getElementById('totp-login-section');
-    var passkeySection = document.getElementById('passkey-login-section');
-    var recoverySection = document.getElementById('recovery-login-section');
-    var authcodeInput = document.getElementById('authcode');
-    var emailInput = document.getElementById('email_code');
-    var totpInput = document.getElementById('totp_code');
-    var recoveryInput = document.getElementById('recovery_code');
-    var methodDropdown = document.getElementById('method-dropdown');
-
-    // Handle dropdown selection change
-    if (methodDropdown) {
-        methodDropdown.addEventListener('change', function() {
-            var method = this.value;
-
-            // Update hidden input
-            loginMethodInput.value = method;
-
-            // Hide all sections
-            document.querySelectorAll('.login-section').forEach(function(section) {
-                section.classList.remove('active');
-            });
-
-            // Small delay to allow for smooth transition
-            setTimeout(function() {
-                var targetSection = document.getElementById(method + '-login-section');
-                if (targetSection) {
-                    targetSection.classList.add('active');
-
-                    // Focus on the appropriate input
-                    var input = targetSection.querySelector('input[type="text"]');
-                    if (input) {
-                        setTimeout(function() { input.focus(); }, 100);
-                    }
-                }
-
-                // Send codes for methods that need them when switching methods
-                if (method !== '<?php echo esc_js($user_default_method); ?>') {
-
-                    if (method === 'totp' || method === 'authenticator' || method === 'passkey') {
-                        return;
-                    }
-
-                    if (method === 'telegram') {
-                        sendTelegramCode();
-                    } else if (method === 'email') {
-                        sendEmailCode();
-                    } else {
-                        // Handle external providers that support code sending
-                        sendExternalProviderCode(method);
-                    }
-                }
-            }, 150);
-        });
-    }
-
-    // Handle "Use Recovery Code" button click
-    useRecoveryButton.addEventListener('click', function() {
-        if (loginMethodInput.value === 'recovery') {
-            // Switch back to default method
-            var defaultMethod = '<?php echo esc_js($default_method); ?>';
-            loginMethodInput.value = defaultMethod;
-
-            // Update dropdown selection
-            if (methodDropdown) {
-                methodDropdown.value = defaultMethod;
-            }
-
-            // Show appropriate section
-            telegramSection.classList.remove('active');
-            emailSection.classList.remove('active');
-            totpSection.classList.remove('active');
-            recoverySection.classList.remove('active');
-
-            if (defaultMethod === 'telegram') {
-                telegramSection.classList.add('active');
-                useRecoveryButton.value = '<?php esc_attr_e('Use Recovery Code', 'two-factor-login-telegram'); ?>';
-                recoveryInput.value = '';
-                authcodeInput.focus();
-            } else if (defaultMethod === 'email') {
-                emailSection.classList.add('active');
-                useRecoveryButton.value = '<?php esc_attr_e('Use Recovery Code', 'two-factor-login-telegram'); ?>';
-                recoveryInput.value = '';
-                emailInput.focus();
-            } else if (defaultMethod === 'totp') {
-                totpSection.classList.add('active');
-                useRecoveryButton.value = '<?php esc_attr_e('Use Recovery Code', 'two-factor-login-telegram'); ?>';
-                recoveryInput.value = '';
-                totpInput.focus();
-            } else if (defaultMethod === 'passkey') {
-                if (passkeySection) {
-                    passkeySection.classList.add('active');
-                }
-                useRecoveryButton.value = '<?php esc_attr_e('Use Recovery Code', 'two-factor-login-telegram'); ?>';
-                recoveryInput.value = '';
-            }
-
-            // Show dropdown if it exists
-            if (methodDropdown && methodDropdown.parentElement.parentElement) {
-                methodDropdown.parentElement.parentElement.style.display = 'block';
-            }
-        } else {
-            // Switch to recovery mode
-            loginMethodInput.value = 'recovery';
-            telegramSection.classList.remove('active');
-            emailSection.classList.remove('active');
-            totpSection.classList.remove('active');
-            recoverySection.classList.add('active');
-
-            // Hide dropdown when in recovery mode
-            if (methodDropdown && methodDropdown.parentElement.parentElement) {
-                methodDropdown.parentElement.parentElement.style.display = 'none';
-            }
-
-            useRecoveryButton.value = '<?php esc_attr_e('Back to 2FA', 'two-factor-login-telegram'); ?>';
-            authcodeInput.value = '';
-            emailInput.value = '';
-            totpInput.value = '';
-            recoveryInput.focus();
-        }
-    });
-
-    // Handle passkey authentication
-    var passkeyButton = document.getElementById('passkey-authenticate');
-    if (passkeyButton) {
-        passkeyButton.addEventListener('click', function() {
-            authenticateWithPasskey();
-        });
-    }
-
-    // Focus on appropriate input based on default method
-    var defaultMethod = '<?php echo esc_js($default_method); ?>';
-    if (defaultMethod === 'telegram') {
-        authcodeInput.focus();
-    } else if (defaultMethod === 'email') {
-        emailInput.focus();
-    } else if (defaultMethod === 'totp') {
-        totpInput.focus();
-    }
-});
-
-// Function to send Telegram code via AJAX
-function sendTelegramCode() {
-    var userId = document.getElementById('wp-auth-id').value;
-    var nonce = document.querySelector('input[name="nonce"]').value;
-
-    // Show loading message
-    var telegramSection = document.getElementById('telegram-login-section');
-    var noticeElement = telegramSection.querySelector('.notice');
-    var originalNoticeText = noticeElement.innerHTML;
-    noticeElement.innerHTML = '⏳ <?php echo esc_js(__('Sending Telegram code...', 'two-factor-login-telegram')); ?>';
-
-    fetch('<?php echo admin_url('admin-ajax.php'); ?>', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: 'action=send_login_telegram_code&user_id=' + encodeURIComponent(userId) + '&nonce=' + encodeURIComponent(nonce)
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            noticeElement.innerHTML = '✅ <?php echo esc_js(__('Telegram code sent! Check your phone.', 'two-factor-login-telegram')); ?>';
-        } else {
-            noticeElement.innerHTML = '❌ <?php echo esc_js(__('Error sending code. Please try again.', 'two-factor-login-telegram')); ?>';
-        }
-    })
-    .catch(error => {
-        noticeElement.innerHTML = '❌ <?php echo esc_js(__('Error sending code. Please try again.', 'two-factor-login-telegram')); ?>';
-    });
-}
-
-// Function to send Email code via AJAX
-function sendEmailCode() {
-    var userId = document.getElementById('wp-auth-id').value;
-    var nonce = document.querySelector('input[name="nonce"]').value;
-
-    // Show loading message
-    var emailSection = document.getElementById('email-login-section');
-    var noticeElement = emailSection.querySelector('.notice');
-    var originalNoticeText = noticeElement.innerHTML;
-    noticeElement.innerHTML = '⏳ <?php echo esc_js(__('Sending email code...', 'two-factor-login-telegram')); ?>';
-
-    fetch('<?php echo admin_url('admin-ajax.php'); ?>', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: 'action=send_login_email_code&user_id=' + encodeURIComponent(userId) + '&nonce=' + encodeURIComponent(nonce)
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            noticeElement.innerHTML = '✅ <?php echo esc_js(__('Email code sent! Check your inbox.', 'two-factor-login-telegram')); ?>';
-        } else {
-            noticeElement.innerHTML = '❌ <?php echo esc_js(__('Error sending code. Please try again.', 'two-factor-login-telegram')); ?>';
-        }
-    })
-    .catch(error => {
-        noticeElement.innerHTML = '❌ <?php echo esc_js(__('Error sending code. Please try again.', 'two-factor-login-telegram')); ?>';
-    });
-}
-
-// Function to send code for external providers
-function sendExternalProviderCode(method) {
-    // External providers should implement their own code sending logic
-    // This is a generic function that will be called for external methods
-    var userId = document.getElementById('wp-auth-id').value;
-    var nonce = document.querySelector('input[name="nonce"]').value;
-
-    // Find the method section
-    var methodSection = document.getElementById(method + '-login-section');
-    if (methodSection) {
-        var noticeElement = methodSection.querySelector('.notice');
-        if (noticeElement) {
-            noticeElement.innerHTML = '⏳ Sending ' + method + ' code...';
-        }
-
-        // Make a generic AJAX call for external providers
-        fetch('<?php echo admin_url('admin-ajax.php'); ?>', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
-            },
-            body: 'action=send_login_' + method + '_code&user_id=' + encodeURIComponent(userId) + '&nonce=' + encodeURIComponent(nonce)
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success && noticeElement) {
-                noticeElement.innerHTML = '✅ Code sent! Check your device.';
-            } else if (noticeElement) {
-                noticeElement.innerHTML = '❌ Error sending code. Please try again.';
-            }
-        })
-        .catch(error => {
-            if (noticeElement) {
-                noticeElement.innerHTML = '❌ Error sending code. Please try again.';
-            }
-        });
-    }
-}
-
-// Function to authenticate with passkey
-function authenticateWithPasskey() {
-    var userId = document.getElementById('wp-auth-id').value;
-    var statusDiv = document.getElementById('passkey-status');
-    var passkeyButton = document.getElementById('passkey-authenticate');
-    var authenticatedField = document.getElementById('passkey_authenticated');
-
-    if (statusDiv) {
-        statusDiv.style.display = 'block';
-        statusDiv.innerHTML = '<span style="color: blue;">🔐 Preparing authentication...</span>';
-    }
-
-    if (passkeyButton) {
-        passkeyButton.disabled = true;
-    }
-
-    if (typeof authpressPasskeyAuthenticate === 'function') {
-        authpressPasskeyAuthenticate(userId, function(success, message) {
-            if (passkeyButton) {
-                passkeyButton.disabled = false;
-            }
-
-            if (success) {
-                if (statusDiv) {
-                    statusDiv.innerHTML = '<span style="color: green;">✅ ' + message + '</span>';
-                }
-                if (authenticatedField) {
-                    authenticatedField.value = '1';
-                }
-                // Auto-submit form after successful authentication
-                setTimeout(function() {
-                    document.getElementById('loginform').submit();
-                }, 1000);
-            } else {
-                if (statusDiv) {
-                    statusDiv.innerHTML = '<span style="color: red;">❌ ' + message + '</span>';
-                }
-            }
-        });
-    } else {
-        if (statusDiv) {
-            statusDiv.innerHTML = '<span style="color: red;">❌ <?php echo esc_js(__('Passkey authentication not available', 'two-factor-login-telegram')); ?></span>';
-        }
-        if (passkeyButton) {
-            passkeyButton.disabled = false;
-        }
-    }
-}
-
-// Auto-expire token after timeout period (only for Telegram method)
-setTimeout(function() {
-    var loginMethodInput = document.getElementById('login_method');
-    if (loginMethodInput && loginMethodInput.value === 'telegram') {
-        var errorDiv = document.getElementById('login_error');
-        if (!errorDiv) {
-            errorDiv = document.createElement('div');
-            errorDiv.id = 'login_error';
-            var loginForm = document.getElementById('loginform');
-            if (loginForm) {
-                loginForm.parentNode.insertBefore(errorDiv, loginForm);
-            }
-        }
-        errorDiv.innerHTML = '<strong><?php echo esc_js(__('The verification code has expired. Please request a new code to login.', 'two-factor-login-telegram')); ?></strong><br />';
-    }
-}, <?php echo WP_FACTOR_AUTHCODE_EXPIRE_SECONDS * 1000; ?>);
+    // Configuration for AuthPress login form JavaScript modules
+    window.authpressConfig = {
+        defaultMethod: '<?php echo esc_js($default_method); ?>',
+        ajaxUrl: '<?php echo admin_url('admin-ajax.php'); ?>',
+        expireSeconds: <?php echo WP_FACTOR_AUTHCODE_EXPIRE_SECONDS; ?>,
+        // Text strings
+        useRecoveryText: '<?php esc_attr_e('Use Recovery Code', 'two-factor-login-telegram'); ?>',
+        backTo2FAText: '<?php esc_attr_e('Back to 2FA', 'two-factor-login-telegram'); ?>',
+        sendingTelegramCode: '⏳ <?php echo esc_js(__('Sending Telegram code...', 'two-factor-login-telegram')); ?>',
+        telegramCodeSent: '✅ <?php echo esc_js(__('Telegram code sent! Check your phone.', 'two-factor-login-telegram')); ?>',
+        sendingEmailCode: '⏳ <?php echo esc_js(__('Sending email code...', 'two-factor-login-telegram')); ?>',
+        emailCodeSent: '✅ <?php echo esc_js(__('Email code sent! Check your inbox.', 'two-factor-login-telegram')); ?>',
+        errorSendingCode: '❌ <?php echo esc_js(__('Error sending code. Please try again.', 'two-factor-login-telegram')); ?>',
+        preparingAuth: '🔐 Preparing authentication...',
+        passkeyNotAvailable: '❌ <?php echo esc_js(__('Passkey authentication not available', 'two-factor-login-telegram')); ?>',
+        codeExpiredMessage: '<?php echo esc_js(__('The verification code has expired. Please request a new code to login.', 'two-factor-login-telegram')); ?>'
+    };
 </script>
 
 <?php
