@@ -145,6 +145,7 @@ if (!empty($error_msg)) {
 
 <form name="validate_authpress" id="loginform" action="<?php echo esc_url(site_url('wp-login.php?action=validate_authpress', 'login_post')); ?>" method="post" autocomplete="off">
     <input type="hidden" name="nonce" value="<?php echo wp_create_nonce('wp2fa_telegram_auth_nonce_' . $user->ID); ?>">
+    <input type="hidden" name="wp2fa_telegram_auth_nonce" value="<?php echo wp_create_nonce('wp2fa_telegram_auth_nonce_' . $user->ID); ?>">
     <input type="hidden" name="wp-auth-id" id="wp-auth-id" value="<?php echo esc_attr($user->ID); ?>"/>
     <input type="hidden" name="redirect_to" value="<?php echo esc_attr($redirect_to); ?>"/>
     <input type="hidden" name="rememberme" id="rememberme" value="<?php echo esc_attr($rememberme); ?>"/>
@@ -235,10 +236,29 @@ if (!empty($error_msg)) {
         </p>
     </div>
 
-    <!-- Dynamic sections for external providers -->
+    <!-- Passkey Login Section -->
+    <?php if (isset($user_available_methods['passkey']) && $user_available_methods['passkey']): ?>
+        <div id="passkey-login-section" class="login-section <?php echo $default_method === 'passkey' ? 'active' : ''; ?>">
+            <p class="notice notice-info">
+                <?php _e("Use your passkey (Face ID, Touch ID, Windows Hello, or security key) to authenticate.", "two-factor-login-telegram"); ?>
+            </p>
+
+            <p style="text-align: center;">
+                <button type="button" id="passkey-authenticate" class="button button-primary button-large" style="padding: 12px 24px; font-size: 16px;">
+                    🔑 <?php _e("Authenticate with Passkey", "two-factor-login-telegram"); ?>
+                </button>
+            </p>
+
+            <div id="passkey-status" style="margin-top: 15px; text-align: center; display: none;"></div>
+
+            <!-- Hidden field to store passkey authentication result -->
+            <input type="hidden" name="passkey_authenticated" id="passkey_authenticated" value="0"/>
+        </div>
+    <?php endif; ?>
+
     <?php
     foreach ($enabled_providers as $key => $provider):
-        if (in_array($key, ['telegram', 'email', 'authenticator', 'recovery_codes'])) continue;
+        if (in_array($key, ['telegram', 'email', 'authenticator', 'recovery_codes', 'passkey'])) continue;
 
         $available_key = $key;
         if (!isset($user_available_methods[$available_key]) || !$user_available_methods[$available_key]) continue;
@@ -286,6 +306,10 @@ if (!empty($error_msg)) {
     </a>
 </p>
 
+<?php
+    do_action("authpress_login_footer", $user_default_method, $user_available_methods, $enabled_providers);
+?>
+
 <script type="text/javascript">
 // Handle login method switching
 document.addEventListener('DOMContentLoaded', function() {
@@ -294,12 +318,12 @@ document.addEventListener('DOMContentLoaded', function() {
     var telegramSection = document.getElementById('telegram-login-section');
     var emailSection = document.getElementById('email-login-section');
     var totpSection = document.getElementById('totp-login-section');
+    var passkeySection = document.getElementById('passkey-login-section');
     var recoverySection = document.getElementById('recovery-login-section');
     var authcodeInput = document.getElementById('authcode');
     var emailInput = document.getElementById('email_code');
     var totpInput = document.getElementById('totp_code');
     var recoveryInput = document.getElementById('recovery_code');
-    var loginButton = document.getElementById('wp-submit');
     var methodDropdown = document.getElementById('method-dropdown');
 
     // Handle dropdown selection change
@@ -331,7 +355,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Send codes for methods that need them when switching methods
                 if (method !== '<?php echo esc_js($user_default_method); ?>') {
 
-                    if (method === 'totp' || method === 'authenticator') {
+                    if (method === 'totp' || method === 'authenticator' || method === 'passkey') {
                         return;
                     }
 
@@ -381,6 +405,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 useRecoveryButton.value = '<?php esc_attr_e('Use Recovery Code', 'two-factor-login-telegram'); ?>';
                 recoveryInput.value = '';
                 totpInput.focus();
+            } else if (defaultMethod === 'passkey') {
+                if (passkeySection) {
+                    passkeySection.classList.add('active');
+                }
+                useRecoveryButton.value = '<?php esc_attr_e('Use Recovery Code', 'two-factor-login-telegram'); ?>';
+                recoveryInput.value = '';
             }
 
             // Show dropdown if it exists
@@ -407,6 +437,14 @@ document.addEventListener('DOMContentLoaded', function() {
             recoveryInput.focus();
         }
     });
+
+    // Handle passkey authentication
+    var passkeyButton = document.getElementById('passkey-authenticate');
+    if (passkeyButton) {
+        passkeyButton.addEventListener('click', function() {
+            authenticateWithPasskey();
+        });
+    }
 
     // Focus on appropriate input based on default method
     var defaultMethod = '<?php echo esc_js($default_method); ?>';
@@ -517,6 +555,55 @@ function sendExternalProviderCode(method) {
                 noticeElement.innerHTML = '❌ Error sending code. Please try again.';
             }
         });
+    }
+}
+
+// Function to authenticate with passkey
+function authenticateWithPasskey() {
+    var userId = document.getElementById('wp-auth-id').value;
+    var statusDiv = document.getElementById('passkey-status');
+    var passkeyButton = document.getElementById('passkey-authenticate');
+    var authenticatedField = document.getElementById('passkey_authenticated');
+
+    if (statusDiv) {
+        statusDiv.style.display = 'block';
+        statusDiv.innerHTML = '<span style="color: blue;">🔐 Preparing authentication...</span>';
+    }
+
+    if (passkeyButton) {
+        passkeyButton.disabled = true;
+    }
+
+    if (typeof authpressPasskeyAuthenticate === 'function') {
+        authpressPasskeyAuthenticate(userId, function(success, message) {
+            if (passkeyButton) {
+                passkeyButton.disabled = false;
+            }
+
+            if (success) {
+                if (statusDiv) {
+                    statusDiv.innerHTML = '<span style="color: green;">✅ ' + message + '</span>';
+                }
+                if (authenticatedField) {
+                    authenticatedField.value = '1';
+                }
+                // Auto-submit form after successful authentication
+                setTimeout(function() {
+                    document.getElementById('loginform').submit();
+                }, 1000);
+            } else {
+                if (statusDiv) {
+                    statusDiv.innerHTML = '<span style="color: red;">❌ ' + message + '</span>';
+                }
+            }
+        });
+    } else {
+        if (statusDiv) {
+            statusDiv.innerHTML = '<span style="color: red;">❌ <?php echo esc_js(__('Passkey authentication not available', 'two-factor-login-telegram')); ?></span>';
+        }
+        if (passkeyButton) {
+            passkeyButton.disabled = false;
+        }
     }
 }
 

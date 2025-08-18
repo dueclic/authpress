@@ -144,18 +144,29 @@ class AuthPress_Authentication_Handler
         $login_successful = false;
         $error_message = '';
 
-        $code = $this->get_code_from_post($login_method);
-
-        if (empty($code)) {
-            $error_message = $this->get_empty_code_error_message($login_method);
-        } else {
-            $validation_result = AuthPress_Auth_Factory::validateByMethod($code, $user->ID, $login_method);
-
-            if ($validation_result) {
+        // Handle passkey authentication differently
+        if ($login_method === 'passkey') {
+            $passkey_authenticated = isset($_POST['passkey_authenticated']) && $_POST['passkey_authenticated'] === '1';
+            if ($passkey_authenticated) {
                 $login_successful = true;
-                $this->log_successful_login($login_method, $user, $code);
+                $this->log_successful_passkey_login($user);
             } else {
-                $error_message = $this->handle_failed_validation($login_method, $user, $code);
+                $error_message = __('Passkey authentication failed. Please try again.', 'two-factor-login-telegram');
+            }
+        } else {
+            $code = $this->get_code_from_post($login_method);
+
+            if (empty($code)) {
+                $error_message = $this->get_empty_code_error_message($login_method);
+            } else {
+                $validation_result = AuthPress_Auth_Factory::validateByMethod($code, $user->ID, $login_method);
+
+                if ($validation_result) {
+                    $login_successful = true;
+                    $this->log_successful_login($login_method, $user, $code);
+                } else {
+                    $error_message = $this->handle_failed_validation($login_method, $user, $code);
+                }
             }
         }
 
@@ -209,6 +220,15 @@ class AuthPress_Authentication_Handler
             'user_login' => $user->user_login,
             'method' => $login_method,
             'code_used' => substr($code, 0, 4) . '****'
+        ));
+    }
+
+    private function log_successful_passkey_login($user)
+    {
+        $this->logger->log_action('passkey_login_success', array(
+            'user_id' => $user->ID,
+            'user_login' => $user->user_login,
+            'method' => 'passkey'
         ));
     }
 
