@@ -158,41 +158,21 @@ if (!empty($error_msg)) {
     $user_available_methods = AuthPress_User_Manager::get_user_available_methods($user->ID);
     $available_count = array_sum($user_available_methods);
     $user_default_method = AuthPress_User_Manager::get_user_effective_provider($user->ID);
+    $enabled_providers = AuthPress_Provider_Registry::get_enabled();
     ?>
 
-    <?php if ($available_count > 1): ?>
-        <!-- Method Selector Dropdown -->
-        <div class="method-selector-wrapper">
-            <label for="method-dropdown" class="method-label">
-                <?php _e("Choose your verification method:", "two-factor-login-telegram"); ?>
-            </label>
-            <div class="method-dropdown-container">
-                <select id="method-dropdown" class="method-dropdown">
-                    <?php
-                    $enabled_providers = AuthPress_Provider_Registry::get_enabled();
-                    foreach ($enabled_providers as $key => $provider):
-                        // Map keys for backward compatibility
-                        $method_key = ($key === 'authenticator') ? 'totp' : $key;
+    <?php
+    $context = array(
+        'available_count' => $available_count,
+        'enabled_providers' => $enabled_providers,
+        'user_available_methods' => $user_available_methods,
+        'default_method' => $default_method
+    );
 
-                        // Skip recovery codes in dropdown
-                        if ($key === 'recovery_codes') continue;
+    $provider_selector_html = authpress_get_template('templates/provider-selector.php', $context);
 
-                        // Check if user has this method available
-                        // Handle both hardcoded providers and external providers
-                        $available_key = ($key === 'authenticator') ? 'totp' : $key;
-                        if (!isset($user_available_methods[$available_key]) || !$user_available_methods[$available_key]) continue;
-                    ?>
-                        <option value="<?php echo esc_attr($method_key); ?>"
-                                <?php echo $default_method === $method_key ? 'selected' : ''; ?>
-                                data-icon="<?php echo esc_url($provider->get_icon()); ?>">
-                            <?php echo esc_html($provider->get_name()); ?>
-                        </option>
-                    <?php endforeach; ?>
-                </select>
-                <div class="dropdown-arrow">▼</div>
-            </div>
-        </div>
-    <?php endif; ?>
+    echo apply_filters('authpress_provider_selector_html', $provider_selector_html, $available_count, $enabled_providers, $user_available_methods, $default_method);
+    ?>
 
     <!-- Telegram Login Section -->
     <div id="telegram-login-section" class="login-section <?php echo $default_method === 'telegram' ? 'active' : ''; ?>">

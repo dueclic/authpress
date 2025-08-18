@@ -267,7 +267,7 @@ public function send_code($code, $user_id, $options = [])
 
 Create a configuration template that will be automatically included in the AuthPress providers page:
 
-**File:** `templates/admin/provider-configs/{provider_key}.php`
+**File:** `templates/provider-configs/{provider_key}.php`
 
 ```php
 <?php
@@ -556,7 +556,7 @@ my-authpress-provider/
 
 1. **Provider not appearing**: Check class autoloading and filter registration
 2. **Codes not sending**: Verify API credentials in AuthPress → Providers configuration
-3. **Configuration not showing**: Ensure config template is at `templates/admin/provider-configs/{key}.php`
+3. **Configuration not showing**: Ensure config template is at `templates/provider-configs/{key}.php`
 4. **Template not loading**: Ensure correct file naming and placement
 5. **Validation failing**: Check code normalization and hashing
 6. **Settings not saving**: Verify configuration template uses correct field names

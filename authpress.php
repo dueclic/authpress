@@ -87,6 +87,23 @@ function authpress_logo() {
     return $plugin_logo;
 }
 
+function authpress_get_template($template_path, $context = array()) {
+    $full_path = plugin_dir_path(WP_FACTOR_TG_FILE) . $template_path;
+
+    if (!file_exists($full_path)) {
+        return '';
+    }
+
+    // Extract context variables
+    if (!empty($context)) {
+        extract($context, EXTR_SKIP);
+    }
+
+    ob_start();
+    include $full_path;
+    return ob_get_clean();
+}
+
 function WFT()
 {
     return \Authpress\AuthPress_Plugin::get_instance();

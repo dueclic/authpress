@@ -25,7 +25,7 @@ class AuthPress_Provider_Registry
      * @var bool Whether external providers have been loaded
      */
     private static $external_providers_loaded = false;
-    
+
     /**
      * @var int Last external provider count to detect new registrations
      */
@@ -49,12 +49,12 @@ class AuthPress_Provider_Registry
         // Always check for new external providers to handle timing issues
         $external_providers = apply_filters('authpress_register_providers', []);
         $current_count = count($external_providers);
-        
+
         // Skip if we've already loaded and no new providers
         if (self::$external_providers_loaded && $current_count === self::$last_external_count) {
             return;
         }
-        
+
         if (is_array($external_providers)) {
             foreach ($external_providers as $key => $class_name) {
                 if (is_string($key) && is_string($class_name) && !empty($key) && !empty($class_name)) {
@@ -75,7 +75,7 @@ class AuthPress_Provider_Registry
     public static function get($key)
     {
         self::load_external_providers();
-        
+
         if (isset(self::$providers[$key])) {
             return self::$providers[$key];
         }
@@ -105,7 +105,7 @@ class AuthPress_Provider_Registry
     public static function get_all()
     {
         self::load_external_providers();
-        
+
         $providers = [];
         foreach (array_keys(self::$provider_classes) as $key) {
             $provider = self::get($key);
@@ -173,7 +173,7 @@ class AuthPress_Provider_Registry
     {
         return !empty(self::get_available());
     }
-    
+
     /**
      * Force reload of external providers (for timing issues)
      * @return void

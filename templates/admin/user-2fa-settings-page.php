@@ -80,11 +80,11 @@ if (file_exists($uikit_path)) {
                 if (method_exists($provider, 'get_user_template_path')) {
                     $template_path = $provider->get_user_template_path();
                 }
-                
+
                 // Fallback to default template location
                 if (!$template_path || !file_exists($template_path)) {
                     $template_file = sprintf('provider-%s.php', $key);
-                    $template_path = dirname(WP_FACTOR_TG_FILE) .'/templates/admin/provider-templates/' . $template_file;
+                    $template_path = dirname(WP_FACTOR_TG_FILE) . '/templates/provider-templates/' . $template_file;
                 }
 
                 if (file_exists($template_path)) {
@@ -92,7 +92,7 @@ if (file_exists($uikit_path)) {
                     include $template_path;
                 } else {
                     // Fallback to generic provider template
-                    include dirname(WP_FACTOR_TG_FILE) .'/templates/admin/provider-templates/generic-provider.php';
+                    include dirname(WP_FACTOR_TG_FILE) .'/templates/provider-templates/generic-provider.php';
                 }
             endforeach;
             ?>

@@ -126,7 +126,7 @@ abstract class Abstract_Provider
     public function get_config_template_path()
     {
         // Default: look for template in AuthPress main plugin directory
-        $default_path = dirname(WP_FACTOR_TG_FILE) . "/templates/admin/provider-configs/{$this->get_key()}.php";
+        $default_path = dirname(WP_FACTOR_TG_FILE) . "/templates/provider-configs/{$this->get_key()}.php";
 
         if (file_exists($default_path)) {
             return $default_path;
@@ -142,7 +142,7 @@ abstract class Abstract_Provider
     public function get_features_template_path()
     {
         // Default: look for template in AuthPress main plugin directory
-        $default_path = dirname(WP_FACTOR_TG_FILE) . "/templates/admin/provider-features/{$this->get_key()}.php";
+        $default_path = dirname(WP_FACTOR_TG_FILE) . "/templates/provider-features/{$this->get_key()}.php";
 
         if (file_exists($default_path)) {
             return $default_path;
