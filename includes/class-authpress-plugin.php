@@ -132,4 +132,15 @@ final class AuthPress_Plugin
             }
         }
     }
+	/**
+	 * Get the configured default provider
+	 *
+	 * @return string The default provider ('telegram' or 'authenticator')
+	 */
+	public function get_default_provider()
+	{
+		$providers = authpress_providers();
+		return isset($providers['default_provider']) ? $providers['default_provider'] : 'telegram';
+	}
 }
+
