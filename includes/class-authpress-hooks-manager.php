@@ -91,6 +91,7 @@ class AuthPress_Hooks_Manager
         add_action('wp_ajax_nopriv_send_login_email_code', array($this->ajax_handler, 'send_login_email_code'));
 
         // Admin AJAX
+        add_action('wp_ajax_authpress_test_email', array($this->ajax_handler, 'handle_test_email')); //email testing
         add_action('wp_ajax_disable_user_2fa_telegram', array($this->ajax_handler, 'disable_user_2fa_ajax'));
         add_action('wp_ajax_force_setup_wizard', array($this, 'handle_force_setup_wizard_ajax'));
     }
