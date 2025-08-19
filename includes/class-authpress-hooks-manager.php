@@ -143,6 +143,7 @@ class AuthPress_Hooks_Manager
                     "checkbot_nonce" => wp_create_nonce('ajax-checkbot-nonce'),
                     "sendtoken_nonce" => wp_create_nonce('ajax-sendtoken-nonce'),
                     "tokencheck_nonce" => wp_create_nonce('ajax-tokencheck-nonce'),
+                    "test_email_nonce" => wp_create_nonce('authpress_test_email_nonce'), //email button
                     "spinner" => admin_url("/images/spinner.gif"),
                     "invalid_chat_id" => __('Please enter a valid Chat ID', 'two-factor-login-telegram'),
                     "enter_confirmation_code" => __('Please enter the confirmation code', 'two-factor-login-telegram'),
