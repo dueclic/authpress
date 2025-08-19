@@ -178,6 +178,39 @@ var AuthPress_Plugin = function ($) {
 
         });
 
+        // Handle Test Email button click
+        $(document).on('click', '#authpress-test-email', function(e) {
+            e.preventDefault();
+            var $btn = $(this);
+            var $status = $('#authpress-test-email-status');
+
+            $btn.prop('disabled', true).text('Sending...');
+            $status.removeClass('success error').text('Sending test email...').show();
+
+            $.ajax({
+                url: ajaxurl,
+                method: 'POST',
+                dataType: 'json',
+                data: {
+                    action: 'authpress_test_email',
+                    _wpnonce: tlj.test_email_nonce
+                },
+                success: function(response) {
+                    if (response.success) {
+                        $status.removeClass('error').addClass('success').text(response.data.message);
+                    } else {
+                        $status.removeClass('success').addClass('error').text(response.data.message);
+                    }
+                },
+                error: function() {
+                    $status.removeClass('success').addClass('error').text(tlj.ajax_error || 'A network error occurred.');
+                },
+                complete: function() {
+                    $btn.prop('disabled', false).text('Send Test Email');
+                }
+            });
+        });
+
         // Method selection buttons
         $(document).on('click', '#setup-telegram-btn, #add-telegram-btn', function() {
             $('#2fa-method-selection').hide();
