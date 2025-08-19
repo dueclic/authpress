@@ -136,6 +136,21 @@ abstract class Abstract_Provider
     }
 
     /**
+     * Get the path to provider's user settings template
+     * @return string|null Template path or null if no template
+     */
+    public function get_user_template_path()
+    {
+        $template_path = dirname(WP_FACTOR_TG_FILE) . "/templates/provider-templates/{$this->get_key()}.php";
+
+        if (file_exists($template_path)) {
+            return $template_path;
+        }
+
+        return dirname(WP_FACTOR_TG_FILE) . "/templates/provider-templates/{$this->get_key()}.php";
+    }
+
+    /**
      * Get the path to provider's features template
      * @return string|null Template path or null if no template
      */

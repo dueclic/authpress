@@ -160,22 +160,22 @@ if (!empty($error_msg)) {
     $user_available_methods = AuthPress_User_Manager::get_user_available_methods($user->ID);
     $available_count = array_sum($user_available_methods);
     $user_default_method = AuthPress_User_Manager::get_user_effective_provider($user->ID);
-    $enabled_providers = AuthPress_Provider_Registry::get_enabled();
+    $available_providers = AuthPress_Provider_Registry::get_available();
     ?>
 
     <?php
     $context = array(
             'available_count' => $available_count,
-            'enabled_providers' => $enabled_providers,
+            'enabled_providers' => $available_providers,
             'user_available_methods' => $user_available_methods,
             'default_method' => $default_method
     );
 
     $provider_selector_html = authpress_get_template('templates/provider-selector.php', $context);
 
-    echo apply_filters('authpress_provider_selector_html', $provider_selector_html, $available_count, $enabled_providers, $user_available_methods, $default_method);
+    echo apply_filters('authpress_provider_selector_html', $provider_selector_html, $available_count, $available_providers, $user_available_methods, $default_method);
 
-    foreach ($enabled_providers as $provider_key => $provider):
+    foreach ($available_providers as $provider_key => $provider):
 
         $provider_sections_disabled = apply_filters('authpress_provider_login_section_disabled', []);
 
@@ -189,7 +189,7 @@ if (!empty($error_msg)) {
                 'provider_key' => $provider_key,
                 'provider' => $provider,
                 'user_available_methods' => $user_available_methods,
-                'enabled_providers' => $enabled_providers,
+                'available_providers' => $available_providers,
                 'default_method' => $default_method,
                 'is_active' => $is_active
         ];
@@ -209,7 +209,7 @@ if (!empty($error_msg)) {
                     $provider_key,
                     $provider,
                     $user_available_methods,
-                    $enabled_providers,
+                    $available_providers,
                     $default_method
             );
             ?>
@@ -250,7 +250,7 @@ if (!empty($error_msg)) {
 </p>
 
 <?php
-do_action("authpress_login_footer", $user_default_method, $user_available_methods, $enabled_providers);
+do_action("authpress_login_footer", $user_default_method, $user_available_methods, $available_providers);
 ?>
 
 <script type="text/javascript">

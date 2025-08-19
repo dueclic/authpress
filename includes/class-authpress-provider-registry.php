@@ -165,23 +165,4 @@ class AuthPress_Provider_Registry
         return self::get($key);
     }
 
-    /**
-     * Check if any providers are available
-     * @return bool
-     */
-    public static function has_available_providers()
-    {
-        return !empty(self::get_available());
-    }
-
-    /**
-     * Force reload of external providers (for timing issues)
-     * @return void
-     */
-    public static function force_reload_external_providers()
-    {
-        self::$external_providers_loaded = false;
-        self::$last_external_count = 0;
-        self::$providers = [];
-    }
 }

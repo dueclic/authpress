@@ -9,39 +9,10 @@ use Authpress\AuthPress_Provider_Registry;
 // Get all available provider instances
 $available_providers = AuthPress_Provider_Registry::get_all();
 
-// Group providers by category
-$provider_categories = [
-        'messaging' => [
-                'title' => __("Messaging Providers", "two-factor-login-telegram"),
-                'description' => __("Receive authentication codes directly via messaging platforms.", "two-factor-login-telegram"),
-                'providers' => ['telegram', 'email']
-        ],
-        'authenticator' => [
-                'title' => __("Authenticator Apps", "two-factor-login-telegram"),
-                'description' => __("Time-based One-Time Password apps that generate codes offline.", "two-factor-login-telegram"),
-                'providers' => ['authenticator']
-        ]
-];
+$provider_categories = authpress_provider_categories(
+        $available_providers
+);
 
-// Allow external plugins to add providers to categories
-$provider_categories = apply_filters('authpress_provider_categories', $provider_categories);
-
-// Auto-add any uncategorized providers to 'other' category
-$categorized_providers = [];
-foreach ($provider_categories as $category) {
-    $categorized_providers = array_merge($categorized_providers, $category['providers']);
-}
-
-$uncategorized_providers = array_diff(array_keys($available_providers), $categorized_providers);
-// Exclude recovery_codes from being shown in admin interface - it's a backend-only provider
-$uncategorized_providers = array_diff($uncategorized_providers, ['recovery_codes']);
-if (!empty($uncategorized_providers)) {
-    $provider_categories['other'] = [
-            'title' => __("Other Providers", "two-factor-login-telegram"),
-            'description' => __("Additional 2FA methods provided by plugins.", "two-factor-login-telegram"),
-            'providers' => $uncategorized_providers
-    ];
-}
 
 ?>
 

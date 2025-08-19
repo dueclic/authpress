@@ -3,17 +3,18 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-// Variables available from the main template:
-// $key - provider key (authenticator)
-// $data - provider data array
-// $provider - provider instance
-// $user_has_method - boolean if user has this method enabled
-// $current_user_id - current user ID
+/**
+ * @var $current_user_id int
+ * @var $user_has_method boolean
+ * @var $provider \AuthPress\Providers\Abstract_Provider
+ */
+
+
 ?>
 
 <div class="authpress-section">
     <h2>
-        <img src="<?php echo esc_url($data['icon']); ?>" alt="Authenticator" style="width: 24px; height: 24px; margin-right: 8px; vertical-align: text-bottom;" />
+        <img src="<?php echo esc_url($provider->get_icon()); ?>" alt="Authenticator" style="width: 24px; height: 24px; margin-right: 8px; vertical-align: text-bottom;" />
         <?php _e('Authenticator App', 'two-factor-login-telegram'); ?>
     </h2>
 

@@ -3,20 +3,20 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-// Variables available from the main template:
-// $key - provider key (telegram)
-// $data - provider data array
-// $provider - provider instance
-// $user_has_method - boolean if user has this method enabled
-// $current_user_id - current user ID
-// $user_config - user configuration from AuthPress_User_Manager
+/**
+ * @var $current_user_id int
+ * @var $user_has_method boolean
+ * @var $provider \AuthPress\Providers\Abstract_Provider
+ * @var $user_config array
+ */
+
 
 $telegram_chat_id = $user_config['chat_id'] ?: '';
 ?>
 
 <div class="authpress-section">
     <h2>
-        <img src="<?php echo esc_url($data['icon']); ?>" alt="Telegram" style="width: 24px; height: 24px; margin-right: 8px; vertical-align: text-bottom;" />
+        <img src="<?php echo esc_url($provider->get_icon()); ?>" alt="Telegram" style="width: 24px; height: 24px; margin-right: 8px; vertical-align: text-bottom;" />
         <?php _e('Telegram', 'two-factor-login-telegram'); ?>
     </h2>
 

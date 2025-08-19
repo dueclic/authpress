@@ -3,12 +3,12 @@
  * Template for 2FA Setup Wizard - Modular approach using provider registry
  *
  * Available variables:
- * - $user: User object  
+ * - $user: User object
  * - $redirect_to: Redirect URL after setup
  * - $plugin_logo: URL of the plugin logo
  * - Legacy variables (for backward compatibility):
  *   - $telegram_available: Whether Telegram provider is available
- *   - $email_available: Whether Email provider is available  
+ *   - $email_available: Whether Email provider is available
  *   - $authenticator_enabled: Whether Authenticator provider is available
  *   - $telegram_bot: Bot info for Telegram setup
  */
@@ -227,16 +227,16 @@ login_header(__('2FA Setup', 'two-factor-login-telegram'), '', '');
 
         <div class="wizard-content">
             <div class="method-options">
-                <?php 
+                <?php
                 // Get all enabled and configured providers dynamically
-                $available_providers = AuthPress_Provider_Registry::get_enabled();
+                $available_providers = AuthPress_Provider_Registry::get_available();
                 $provider_features = [
                     'telegram' => __('Fast and convenient', 'two-factor-login-telegram'),
                     'email' => __('Works with any email client', 'two-factor-login-telegram'),
                     'authenticator' => __('Works without internet connection', 'two-factor-login-telegram')
                 ];
-                
-                foreach ($available_providers as $key => $provider): 
+
+                foreach ($available_providers as $key => $provider):
                     // Skip recovery codes in setup wizard - it's a backup method
                     if ($key === 'recovery_codes') continue;
                 ?>
@@ -254,7 +254,7 @@ login_header(__('2FA Setup', 'two-factor-login-telegram'), '', '');
                         <?php endif; ?>
                     </label>
                 <?php endforeach; ?>
-                
+
                 <?php if (empty($available_providers)): ?>
                     <div class="wizard-notice">
                         <span class="dashicons dashicons-warning"></span>

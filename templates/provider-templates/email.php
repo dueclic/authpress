@@ -3,20 +3,18 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-// Variables available from the main template:
-// $key - provider key (email)
-// $data - provider data array
-// $provider - provider instance
-// $user_has_method - boolean if user has this method enabled
-// $current_user_id - current user ID
+/**
+ * @var $current_user_id int
+ * @var $user_has_method boolean
+ * @var $provider \AuthPress\Providers\Abstract_Provider
+ */
 
-// Check if email is available but not necessarily enabled
 $email_user_available = \Authpress\AuthPress_User_Manager::user_email_available($current_user_id);
 ?>
 
 <div class="authpress-section">
     <h2>
-        <img src="<?php echo esc_url($data['icon']); ?>" alt="Email" style="width: 24px; height: 24px; margin-right: 8px; vertical-align: text-bottom;" />
+        <img src="<?php echo esc_url($provider->get_icon()); ?>" alt="Email" style="width: 24px; height: 24px; margin-right: 8px; vertical-align: text-bottom;" />
         <?php _e('Email', 'two-factor-login-telegram'); ?>
     </h2>
 
@@ -30,7 +28,7 @@ $email_user_available = \Authpress\AuthPress_User_Manager::user_email_available(
                 </p>
             </div>
             <p><?php _e('Authentication codes will be sent to your registered email address when you log in.', 'two-factor-login-telegram'); ?></p>
-            
+
             <form method="post" action="" class="authpress-disable-form" style="margin-top: 15px;">
                 <?php wp_nonce_field('wp_factor_disable_email', 'wp_factor_email_disable_nonce'); ?>
                 <input type="hidden" name="wp_factor_action" value="disable_email">
@@ -47,7 +45,7 @@ $email_user_available = \Authpress\AuthPress_User_Manager::user_email_available(
                 </p>
             </div>
             <p><?php _e('Enable email 2FA to receive authentication codes via email when you log in.', 'two-factor-login-telegram'); ?></p>
-            
+
             <form method="post" action="" class="authpress-enable-form" style="margin-top: 15px;">
                 <?php wp_nonce_field('wp_factor_enable_email', 'wp_factor_email_enable_nonce'); ?>
                 <input type="hidden" name="wp_factor_action" value="enable_email">

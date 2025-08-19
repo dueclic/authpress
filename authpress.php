@@ -48,6 +48,45 @@ if (file_exists(dirname(__FILE__) . '/vendor/autoload.php')) {
 
 require_once(dirname(__FILE__) . "/includes/class-authpress-plugin.php");
 
+function authpress_provider_categories(
+    $available_providers = array()
+)
+{
+    $provider_categories = [
+        'messaging' => [
+            'title' => __("Messaging Providers", "two-factor-login-telegram"),
+            'description' => __("Receive authentication codes directly via messaging platforms.", "two-factor-login-telegram"),
+            'providers' => ['telegram', 'email']
+        ],
+        'authenticator' => [
+            'title' => __("Authenticator Apps", "two-factor-login-telegram"),
+            'description' => __("Time-based One-Time Password apps that generate codes offline.", "two-factor-login-telegram"),
+            'providers' => ['authenticator']
+        ]
+    ];
+
+    $provider_categories = apply_filters('authpress_provider_categories', $provider_categories);
+
+    $categorized_providers = [];
+    foreach ($provider_categories as $category) {
+        $categorized_providers = array_merge($categorized_providers, $category['providers']);
+    }
+
+    $uncategorized_providers = array_diff(array_keys($available_providers), $categorized_providers);
+// Exclude recovery_codes from being shown in admin interface - it's a backend-only provider
+    $uncategorized_providers = array_diff($uncategorized_providers, ['recovery_codes']);
+    if (!empty($uncategorized_providers)) {
+        $provider_categories['other'] = [
+            'title' => __("Other Providers", "two-factor-login-telegram"),
+            'description' => __("Additional 2FA methods provided by plugins.", "two-factor-login-telegram"),
+            'providers' => $uncategorized_providers
+        ];
+    }
+
+    return $provider_categories;
+
+}
+
 function authpress_providers()
 {
 
@@ -62,7 +101,8 @@ function authpress_providers()
 
 function authpress_provider_config(
     $provider_name
-){
+)
+{
     $providers = authpress_providers();
     if (isset($providers[$provider_name])) {
         return $providers[$provider_name];
@@ -70,7 +110,8 @@ function authpress_provider_config(
     return null;
 }
 
-function authpress_logo() {
+function authpress_logo()
+{
 
     $plugin_logo = plugins_url('assets/img/plugin_logo.png', WP_FACTOR_TG_FILE);
 
@@ -87,7 +128,8 @@ function authpress_logo() {
     return $plugin_logo;
 }
 
-function authpress_get_template($template_path, $context = array(), $full_path = false) {
+function authpress_get_template($template_path, $context = array(), $full_path = false)
+{
 
     $full_path = $full_path ? $template_path : plugin_dir_path(WP_FACTOR_TG_FILE) . $template_path;
 
