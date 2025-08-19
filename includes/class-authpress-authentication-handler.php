@@ -136,7 +136,7 @@ class AuthPress_Authentication_Handler
             return;
         }
 
-        if (!wp_verify_nonce($_POST['wp2fa_telegram_auth_nonce'], 'wp2fa_telegram_auth_nonce_' . $user->ID)) {
+        if (!wp_verify_nonce($_POST['authpress_auth_nonce'], 'authpress_auth_nonce_' . $user->ID)) {
             return;
         }
 

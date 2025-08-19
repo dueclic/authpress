@@ -12,7 +12,7 @@
 
         init: function() {
             this.userId = $('#wp-auth-id').val();
-            this.nonce = $('input[name="wp2fa_telegram_auth_nonce"]').val();
+            this.nonce = $('input[name="authpress_auth_nonce"]').val();
         },
 
         sendTelegramCode: function() {

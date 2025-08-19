@@ -262,7 +262,7 @@ class AuthPress_AJAX_Handler
 
     public function send_login_telegram_code()
     {
-        if (!isset($_POST['nonce']) || !wp_verify_nonce($_POST['nonce'], 'wp2fa_telegram_auth_nonce_' . $_POST['user_id'])) {
+        if (!isset($_POST['nonce']) || !wp_verify_nonce($_POST['nonce'], 'authpress_auth_nonce_' . $_POST['user_id'])) {
             wp_send_json_error(['message' => __('Security verification failed', 'two-factor-login-telegram')]);
         }
 
@@ -300,7 +300,7 @@ class AuthPress_AJAX_Handler
 
     public function send_login_email_code()
     {
-        if (!isset($_POST['nonce']) || !wp_verify_nonce($_POST['nonce'], 'wp2fa_telegram_auth_nonce_' . $_POST['user_id'])) {
+        if (!isset($_POST['nonce']) || !wp_verify_nonce($_POST['nonce'], 'authpress_auth_nonce_' . $_POST['user_id'])) {
             wp_send_json_error(['message' => __('Security verification failed', 'two-factor-login-telegram')]);
         }
 

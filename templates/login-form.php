@@ -146,8 +146,8 @@ if (!empty($error_msg)) {
 <form name="validate_authpress" id="loginform"
       action="<?php echo esc_url(site_url('wp-login.php?action=validate_authpress', 'login_post')); ?>" method="post"
       autocomplete="off">
-    <input type="hidden" name="wp2fa_telegram_auth_nonce"
-           value="<?php echo wp_create_nonce('wp2fa_telegram_auth_nonce_' . $user->ID); ?>">
+    <input type="hidden" name="authpress_auth_nonce"
+           value="<?php echo wp_create_nonce('authpress_auth_nonce_' . $user->ID); ?>">
     <input type="hidden" name="wp-auth-id" id="wp-auth-id" value="<?php echo esc_attr($user->ID); ?>"/>
     <input type="hidden" name="redirect_to" value="<?php echo esc_attr($redirect_to); ?>"/>
     <input type="hidden" name="rememberme" id="rememberme" value="<?php echo esc_attr($rememberme); ?>"/>
