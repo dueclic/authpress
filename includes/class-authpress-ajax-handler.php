@@ -364,4 +364,30 @@ class AuthPress_AJAX_Handler
             'new_status' => '<span style="color: #ccc;">❌ ' . __('Inactive', 'two-factor-login-telegram') . '</span>'
         ));
     }
+	// For testin email service
+	public function handle_test_email()
+	{
+		if (!is_user_logged_in() || !current_user_can('manage_options')) {
+			wp_send_json_error(['message' => __('Not authorized.', 'two-factor-login-telegram')]);
+		}
+
+		if (!wp_verify_nonce($_POST['_wpnonce'], 'authpress_test_email_nonce')) {
+			wp_send_json_error(['message' => __('Invalid request.', 'two-factor-login-telegram')]);
+		}
+
+		$current_user = wp_get_current_user();
+		$email = $current_user->user_email;
+
+		$subject = sprintf(__('[%s] Test Email from AuthPress', 'two-factor-login-telegram'), get_bloginfo('name'));
+		$message = __("Hello,\n\nThis is a test email sent from the AuthPress plugin to confirm that your WordPress mail configuration is working correctly.\n\nRegards,\nThe AuthPress Plugin", 'two-factor-login-telegram');
+		$headers = ['Content-Type: text/plain; charset=UTF-8'];
+
+		$sent = wp_mail($email, $subject, $message, $headers);
+
+		if ($sent) {
+			wp_send_json_success(['message' => sprintf(__('Test email successfully sent to %s.', 'two-factor-login-telegram'), $email)]);
+		} else {
+			wp_send_json_error(['message' => __('Failed to send the test email. Please check your WordPress mail configuration or SMTP plugin settings.', 'two-factor-login-telegram')]);
+		}
+	}
 }
