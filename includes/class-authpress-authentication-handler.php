@@ -140,18 +140,21 @@ class AuthPress_Authentication_Handler
             return;
         }
 
-        $login_method = isset($_POST['login_method']) ? $_POST['login_method'] : 'telegram';
+        $login_method = $_POST['login_method'] ?? 'telegram';
+
+        $has_code = apply_filters('authpress_login_provider_has_code', true, $login_method, $_POST, $user);
+
         $login_successful = false;
         $error_message = '';
 
-        // Handle passkey authentication differently
-        if ($login_method === 'passkey') {
-            $passkey_authenticated = isset($_POST['passkey_authenticated']) && $_POST['passkey_authenticated'] === '1';
-            if ($passkey_authenticated) {
+        if (!$has_code) {
+            $validation_result = apply_filters('authpress_validate_codeless_authentication', false, $login_method, $_POST, $user);
+            if ($validation_result) {
                 $login_successful = true;
-                $this->log_successful_passkey_login($user);
+                $this->log_successful_login($login_method, $user, '');
             } else {
-                $error_message = __('Passkey authentication failed. Please try again.', 'two-factor-login-telegram');
+                $error_message = apply_filters('authpress_get_codeless_error_message', __('Authentication failed. Please try again.', 'two-factor-login-telegram'), $login_method);
+                $this->get_generic_failed_message($login_method, $user, '');
             }
         } else {
             $code = $this->get_code_from_post($login_method);
@@ -223,14 +226,6 @@ class AuthPress_Authentication_Handler
         ));
     }
 
-    private function log_successful_passkey_login($user)
-    {
-        $this->logger->log_action('passkey_login_success', array(
-            'user_id' => $user->ID,
-            'user_login' => $user->user_login,
-            'method' => 'passkey'
-        ));
-    }
 
     private function handle_failed_validation($login_method, $user, $code)
     {
