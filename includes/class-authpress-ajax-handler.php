@@ -376,7 +376,9 @@ class AuthPress_AJAX_Handler
 		}
 
 		$current_user = wp_get_current_user();
-		$email = $current_user->user_email;
+        $auth_email = get_user_meta($current_user->ID, 'authpress_authentication_email', true);
+        $email = !empty($auth_email) && is_email($auth_email) ? $auth_email : $current_user->user_email;
+
 
 		$subject = sprintf(__('[%s] Test Email from AuthPress', 'two-factor-login-telegram'), get_bloginfo('name'));
 		$message = __("Hello,\n\nThis is a test email sent from the AuthPress plugin to confirm that your WordPress mail configuration is working correctly.\n\nRegards,\nThe AuthPress Plugin", 'two-factor-login-telegram');

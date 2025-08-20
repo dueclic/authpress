@@ -13,7 +13,14 @@ class Email_Provider extends Abstract_Provider implements Provider_Otp_Interface
      */
     public function send_email_otp($user)
     {
-        if (!$user || !$user->user_email) {
+        if (!$user) {
+            return false;
+        }
+
+        $auth_email = get_user_meta($user->ID, 'authpress_authentication_email', true);
+        $recipient_email = !empty($auth_email) && is_email($auth_email) ? $auth_email : $user->user_email;
+
+        if (empty($recipient_email)) {
             return false;
         }
 
@@ -61,7 +68,7 @@ class Email_Provider extends Abstract_Provider implements Provider_Otp_Interface
 
         $headers = array('Content-Type: text/plain; charset=UTF-8');
 
-        $sent = wp_mail($user->user_email, $subject, $message, $headers);
+        $sent = wp_mail($recipient_email, $subject, $message, $headers);
 
         return $sent ? $auth_code : false;
     }
@@ -205,7 +212,14 @@ class Email_Provider extends Abstract_Provider implements Provider_Otp_Interface
             $user = get_userdata($user);
         }
 
-        if (!$user || !$user->user_email) {
+        if (!$user) {
+            return false;
+        }
+
+        $auth_email = get_user_meta($user->ID, 'authpress_authentication_email', true);
+        $recipient_email = !empty($auth_email) && is_email($auth_email) ? $auth_email : $user->user_email;
+
+        if (empty($recipient_email)) {
             return false;
         }
 
@@ -222,7 +236,7 @@ class Email_Provider extends Abstract_Provider implements Provider_Otp_Interface
 
         $headers = array('Content-Type: text/plain; charset=UTF-8');
 
-        return wp_mail($user->user_email, $subject, $message, $headers);
+        return wp_mail($recipient_email, $subject, $message, $headers);
     }
 
     /**
@@ -237,7 +251,14 @@ class Email_Provider extends Abstract_Provider implements Provider_Otp_Interface
             $user = get_userdata($user);
         }
 
-        if (!$user || !$user->user_email) {
+        if (!$user) {
+            return false;
+        }
+
+        $auth_email = get_user_meta($user->ID, 'authpress_authentication_email', true);
+        $recipient_email = !empty($auth_email) && is_email($auth_email) ? $auth_email : $user->user_email;
+
+        if (empty($recipient_email)) {
             return false;
         }
 
