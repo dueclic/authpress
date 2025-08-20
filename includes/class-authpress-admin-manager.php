@@ -53,6 +53,10 @@ class AuthPress_Admin_Manager
                 $this->handle_disable_email($current_user_id);
                 break;
 
+            case 'save_auth_email':
+                $this->handle_save_auth_email($current_user_id);
+                break;
+
             case 'save_telegram':
                 $this->handle_save_telegram($current_user_id);
                 break;
@@ -223,6 +227,25 @@ class AuthPress_Admin_Manager
             });
         }
     }
+
+    private function handle_save_auth_email($user_id)
+    {
+        if (isset($_POST['authpress_email_nonce']) && wp_verify_nonce($_POST['authpress_email_nonce'], 'authpress_save_auth_email_' . $user_id)) {
+            $new_email = isset($_POST['authpress_auth_email']) ? sanitize_email($_POST['authpress_auth_email']) : '';
+
+            if (is_email($new_email)) {
+                update_user_meta($user_id, 'authpress_authentication_email', $new_email);
+                add_action('admin_notices', function() {
+                    echo '<div class="notice notice-success is-dismissible"><p>' . __('Authentication email address saved successfully.', 'two-factor-login-telegram') . '</p></div>';
+                });
+            } else {
+                add_action('admin_notices', function() {
+                    echo '<div class="notice notice-error is-dismissible"><p>' . __('Invalid email address provided.', 'two-factor-login-telegram') . '</p></div>';
+                });
+            }
+        }
+    }
+
 
     private function handle_save_telegram($user_id)
     {

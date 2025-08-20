@@ -10,6 +10,10 @@ if (!defined('ABSPATH')) {
  */
 
 $email_user_available = \Authpress\AuthPress_User_Manager::user_email_available($current_user_id);
+$auth_email = get_user_meta($current_user_id, 'authpress_authentication_email', true);
+if (empty($auth_email)) {
+    $auth_email = wp_get_current_user()->user_email;
+}
 ?>
 
 <div class="authpress-section">
@@ -22,38 +26,75 @@ $email_user_available = \Authpress\AuthPress_User_Manager::user_email_available(
         <?php if ($user_has_method): ?>
             <div class="notice notice-success inline">
                 <p>
-                    <?php _e('✅ Email 2FA is configured and active.', 'two-factor-login-telegram'); ?>
-                    <br>
-                    <strong><?php _e('Email:', 'two-factor-login-telegram'); ?></strong> <?php echo esc_html(wp_get_current_user()->user_email); ?>
+                    <?php _e('✅ Email 2FA is configured and active.', 'two-factor-login-telegram'); ?><br>
+                    <strong><?php _e('Email:', 'two-factor-login-telegram'); ?></strong> <?php echo esc_html($auth_email); ?>
                 </p>
             </div>
-            <p><?php _e('Authentication codes will be sent to your registered email address when you log in.', 'two-factor-login-telegram'); ?></p>
 
-            <form method="post" action="" class="authpress-disable-form" style="margin-top: 15px;">
-                <?php wp_nonce_field('wp_factor_disable_email', 'wp_factor_email_disable_nonce'); ?>
-                <input type="hidden" name="wp_factor_action" value="disable_email">
-                <button type="submit" class="button button-secondary" onclick="return confirm('<?php _e('Are you sure you want to disable Email 2FA?', 'two-factor-login-telegram'); ?>')">
-                    <?php _e('Disable Email 2FA', 'two-factor-login-telegram'); ?>
+            <div class="authpress-actions">
+                <button type="button" class="button button-primary" id="reconfigure-email">
+                    <?php _e('Change Authentication Email', 'two-factor-login-telegram'); ?>
                 </button>
-            </form>
+                <form method="post" action="" class="authpress-disable-form" style="display: inline-block; margin-left: 10px;">
+                    <?php wp_nonce_field('wp_factor_disable_email', 'wp_factor_email_disable_nonce'); ?>
+                    <input type="hidden" name="wp_factor_action" value="disable_email">
+                    <button type="submit" class="button button-secondary" onclick="return confirm('<?php _e('Are you sure you want to disable Email 2FA?', 'two-factor-login-telegram'); ?>')">
+                        <?php _e('Disable Email 2FA', 'two-factor-login-telegram'); ?>
+                    </button>
+                </form>
+            </div>
+
         <?php else: ?>
             <div class="notice notice-info inline">
                 <p>
-                    <?php _e('📧 Email 2FA is available but not enabled.', 'two-factor-login-telegram'); ?>
-                    <br>
-                    <strong><?php _e('Email:', 'two-factor-login-telegram'); ?></strong> <?php echo esc_html(wp_get_current_user()->user_email); ?>
+                    <?php _e('📧 Email 2FA is available but not enabled.', 'two-factor-login-telegram'); ?><br>
+                    <strong><?php _e('Current Email:', 'two-factor-login-telegram'); ?></strong> <?php echo esc_html($auth_email); ?>
                 </p>
             </div>
-            <p><?php _e('Enable email 2FA to receive authentication codes via email when you log in.', 'two-factor-login-telegram'); ?></p>
+            <p><?php _e('You can specify a different email address for receiving authentication codes. If left blank, your primary WordPress email will be used.', 'two-factor-login-telegram'); ?></p>
 
-            <form method="post" action="" class="authpress-enable-form" style="margin-top: 15px;">
-                <?php wp_nonce_field('wp_factor_enable_email', 'wp_factor_email_enable_nonce'); ?>
-                <input type="hidden" name="wp_factor_action" value="enable_email">
-                <button type="submit" class="button button-primary">
-                    <?php _e('Enable Email 2FA', 'two-factor-login-telegram'); ?>
+            <div class="authpress-actions">
+                 <button type="button" class="button button-primary" id="reconfigure-email">
+                    <?php _e('Set Authentication Email', 'two-factor-login-telegram'); ?>
                 </button>
-            </form>
+                <form method="post" action="" class="authpress-enable-form" style="display: inline-block; margin-left: 10px;">
+                    <?php wp_nonce_field('wp_factor_enable_email', 'wp_factor_email_enable_nonce'); ?>
+                    <input type="hidden" name="wp_factor_action" value="enable_email">
+                    <button type="submit" class="button button-primary">
+                        <?php _e('Enable Email 2FA', 'two-factor-login-telegram'); ?>
+                    </button>
+                </form>
+            </div>
         <?php endif; ?>
+
+        <!-- Hidden reconfiguration section -->
+        <div class="authpress-reconfig" id="email-reconfig-section" style="display: none; margin-top: 20px;">
+             <h4><?php _e('Set Authentication Email', 'two-factor-login-telegram'); ?></h4>
+            <form method="post" action="" class="authpress-save-email-form">
+                <?php wp_nonce_field('authpress_save_auth_email_' . $current_user_id, 'authpress_email_nonce'); ?>
+                <input type="hidden" name="wp_factor_action" value="save_auth_email">
+                <table class="form-table">
+                    <tr>
+                        <th scope="row">
+                            <label for="authpress_auth_email"><?php _e('New Authentication Email', 'two-factor-login-telegram'); ?></label>
+                        </th>
+                        <td>
+                            <input type="email" id="authpress_auth_email" name="authpress_auth_email" value="<?php echo esc_attr($auth_email); ?>" class="regular-text" />
+                            <p class="description"><?php _e('Enter the email address to receive 2FA codes.', 'two-factor-login-telegram'); ?></p>
+                        </td>
+                    </tr>
+                </table>
+                <p class="submit">
+                    <button type="submit" class="button button-primary">
+                        <?php _e('Save Authentication Email', 'two-factor-login-telegram'); ?>
+                    </button>
+                    <button type="button" class="button button-secondary" id="cancel-reconfigure-email" style="margin-left: 10px;">
+                        <?php _e('Cancel', 'two-factor-login-telegram'); ?>
+                    </button>
+                </p>
+            </form>
+        </div>
+
     <?php else: ?>
         <div class="notice notice-warning inline">
             <p><?php _e('⚠️ Email 2FA is not available.', 'two-factor-login-telegram'); ?></p>
@@ -61,3 +102,27 @@ $email_user_available = \Authpress\AuthPress_User_Manager::user_email_available(
         <p><?php _e('You need a valid email address in your profile to use email 2FA. Please update your email address in your user profile.', 'two-factor-login-telegram'); ?></p>
     <?php endif; ?>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    var reconfigureButton = document.getElementById('reconfigure-email');
+    var cancelButton = document.getElementById('cancel-reconfigure-email');
+    var reconfigSection = document.getElementById('email-reconfig-section');
+
+    if (reconfigureButton) {
+        reconfigureButton.addEventListener('click', function() {
+            if (reconfigSection) {
+                reconfigSection.style.display = 'block';
+            }
+        });
+    }
+
+    if (cancelButton) {
+        cancelButton.addEventListener('click', function() {
+            if (reconfigSection) {
+                reconfigSection.style.display = 'none';
+            }
+        });
+    }
+});
+</script>
