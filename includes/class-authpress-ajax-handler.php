@@ -392,4 +392,60 @@ class AuthPress_AJAX_Handler
 			wp_send_json_error(['message' => __('Failed to send the test email. Please check your WordPress mail configuration or SMTP plugin settings.', 'two-factor-login-telegram')]);
 		}
 	}
+
+    public function send_auth_email_verification()
+    {
+        if (!is_user_logged_in()) {
+            wp_send_json_error(['message' => __('Not authorized.', 'two-factor-login-telegram')]);
+        }
+
+        $user_id = get_current_user_id();
+
+        if (!wp_verify_nonce($_POST['_wpnonce'], 'authpress_save_auth_email_' . $user_id)) {
+            wp_send_json_error(['message' => __('Invalid request.', 'two-factor-login-telegram')]);
+        }
+
+        $new_email = isset($_POST['authpress_auth_email']) ? sanitize_email($_POST['authpress_auth_email']) : '';
+
+        if (is_email($new_email)) {
+            $verification_code = strval(rand(100000, 999999));
+            update_user_meta($user_id, 'authpress_pending_email', $new_email);
+            update_user_meta($user_id, 'authpress_pending_email_code', $verification_code);
+
+            $subject = __('Verify your new authentication email', 'two-factor-login-telegram');
+            $message = sprintf(__('Your verification code is: %s', 'two-factor-login-telegram'), $verification_code);
+            wp_mail($new_email, $subject, $message);
+
+            wp_send_json_success(['message' => __('A verification code has been sent to the new email address. Please enter the code to confirm the change.', 'two-factor-login-telegram')]);
+        } else {
+            wp_send_json_error(['message' => __('Invalid email address provided.', 'two-factor-login-telegram')]);
+        }
+    }
+
+    public function verify_auth_email()
+    {
+        if (!is_user_logged_in()) {
+            wp_send_json_error(['message' => __('Not authorized.', 'two-factor-login-telegram')]);
+        }
+
+        $user_id = get_current_user_id();
+
+        if (!wp_verify_nonce($_POST['_wpnonce'], 'authpress_verify_auth_email_' . $user_id)) {
+            wp_send_json_error(['message' => __('Invalid request.', 'two-factor-login-telegram')]);
+        }
+
+        $verification_code = isset($_POST['authpress_verification_code']) ? sanitize_text_field($_POST['authpress_verification_code']) : '';
+        $pending_email = get_user_meta($user_id, 'authpress_pending_email', true);
+        $stored_code = get_user_meta($user_id, 'authpress_pending_email_code', true);
+
+        if ($verification_code === $stored_code && is_email($pending_email)) {
+            update_user_meta($user_id, 'authpress_authentication_email', $pending_email);
+            delete_user_meta($user_id, 'authpress_pending_email');
+            delete_user_meta($user_id, 'authpress_pending_email_code');
+
+            wp_send_json_success(['message' => __('Authentication email address changed successfully.', 'two-factor-login-telegram')]);
+        } else {
+            wp_send_json_error(['message' => __('Invalid verification code.', 'two-factor-login-telegram')]);
+        }
+    }
 }
