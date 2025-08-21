@@ -27,13 +27,13 @@ $pending_email = get_user_meta($current_user_id, 'authpress_pending_email', true
     <?php if ($email_user_available): ?>
         <?php if ($user_has_method): ?>
             <div class="notice notice-success inline">
-                <p>
+                <p class="tex">
                     <?php _e('✅ Email 2FA is configured and active.', 'two-factor-login-telegram'); ?><br>
                     <strong><?php _e('Email:', 'two-factor-login-telegram'); ?></strong> <?php echo esc_html($auth_email); ?>
                 </p>
             </div>
 
-            <div class="authpress-actions">
+            <div class="authpress-actions mt-8">
                 <button type="button" class="button button-primary" id="reconfigure-email">
                     <?php _e('Change Authentication Email', 'two-factor-login-telegram'); ?>
                 </button>
