@@ -70,58 +70,54 @@ $pending_email = get_user_meta($current_user_id, 'authpress_pending_email', true
         <?php endif; ?>
 
         <!-- Hidden reconfiguration section -->
-        <div class="authpress-reconfig" id="email-reconfig-section" style="display: <?php echo $pending_email ? 'none' : 'none'; ?>; margin-top: 20px;">
-             <h4><?php _e('Set Authentication Email', 'two-factor-login-telegram'); ?></h4>
-            <form method="post" action="" class="authpress-save-email-form">
-                <?php wp_nonce_field('authpress_save_auth_email_' . $current_user_id, 'authpress_email_nonce'); ?>
-                <input type="hidden" name="wp_factor_action" value="send_auth_email_verification">
-                <table class="form-table">
-                    <tr>
-                        <th scope="row">
-                            <label for="authpress_auth_email"><?php _e('New Authentication Email', 'two-factor-login-telegram'); ?></label>
-                        </th>
-                        <td>
-                            <input type="email" id="authpress_auth_email" name="authpress_auth_email" value="<?php echo esc_attr($auth_email); ?>" class="regular-text" />
-                            <p class="description"><?php _e('Enter the email address to receive 2FA codes.', 'two-factor-login-telegram'); ?></p>
-                        </td>
-                    </tr>
-                </table>
-                <p class="submit">
-                    <button type="submit" class="button button-primary">
-                        <?php _e('Send Verification Code', 'two-factor-login-telegram'); ?>
-                    </button>
-                    <button type="button" class="button button-secondary" id="cancel-reconfigure-email" style="margin-left: 10px;">
-                        <?php _e('Cancel', 'two-factor-login-telegram'); ?>
-                    </button>
-                </p>
-            </form>
+        <div class="authpress-reconfig" id="email-reconfig-section" style="display: none; margin-top: 20px;">
+            <h4><?php _e('Set Authentication Email', 'two-factor-login-telegram'); ?></h4>
+            <?php wp_nonce_field('authpress_save_auth_email_' . $current_user_id, 'authpress_email_nonce'); ?>
+            <table class="form-table">
+                <tr>
+                    <th scope="row">
+                        <label for="authpress_auth_email"><?php _e('New Authentication Email', 'two-factor-login-telegram'); ?></label>
+                    </th>
+                    <td>
+                        <input type="email" id="authpress_auth_email" name="authpress_auth_email" value="<?php echo esc_attr($auth_email); ?>" class="regular-text" />
+                        <p class="description"><?php _e('Enter the email address to receive 2FA codes.', 'two-factor-login-telegram'); ?></p>
+                    </td>
+                </tr>
+            </table>
+            <p class="submit">
+                <button type="button" id="authpress_send_email_code_btn" class="button button-primary">
+                    <?php _e('Send Verification Code', 'two-factor-login-telegram'); ?>
+                </button>
+                <button type="button" class="button button-secondary" id="cancel-reconfigure-email" style="margin-left: 10px;">
+                    <?php _e('Cancel', 'two-factor-login-telegram'); ?>
+                </button>
+            </p>
+            <div id="authpress-email-send-status" class="tg-status" style="display: none;"></div>
         </div>
 
         <!-- Hidden verification section -->
-        <div class="authpress-reconfig" id="email-verify-section" style="display: <?php echo $pending_email ? 'block' : 'none'; ?>; margin-top: 20px;">
+        <div class="authpress-reconfig" id="email-verify-section" style="display: none; margin-top: 20px;">
             <h4><?php _e('Verify New Email Address', 'two-factor-login-telegram'); ?></h4>
-            <p><?php printf(__('A verification code has been sent to %s. Please enter the code below to confirm the change.', 'two-factor-login-telegram'), '<strong>' . esc_html($pending_email) . '</strong>'); ?></p>
-            <form method="post" action="" class="authpress-verify-email-form">
-                <?php wp_nonce_field('authpress_verify_auth_email_' . $current_user_id, 'authpress_email_verification_nonce'); ?>
-                <input type="hidden" name="wp_factor_action" value="verify_and_save_auth_email">
-                <table class="form-table">
-                    <tr>
-                        <th scope="row">
-                            <label for="authpress_verification_code"><?php _e('Verification Code', 'two-factor-login-telegram'); ?></label>
-                        </th>
-                        <td>
-                            <input type="text" id="authpress_verification_code" name="authpress_verification_code" value="" class="regular-text" />
-                            <p class="description"><?php _e('Enter the verification code you received in your email.', 'two-factor-login-telegram'); ?></p>
-                        </td>
-                    </tr>
-                </table>
-                <p class="submit">
-                    <button type="submit" class="button button-primary">
-                        <?php _e('Verify & Save', 'two-factor-login-telegram'); ?>
-                    </button>
-                    <a href="<?php echo esc_url(admin_url('users.php?page=my-2fa-settings')); ?>" class="button button-secondary" style="margin-left: 10px;"><?php _e('Cancel', 'two-factor-login-telegram'); ?></a>
-                </p>
-            </form>
+            <p id="email-verify-message"></p>
+            <?php wp_nonce_field('authpress_verify_auth_email_' . $current_user_id, 'authpress_email_verification_nonce'); ?>
+            <table class="form-table">
+                <tr>
+                    <th scope="row">
+                        <label for="authpress_verification_code"><?php _e('Verification Code', 'two-factor-login-telegram'); ?></label>
+                    </th>
+                    <td>
+                        <input type="text" id="authpress_verification_code" name="authpress_verification_code" value="" class="regular-text" />
+                        <p class="description"><?php _e('Enter the verification code you received in your email.', 'two-factor-login-telegram'); ?></p>
+                    </td>
+                </tr>
+            </table>
+            <p class="submit">
+                <button type="button" id="authpress_verify_email_code_btn" class="button button-primary">
+                    <?php _e('Verify & Save', 'two-factor-login-telegram'); ?>
+                </button>
+                <button type="button" class="button button-secondary" id="cancel-verify-email" style="margin-left: 10px;"><?php _e('Cancel', 'two-factor-login-telegram'); ?></button>
+            </p>
+            <div id="authpress-email-verify-status" class="tg-status" style="display: none;"></div>
         </div>
 
     <?php else: ?>
@@ -131,28 +127,3 @@ $pending_email = get_user_meta($current_user_id, 'authpress_pending_email', true
         <p><?php _e('You need a valid email address in your profile to use email 2FA. Please update your email address in your user profile.', 'two-factor-login-telegram'); ?></p>
     <?php endif; ?>
 </div>
-
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    var reconfigureButton = document.getElementById('reconfigure-email');
-    var cancelButton = document.getElementById('cancel-reconfigure-email');
-    var reconfigSection = document.getElementById('email-reconfig-section');
-    var verifySection = document.getElementById('email-verify-section');
-
-    if (reconfigureButton) {
-        reconfigureButton.addEventListener('click', function() {
-            if (reconfigSection) {
-                reconfigSection.style.display = 'block';
-            }
-        });
-    }
-
-    if (cancelButton) {
-        cancelButton.addEventListener('click', function() {
-            if (reconfigSection) {
-                reconfigSection.style.display = 'none';
-            }
-        });
-    }
-});
-</script>
