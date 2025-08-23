@@ -21,9 +21,19 @@ if (!defined('ABSPATH')) {
     die;
 }
 
-define('WP_FACTOR_PLUGIN_VERSION', '3.6.0');
+if (!defined('WP_FACTOR_PLUGIN_VERSION')) {
+    define('WP_FACTOR_PLUGIN_VERSION', '6.8.2');
+}
 
-define('WP_FACTOR_AUTHCODE_EXPIRE_SECONDS', 60 * 20);
+if (!function_exists('get_auth_token_duration')) {
+    function get_auth_token_duration() {
+        $providers = get_option('wp_factor_providers');
+        $duration = $providers['email']['token_duration'] ?? 20;
+        return absint($duration) * 60;
+    }
+}
+
+
 
 /**
  *
