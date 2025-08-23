@@ -94,6 +94,7 @@ class AuthPress_Hooks_Manager
         add_action('wp_ajax_authpress_test_email', array($this->ajax_handler, 'handle_test_email')); //email testing
         add_action('wp_ajax_send_auth_email_verification', array($this->ajax_handler, 'send_auth_email_verification'));
         add_action('wp_ajax_verify_auth_email', array($this->ajax_handler, 'verify_auth_email'));
+        add_action('wp_ajax_reset_auth_email', array($this->ajax_handler, 'reset_auth_email'));
         add_action('wp_ajax_disable_user_2fa_telegram', array($this->ajax_handler, 'disable_user_2fa_ajax'));
         add_action('wp_ajax_force_setup_wizard', array($this, 'handle_force_setup_wizard_ajax'));
     }
