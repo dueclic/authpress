@@ -281,6 +281,8 @@ var AuthPress_Plugin = function ($) {
 
         // Setup Telegram reconfiguration
         setupTelegramReconfiguration();
+        // Setup Email reconfiguration
+        setupEmailReconfiguration();
 
         // Generate QR Code button for TOTP
         $(document).on('click', '#wp_factor_generate_qr', function(e) {
