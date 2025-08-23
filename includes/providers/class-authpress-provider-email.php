@@ -62,7 +62,7 @@ class Email_Provider extends Abstract_Provider implements Provider_Otp_Interface
             $user->display_name,
             get_bloginfo('name'),
             $auth_code,
-            WP_FACTOR_AUTHCODE_EXPIRE_SECONDS / 60,
+            get_auth_token_duration() / 60,
             get_bloginfo('name')
         );
 
@@ -230,7 +230,7 @@ class Email_Provider extends Abstract_Provider implements Provider_Otp_Interface
             $user->display_name,
             get_bloginfo('name'),
             $code,
-            WP_FACTOR_AUTHCODE_EXPIRE_SECONDS / 60,
+            get_auth_token_duration() / 60,
             get_bloginfo('name')
         );
 
@@ -269,7 +269,7 @@ class Email_Provider extends Abstract_Provider implements Provider_Otp_Interface
         $table_name = $wpdb->prefix . 'telegram_auth_codes';
 
         $creation_date = current_time('mysql');
-        $expiration_date = date('Y-m-d H:i:s', strtotime($creation_date) + WP_FACTOR_AUTHCODE_EXPIRE_SECONDS);
+        $expiration_date = date('Y-m-d H:i:s', strtotime($creation_date) + get_auth_token_duration());
 
         $result = $wpdb->insert(
             $table_name,
