@@ -628,7 +628,8 @@ class AuthPress_Admin_Manager
         );
 
         $sanitized['email'] = array(
-            'enabled' => isset($input['email']['enabled']) ? true : false
+            'enabled' => isset($input['email']['enabled']) ? true : false,
+            'token_duration' => isset($input['email']['token_duration']) ? absint($input['email']['token_duration']) : 20
         );
 
         if ($sanitized['telegram']['enabled'] && !empty($sanitized['telegram']['bot_token'])) {
