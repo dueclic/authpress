@@ -829,6 +829,100 @@ var AuthPress_Plugin = function ($) {
         $('#reconfig-status, #reconfig-validation-status').hide();
     }
 
+    function setupEmailReconfiguration() {
+        // Show reconfiguration section
+        $('#reconfigure-email').on('click', function() {
+            $('#email-reconfig-section').slideDown();
+        });
+
+        // Cancel reconfiguration
+        $('#cancel-reconfigure-email').on('click', function() {
+            $('#email-reconfig-section').slideUp();
+        });
+
+        // Send verification code for email
+        $('#authpress_send_email_code_btn').on('click', function() {
+            var $btn = $(this);
+            var email = $('#authpress_auth_email').val().trim();
+            if (!email) {
+                showStatus('#authpress-email-send-status', 'error', 'Please enter an email address');
+                return;
+            }
+
+            $btn.prop('disabled', true).text('Sending...');
+            showStatus('#authpress-email-send-status', 'info', 'Sending verification code...');
+
+            $.ajax({
+                url: ajaxurl,
+                method: 'POST',
+                dataType: 'json',
+                data: {
+                    action: 'send_auth_email_verification',
+                    authpress_auth_email: email,
+                    _wpnonce: $('#authpress_email_nonce').val()
+                },
+                success: function(response) {
+                    $btn.prop('disabled', false).text('Send Verification Code');
+                    if (response.success) {
+                        showStatus('#authpress-email-send-status', 'success', response.data.message);
+                        $('#email-reconfig-section').slideUp();
+                        $('#email-verify-section').slideDown();
+                        $('#email-verify-message').html('A verification code has been sent to <strong>' + email + '</strong>. Please enter the code below to confirm the change.');
+                    } else {
+                        showStatus('#authpress-email-send-status', 'error', response.data.message);
+                    }
+                },
+                error: function() {
+                    $btn.prop('disabled', false).text('Send Verification Code');
+                    showStatus('#authpress-email-send-status', 'error', 'Network error. Please try again.');
+                }
+            });
+        });
+
+        // Verify and save email
+        $('#authpress_verify_email_code_btn').on('click', function() {
+            var $btn = $(this);
+            var verificationCode = $('#authpress_verification_code').val().trim();
+            if (!verificationCode) {
+                showStatus('#authpress-email-verify-status', 'error', 'Please enter the verification code');
+                return;
+            }
+
+            $btn.prop('disabled', true).text('Verifying...');
+            showStatus('#authpress-email-verify-status', 'info', 'Verifying code...');
+
+            $.ajax({
+                url: ajaxurl,
+                method: 'POST',
+                dataType: 'json',
+                data: {
+                    action: 'verify_auth_email',
+                    authpress_verification_code: verificationCode,
+                    _wpnonce: $('#authpress_email_verification_nonce').val()
+                },
+                success: function(response) {
+                    $btn.prop('disabled', false).text('Verify & Save');
+                    if (response.success) {
+                        showStatus('#authpress-email-verify-status', 'success', response.data.message);
+                        setTimeout(function() {
+                            location.reload();
+                        }, 2000);
+                    } else {
+                        showStatus('#authpress-email-verify-status', 'error', response.data.message);
+                    }
+                },
+                error: function() {
+                    $btn.prop('disabled', false).text('Verify & Save');
+                    showStatus('#authpress-email-verify-status', 'error', 'Network error. Please try again.');
+                }
+            });
+        });
+
+        $('#cancel-verify-email').on('click', function() {
+            $('#email-verify-section').slideUp();
+        });
+    }
+
 }(jQuery);
 
 // Functionality to disable 2FA from users list (admin)
