@@ -414,9 +414,13 @@ class AuthPress_AJAX_Handler
 
             $subject = __('Verify your new authentication email', 'two-factor-login-telegram');
             $message = sprintf(__('Your verification code is: %s', 'two-factor-login-telegram'), $verification_code);
-            wp_mail($new_email, $subject, $message);
+            $sent = wp_mail($new_email, $subject, $message);
 
-            wp_send_json_success(['message' => __('A verification code has been sent to the new email address. Please enter the code to confirm the change.', 'two-factor-login-telegram')]);
+            if ($sent) {
+                wp_send_json_success(['message' => __('A verification code has been sent to the new email address. Please enter the code to confirm the change.', 'two-factor-login-telegram')]);
+            } else {
+                wp_send_json_error(['message' => __('Failed to send the verification email. Please check your WordPress mail configuration.', 'two-factor-login-telegram')]);
+            }
         } else {
             wp_send_json_error(['message' => __('Invalid email address provided.', 'two-factor-login-telegram')]);
         }
@@ -440,6 +444,7 @@ class AuthPress_AJAX_Handler
 
         if ($verification_code === $stored_code && is_email($pending_email)) {
             update_user_meta($user_id, 'authpress_authentication_email', $pending_email);
+            AuthPress_User_Manager::enable_user_email($user_id);
             delete_user_meta($user_id, 'authpress_pending_email');
             delete_user_meta($user_id, 'authpress_pending_email_code');
 
