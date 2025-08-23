@@ -921,6 +921,39 @@ var AuthPress_Plugin = function ($) {
         $('#cancel-verify-email').on('click', function() {
             $('#email-verify-section').slideUp();
         });
+
+        // Reset email to default
+        $('#authpress_reset_email_btn').on('click', function() {
+            var $btn = $(this);
+            if (!confirm('Are you sure you want to reset to your default WordPress email address?')) {
+                return;
+            }
+
+            $btn.prop('disabled', true).text('Resetting...');
+
+            $.ajax({
+                url: ajaxurl,
+                method: 'POST',
+                dataType: 'json',
+                data: {
+                    action: 'reset_auth_email',
+                    _wpnonce: $('#authpress_email_nonce').val() // Re-using the nonce for simplicity
+                },
+                success: function(response) {
+                    if (response.success) {
+                        alert(response.data.message);
+                        location.reload();
+                    } else {
+                        alert(response.data.message);
+                        $btn.prop('disabled', false).text('Reset default mail');
+                    }
+                },
+                error: function() {
+                    alert('Network error. Please try again.');
+                    $btn.prop('disabled', false).text('Reset default mail');
+                }
+            });
+        });
     }
 
 }(jQuery);
