@@ -453,4 +453,21 @@ class AuthPress_AJAX_Handler
             wp_send_json_error(['message' => __('Invalid verification code.', 'two-factor-login-telegram')]);
         }
     }
+
+    public function reset_auth_email()
+    {
+        if (!is_user_logged_in()) {
+            wp_send_json_error(['message' => __('Not authorized.', 'two-factor-login-telegram')]);
+        }
+
+        $user_id = get_current_user_id();
+
+        if (!wp_verify_nonce($_POST['_wpnonce'], 'authpress_save_auth_email_' . $user_id)) {
+            wp_send_json_error(['message' => __('Invalid request.', 'two-factor-login-telegram')]);
+        }
+
+        delete_user_meta($user_id, 'authpress_authentication_email');
+
+        wp_send_json_success(['message' => __('Authentication email has been reset to your default WordPress email address.', 'two-factor-login-telegram')]);
+    }
 }
