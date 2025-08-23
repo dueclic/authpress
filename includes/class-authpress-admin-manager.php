@@ -224,54 +224,6 @@ class AuthPress_Admin_Manager
         }
     }
 
-    private function handle_send_auth_email_verification($user_id)
-    {
-        if (isset($_POST['authpress_email_nonce']) && wp_verify_nonce($_POST['authpress_email_nonce'], 'authpress_save_auth_email_' . $user_id)) {
-            $new_email = isset($_POST['authpress_auth_email']) ? sanitize_email($_POST['authpress_auth_email']) : '';
-
-            if (is_email($new_email)) {
-                $verification_code = strval(rand(100000, 999999));
-                update_user_meta($user_id, 'authpress_pending_email', $new_email);
-                update_user_meta($user_id, 'authpress_pending_email_code', $verification_code);
-
-                $subject = __('Verify your new authentication email', 'two-factor-login-telegram');
-                $message = sprintf(__('Your verification code is: %s', 'two-factor-login-telegram'), $verification_code);
-                wp_mail($new_email, $subject, $message);
-
-                add_action('admin_notices', function() {
-                    echo '<div class="notice notice-info is-dismissible"><p>' . __('A verification code has been sent to the new email address. Please enter the code to confirm the change.', 'two-factor-login-telegram') . '</p></div>';
-                });
-            } else {
-                add_action('admin_notices', function() {
-                    echo '<div class="notice notice-error is-dismissible"><p>' . __('Invalid email address provided.', 'two-factor-login-telegram') . '</p></div>';
-                });
-            }
-        }
-    }
-
-    private function handle_verify_and_save_auth_email($user_id)
-    {
-        if (isset($_POST['authpress_email_verification_nonce']) && wp_verify_nonce($_POST['authpress_email_verification_nonce'], 'authpress_verify_auth_email_' . $user_id)) {
-            $verification_code = isset($_POST['authpress_verification_code']) ? sanitize_text_field($_POST['authpress_verification_code']) : '';
-            $pending_email = get_user_meta($user_id, 'authpress_pending_email', true);
-            $stored_code = get_user_meta($user_id, 'authpress_pending_email_code', true);
-
-            if ($verification_code === $stored_code && is_email($pending_email)) {
-                update_user_meta($user_id, 'authpress_authentication_email', $pending_email);
-                delete_user_meta($user_id, 'authpress_pending_email');
-                delete_user_meta($user_id, 'authpress_pending_email_code');
-
-                add_action('admin_notices', function() {
-                    echo '<div class="notice notice-success is-dismissible"><p>' . __('Authentication email address changed successfully.', 'two-factor-login-telegram') . '</p></div>';
-                });
-            } else {
-                add_action('admin_notices', function() {
-                    echo '<div class="notice notice-error is-dismissible"><p>' . __('Invalid verification code.', 'two-factor-login-telegram') . '</p></div>';
-                });
-            }
-        }
-    }
-
 
     private function handle_save_telegram($user_id)
     {
