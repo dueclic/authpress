@@ -31,7 +31,7 @@ class AuthPress_AJAX_Handler
         $codes = $telegram_otp->generate_codes(0, ['length' => 5]);
         $auth_code = !empty($codes) ? $codes[0] : '';
 
-        set_transient('wp2fa_telegram_authcode_' . $_POST['chat_id'], hash('sha256', $auth_code), WP_FACTOR_AUTHCODE_EXPIRE_SECONDS);
+        set_transient('wp2fa_telegram_authcode_' . $_POST['chat_id'], hash('sha256', $auth_code), get_auth_token_duration());
 
         $current_user_id = get_current_user_id();
 

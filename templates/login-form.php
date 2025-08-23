@@ -258,7 +258,7 @@ do_action("authpress_login_footer", $user_default_method, $user_available_method
     window.authpressConfig = {
         defaultMethod: '<?php echo esc_js($default_method); ?>',
         ajaxUrl: '<?php echo admin_url('admin-ajax.php'); ?>',
-        expireSeconds: <?php echo WP_FACTOR_AUTHCODE_EXPIRE_SECONDS; ?>,
+        expireSeconds: <?php echo get_auth_token_duration(); ?>,
         // Text strings
         useRecoveryText: '<?php esc_attr_e('Use Recovery Code', 'two-factor-login-telegram'); ?>',
         backTo2FAText: '<?php esc_attr_e('Back to 2FA', 'two-factor-login-telegram'); ?>',
