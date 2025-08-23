@@ -10,9 +10,9 @@ $token_duration = $email_settings['token_duration'] ?? 20; // Default to 20 minu
 ?>
 
 <div class="ap-form__group">
-	<label class="ap-label" for="email_token_duration"><?php _e("Durata token:", "two-factor-login-telegram"); ?></label>
+	<label class="ap-label" for="email_token_duration"><?php _e("Token duration:", "two-factor-login-telegram"); ?></label>
 	<p class="ap-provider-config__description">
-		<?php _e("Durata predefinita token in minuti", "two-factor-login-telegram"); ?>
+		<?php _e("Default token duration in minutes", "two-factor-login-telegram"); ?>
 	</p>
 	<div class="ap-form">
 		<div class="ap-form__group">
