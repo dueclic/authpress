@@ -37,6 +37,13 @@ $pending_email = get_user_meta($current_user_id, 'authpress_pending_email', true
                 <button type="button" class="button button-primary" id="reconfigure-email">
                     <?php _e('Change Authentication Email', 'two-factor-login-telegram'); ?>
                 </button>
+                <?php
+                $custom_auth_email = get_user_meta($current_user_id, 'authpress_authentication_email', true);
+                if (!empty($custom_auth_email) && $custom_auth_email !== wp_get_current_user()->user_email) : ?>
+                    <button type="button" class="button button-secondary" id="authpress_reset_email_btn" style="margin-left: 10px;">
+                        <?php _e('Reset default mail', 'two-factor-login-telegram'); ?>
+                    </button>
+                <?php endif; ?>
                 <form method="post" action="" class="authpress-disable-form" style="display: inline-block; margin-left: 10px;">
                     <?php wp_nonce_field('wp_factor_disable_email', 'wp_factor_email_disable_nonce'); ?>
                     <input type="hidden" name="wp_factor_action" value="disable_email">
