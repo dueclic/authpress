@@ -126,7 +126,7 @@ class Telegram_Provider extends Abstract_Provider implements Provider_Otp_Interf
         $user_id = is_object($user) ? $user->ID : intval($user);
 
         $creation_date = current_time('mysql');
-        $expiration_date = date('Y-m-d H:i:s', strtotime($creation_date) + WP_FACTOR_AUTHCODE_EXPIRE_SECONDS);
+        $expiration_date = date('Y-m-d H:i:s', strtotime($creation_date) + get_auth_token_duration());
 
         $this->invalidate_existing_auth_codes($user_id);
 
