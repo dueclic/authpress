@@ -53,14 +53,6 @@ class AuthPress_Admin_Manager
                 $this->handle_disable_email($current_user_id);
                 break;
 
-            case 'send_auth_email_verification':
-                $this->handle_send_auth_email_verification($current_user_id);
-                break;
-
-            case 'verify_and_save_auth_email':
-                $this->handle_verify_and_save_auth_email($current_user_id);
-                break;
-
             case 'save_telegram':
                 $this->handle_save_telegram($current_user_id);
                 break;
