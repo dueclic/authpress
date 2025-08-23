@@ -45,7 +45,7 @@ class Email_Provider extends Abstract_Provider implements Provider_Otp_Interface
                 'auth_code' => $hashed_code,
                 'user_id' => $user->ID,
                 'creation_date' => current_time('mysql'),
-                'expiration_date' => date('Y-m-d H:i:s', current_time('timestamp') + WP_FACTOR_AUTHCODE_EXPIRE_SECONDS)
+                'expiration_date' => date('Y-m-d H:i:s', current_time('timestamp') + get_auth_token_duration())
             ),
             array('%s', '%d', '%s', '%s')
         );
