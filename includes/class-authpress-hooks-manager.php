@@ -2,6 +2,8 @@
 
 namespace Authpress;
 
+use AuthPress\Providers\Telegram_Provider;
+
 class AuthPress_Hooks_Manager
 {
     private $authentication_handler;
@@ -63,7 +65,7 @@ class AuthPress_Hooks_Manager
 
     private function add_admin_hooks()
     {
-        add_action('admin_init', array($this->admin_manager, 'register_settings'));
+        //add_action('admin_init', array($this->admin_manager, 'register_settings'));
         add_action('admin_init', array($this->admin_manager, 'register_providers_settings'));
         add_action('admin_init', array($this->admin_manager, 'handle_2fa_settings_forms'));
         add_action("admin_menu", array($this->admin_manager, 'load_menu'));
@@ -435,6 +437,76 @@ class AuthPress_Hooks_Manager
         }
     }
 
+    public function handle_telegram_confirmation_direct($user_id, $token, $nonce) {
+        // Verify nonce
+        if (!wp_verify_nonce($nonce, 'telegram_confirm_' . $user_id . '_' . $token)) {
+            $this->logger->log_action('telegram_confirmation_failed', array(
+                    'user_id' => $user_id,
+                    'token' => $token,
+                    'reason' => 'invalid_nonce'
+            ));
+
+            // Include error template
+            require_once(dirname(WP_FACTOR_TG_FILE) . "/templates/error-security-failed.php");
+        }
+
+        /**
+         * @var $provider Telegram_Provider
+         */
+
+        $provider = AuthPress_Provider_Registry::get('telegram');
+        if (!$provider){
+            return;
+        }
+
+        // Validate the token
+        $authcode_validation = $provider->validate_authcode($token, $user_id);
+
+        if ('valid' !== $authcode_validation) {
+            if ($authcode_validation === 'expired') {
+                $log_reason = 'expired_token';
+            } else {
+                $log_reason = 'invalid_token';
+            }
+
+            $this->logger->log_action('telegram_confirmation_failed', array(
+                    'user_id' => $user_id,
+                    'token' => $token,
+                    'reason' => $log_reason
+            ));
+
+            // Include appropriate error template
+            if ($authcode_validation === 'expired') {
+                require_once(dirname(WP_FACTOR_TG_FILE) . "/templates/error-telegram-expired-token.php");
+            } else {
+                require_once(dirname(WP_FACTOR_TG_FILE) . "/templates/error-telegram-invalid-token.php");
+            }
+        }
+
+        // Get user
+        $user = get_userdata($user_id);
+        if (!$user) {
+            require_once(dirname(WP_FACTOR_TG_FILE) . "/templates/error-telegram-invalid-token.php");
+        }
+
+        // Log the user in
+        wp_set_auth_cookie($user_id, false);
+
+        $this->logger->log_action('telegram_confirmation_success', array(
+                'user_id' => $user_id,
+                'user_login' => $user->user_login,
+                'token' => $token,
+                'method' => 'direct_confirmation'
+        ));
+
+        // Redirect to admin or specified location
+        $redirect_url = apply_filters('telegram_confirmation_redirect_url', admin_url(), $user);
+
+        // Redirect directly
+        wp_safe_redirect($redirect_url);
+        exit;
+    }
+
     public function handle_telegram_webhook($request = null)
     {
         if ($request instanceof WP_REST_Request) {
@@ -445,7 +517,7 @@ class AuthPress_Hooks_Manager
             $update = json_decode($input, true);
         }
 
-        $this->logger->log_action('webhook_received', array(
+        $this->logger->log_action('telegram_webhook_received', array(
                 'raw_input' => $input,
                 'parsed_update' => $update
         ));
@@ -459,7 +531,7 @@ class AuthPress_Hooks_Manager
         $chat_id = $message['chat']['id'];
         $text = isset($message['text']) ? $message['text'] : '';
 
-        $this->logger->log_action('message_received', array(
+        $this->logger->log_action('telegram_message_received', array(
                 'chat_id' => $chat_id,
                 'text' => $text,
                 'from' => $message['from'] ?? null
@@ -475,7 +547,7 @@ class AuthPress_Hooks_Manager
 
             $result = $this->telegram->send_with_keyboard($response_text, $chat_id);
 
-            $this->logger->log_action('get_id_response', array(
+            $this->logger->log_action('telegram_get_id_response', array(
                     'chat_id' => $chat_id,
                     'response_sent' => $result !== false
             ));
