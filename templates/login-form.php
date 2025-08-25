@@ -10,7 +10,6 @@
  * - $rememberme: Remember me value
  * - $nonce: Security nonce
  * Legacy variables (for backward compatibility):
- * - $user_has_telegram, $user_has_email, $user_has_totp
  * - $default_method
  * - Provider objects
  */

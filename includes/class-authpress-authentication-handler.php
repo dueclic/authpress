@@ -106,20 +106,12 @@ class AuthPress_Authentication_Handler
         $plugin_logo = authpress_logo();
 
         $user_config = AuthPress_User_Manager::get_user_2fa_config($user->ID);
-        $user_has_telegram = $user_config['available_methods']['telegram'];
-        $user_has_email = $user_config['available_methods']['email'];
-        $user_has_totp = $user_config['available_methods']['totp'];
         $default_method = $user_config['effective_provider'];
 
         // If validation failed, set the failed method as the active method
         if ($failed_method !== null && $failed_method !== 'recovery') {
             $default_method = $failed_method;
         }
-
-        // Get provider instances for icons
-        $telegram_provider = AuthPress_Auth_Factory::create(AuthPress_Auth_Factory::METHOD_TELEGRAM_OTP);
-        $email_provider = AuthPress_Auth_Factory::create(AuthPress_Auth_Factory::METHOD_EMAIL_OTP);
-        $totp_provider = AuthPress_Auth_Factory::create(AuthPress_Auth_Factory::METHOD_TOTP);
 
         require_once(ABSPATH . '/wp-admin/includes/template.php');
         require_once(dirname(WP_FACTOR_TG_FILE) . "/templates/login-form.php");
