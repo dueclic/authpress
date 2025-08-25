@@ -45,7 +45,7 @@ class AuthPress_Authentication_Handler
 
             $result = $this->telegram->send_tg_token($auth_code, $user_config['chat_id'], $user->ID);
 
-            $this->logger->log_action('auth_code_sent', array(
+            $this->logger->log_action('telegram_auth_code_sent', array(
                 'user_id' => $user->ID,
                 'user_login' => $user->user_login,
                 'chat_id' => $user_config['chat_id'],
@@ -258,7 +258,7 @@ class AuthPress_Authentication_Handler
             $auth_code = $telegram_otp->save_authcode($user);
             $result = $this->telegram->send_tg_token($auth_code, $chat_id, $user->ID);
 
-            $this->logger->log_action('auth_code_resent', array(
+            $this->logger->log_action('telegram_auth_code_resent', array(
                 'user_id' => $user->ID,
                 'user_login' => $user->user_login,
                 'chat_id' => $chat_id,
