@@ -27,7 +27,7 @@ if (!defined('WP_FACTOR_PLUGIN_VERSION')) {
 
 if (!function_exists('get_auth_token_duration')) {
     function get_auth_token_duration() {
-        $providers = get_option('wp_factor_providers');
+        $providers = authpress_providers();
         $duration = $providers['email']['token_duration'] ?? 20;
         return absint($duration) * 60;
     }
