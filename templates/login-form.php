@@ -176,6 +176,12 @@ if (!empty($error_msg)) {
 
     foreach ($available_providers as $provider_key => $provider):
 
+        if ($provider_key === 'authenticator'){
+            $provider_key = 'totp';
+        }
+
+        $provider_key = apply_filters('authpress_provider_key', $provider_key, $provider);
+
         $provider_sections_disabled = apply_filters('authpress_provider_login_section_disabled', []);
 
         if (in_array($provider_key, $provider_sections_disabled)) continue;
