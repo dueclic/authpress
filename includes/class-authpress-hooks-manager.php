@@ -55,7 +55,7 @@ class AuthPress_Hooks_Manager
         $this->add_rest_api_hooks();
 
         // User list customization
-        if (is_admin() && AuthPress_User_Manager::is_telegram_provider_enabled()) {
+        if (is_admin()) {
             $this->add_user_list_hooks();
         }
 

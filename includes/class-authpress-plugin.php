@@ -128,6 +128,9 @@ final class AuthPress_Plugin
                         echo '<p>' . __('AuthPress: Legacy settings have been automatically migrated to the new provider system. You can now configure additional 2FA methods.', 'two-factor-login-telegram') . '</p>';
                         echo '</div>';
                     });
+
+                    delete_option($this->namespace);
+
                 }
             }
         }
