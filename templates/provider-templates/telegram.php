@@ -52,7 +52,6 @@ $telegram_chat_id = $user_config['chat_id'] ?: '';
                 <ol>
                     <li>
                         <?php
-                        $username = $provider && method_exists($provider, 'get_me') && $provider->get_me() ? $provider->get_me()->username : '';
                         printf(__('Open a conversation with %s and make sure it\'s still active',
                                 'two-factor-login-telegram'),
                                 '<a href="https://telegram.me/' . $username
@@ -121,7 +120,7 @@ $telegram_chat_id = $user_config['chat_id'] ?: '';
             <h3><?php _e('Setup Telegram', 'two-factor-login-telegram'); ?></h3>
 
             <?php
-            $username = $provider && method_exists($provider, 'get_me') && $provider->get_me() ? $provider->get_me()->username : '';
+            $username = $this->telegram->get_me()->username;
             ?>
 
             <div class="tg-setup-steps">
