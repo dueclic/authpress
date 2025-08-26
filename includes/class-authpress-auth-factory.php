@@ -38,17 +38,6 @@ class AuthPress_Auth_Factory
     }
 
     /**
-     * Get the appropriate auth method based on login method
-     * @param string $login_method The login method from form data
-     * @return Abstract_Provider|null
-     * @deprecated Use AuthPress_Provider_Registry::get_by_login_method() instead
-     */
-    public static function getByLoginMethod($login_method)
-    {
-        return AuthPress_Provider_Registry::get_by_login_method($login_method);
-    }
-
-    /**
      * Validate a code using the appropriate method
      * @param string $code The code to validate
      * @param int $user_id The user ID
