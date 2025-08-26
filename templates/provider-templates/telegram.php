@@ -17,13 +17,6 @@ $telegram_chat_id = $user_config['chat_id'] ?: '';
 <div class="authpress-section">
 
     <?php if ($user_has_method): ?>
-        <div class="notice notice-success inline">
-            <p>
-                <?php _e('✅ Telegram is configured and active.', 'two-factor-login-telegram'); ?>
-                <br>
-                <strong><?php _e('Chat ID:', 'two-factor-login-telegram'); ?></strong> <?php echo esc_html($telegram_chat_id); ?>
-            </p>
-        </div>
 
         <div class="authpress-actions">
             <button type="button" class="button button-primary" id="reconfigure-telegram">

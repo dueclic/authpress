@@ -15,11 +15,6 @@ if (!defined('ABSPATH')) {
 <div class="authpress-section">
 
     <?php if ($user_has_method): ?>
-        <div class="notice notice-success inline">
-            <p>
-                ✅ <?php printf(__('%s is configured and active.', 'two-factor-login-telegram'), $provider->get_name()); ?>
-            </p>
-        </div>
 
         <p class="description"><?php echo esc_html($provider->get_description()); ?></p>
 
