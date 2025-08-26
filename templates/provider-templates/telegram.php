@@ -15,10 +15,6 @@ $telegram_chat_id = $user_config['chat_id'] ?: '';
 ?>
 
 <div class="authpress-section">
-    <h2>
-        <img src="<?php echo esc_url($provider->get_icon()); ?>" alt="Telegram" style="width: 24px; height: 24px; margin-right: 8px; vertical-align: text-bottom;" />
-        <?php _e('Telegram', 'two-factor-login-telegram'); ?>
-    </h2>
 
     <?php if ($user_has_method): ?>
         <div class="notice notice-success inline">

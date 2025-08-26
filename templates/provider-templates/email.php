@@ -19,10 +19,6 @@ $pending_email = get_user_meta($current_user_id, 'authpress_pending_email', true
 ?>
 
 <div class="authpress-section">
-    <h2>
-        <img src="<?php echo esc_url($provider->get_icon()); ?>" alt="Email" style="width: 24px; height: 24px; margin-right: 8px; vertical-align: text-bottom;" />
-        <?php _e('Email', 'two-factor-login-telegram'); ?>
-    </h2>
 
     <?php if ($email_user_available): ?>
         <?php if ($user_has_method): ?>

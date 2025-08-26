@@ -13,10 +13,6 @@ if (!defined('ABSPATH')) {
 ?>
 
 <div class="authpress-section">
-    <h2>
-        <img src="<?php echo esc_url($provider->get_icon()); ?>" alt="Authenticator" style="width: 24px; height: 24px; margin-right: 8px; vertical-align: text-bottom;" />
-        <?php _e('Authenticator App', 'two-factor-login-telegram'); ?>
-    </h2>
 
     <?php if ($user_has_method): ?>
         <div class="notice notice-success inline">

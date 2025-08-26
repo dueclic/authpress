@@ -13,12 +13,6 @@ if (!defined('ABSPATH')) {
 ?>
 
 <div class="authpress-section">
-    <h2>
-        <?php if (!empty($provider->get_icon())): ?>
-            <img src="<?php echo $provider->get_icon(); ?>" alt="<?php echo esc_attr($provider->get_name()); ?>" style="width: 24px; height: 24px; margin-right: 8px; vertical-align: text-bottom;" />
-        <?php endif; ?>
-        <?php echo esc_html($provider->get_name()); ?>
-    </h2>
 
     <?php if ($user_has_method): ?>
         <div class="notice notice-success inline">
