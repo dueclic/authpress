@@ -69,7 +69,8 @@ class AuthPress_Hooks_Manager
         add_action('admin_init', array($this->admin_manager, 'register_providers_settings'));
         add_action('admin_init', array($this->admin_manager, 'handle_2fa_settings_forms'));
         add_action("admin_menu", array($this->admin_manager, 'load_menu'));
-        add_action('authpress_provider_card_col_class', array($this->admin_manager, 'provider_card_col_class'), 10, 4);
+        add_filter('authpress_provider_card_col_class', array($this->admin_manager, 'provider_card_col_class'), 10, 4);
+        add_filter('authpress_user_provider_card_col_class', array($this->admin_manager, 'provider_card_col_class'), 10, 4);
         add_filter(
                 "plugin_action_links_" . plugin_basename(WP_FACTOR_TG_FILE),
                 array($this->admin_manager, 'action_links')
