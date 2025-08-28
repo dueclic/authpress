@@ -112,8 +112,8 @@ $telegram_chat_id = $user_config['chat_id'] ?: '';
             $username = $this->telegram->get_me()->username;
             ?>
 
-            <div class="tg-setup-steps">
-                <h4><?php _e('🚀 Setup Steps', 'two-factor-login-telegram'); ?></h4>
+            <div class="ap-notice ap-notice--info">
+                <h4 class="ap-heading"><?php _e('🚀 Setup Steps', 'two-factor-login-telegram'); ?></h4>
                 <ol>
                     <li>
                         <?php
