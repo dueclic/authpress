@@ -106,13 +106,14 @@ $telegram_chat_id = $user_config['chat_id'] ?: '';
         </div>
 
         <div class="authpress-setup">
-            <h3 class="ap-notice ap-notice--info"><?php _e('Setup Telegram', 'two-factor-login-telegram'); ?></h3>
 
             <?php
             $username = $this->telegram->get_me()->username;
             ?>
 
             <div class="ap-notice ap-notice--info">
+                <h3 class="ap-notice ap-notice--info"><?php _e('Setup Telegram', 'two-factor-login-telegram'); ?></h3>
+
                 <h4 class="ap-heading"><?php _e('🚀 Setup Steps', 'two-factor-login-telegram'); ?></h4>
                 <ol>
                     <li>
