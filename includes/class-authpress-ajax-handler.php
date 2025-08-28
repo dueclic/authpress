@@ -470,4 +470,73 @@ class AuthPress_AJAX_Handler
 
         wp_send_json_success(['message' => __('Authentication email has been reset to your default WordPress email address.', 'two-factor-login-telegram')]);
     }
+
+    public function update_user_provider_status()
+    {
+        if (!is_user_logged_in()) {
+            wp_send_json_error(['message' => __('Not authorized.', 'two-factor-login-telegram')]);
+        }
+
+        $user_id = get_current_user_id();
+        $provider_key = sanitize_key($_POST['provider_key'] ?? '');
+        $nonce = sanitize_text_field($_POST['nonce'] ?? '');
+
+        if (empty($provider_key) || !wp_verify_nonce($nonce, 'authpress_update_user_provider_status_' . $provider_key)) {
+            wp_send_json_error(['message' => __('Invalid request or security check failed.', 'two-factor-login-telegram')]);
+        }
+
+        if ($user_id != intval($_POST['user_id'])) {
+            wp_send_json_error(['message' => __('You can only change your own settings.', 'two-factor-login-telegram')]);
+        }
+
+        $is_enabled = isset($_POST['enabled']) && $_POST['enabled'] === '1';
+        $result = false;
+
+        // Only allow toggling if the method is already configured.
+        $user_config = \Authpress\AuthPress_User_Manager::get_user_2fa_config($user_id);
+        $user_method_key = $provider_key === 'authenticator' ? 'totp' : $provider_key;
+        $is_configured = $user_config['available_methods'][$user_method_key] ?? false;
+
+        // If enabling, it must be configured. If disabling, it's fine.
+        if ($is_enabled && !$is_configured) {
+             wp_send_json_error(['message' => __('This method must be configured before it can be enabled.', 'two-factor-login-telegram')]);
+        }
+
+        switch ($provider_key) {
+            case 'authenticator':
+                $totp_provider = \Authpress\AuthPress_Auth_Factory::create(\Authpress\AuthPress_Auth_Factory::METHOD_TOTP);
+                if ($is_enabled) {
+                    $result = $totp_provider->enable_user_totp($user_id);
+                } else {
+                    $result = $totp_provider->disable_user_totp($user_id);
+                }
+                break;
+            case 'telegram':
+                update_user_meta($user_id, 'tg_wp_factor_enabled', $is_enabled ? '1' : '0');
+                $result = true;
+                break;
+            case 'email':
+                if ($is_enabled) {
+                    \Authpress\AuthPress_User_Manager::enable_user_email($user_id);
+                    $result = true;
+                } else {
+                    // Assuming 'wp_factor_email_enabled' is the meta key.
+                    update_user_meta($user_id, 'wp_factor_email_enabled', false);
+                    $result = true;
+                }
+                break;
+        }
+
+        if ($result) {
+            $this->logger->log_action('user_provider_status_changed', [
+                'user_id' => $user_id,
+                'provider' => $provider_key,
+                'enabled' => $is_enabled,
+                'changed_by' => 'user'
+            ]);
+            wp_send_json_success(['message' => __('Settings saved.', 'two-factor-login-telegram')]);
+        } else {
+            wp_send_json_error(['message' => __('Could not save settings.', 'two-factor-login-telegram')]);
+        }
+    }
 }
