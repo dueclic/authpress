@@ -101,7 +101,7 @@ $telegram_chat_id = $user_config['chat_id'] ?: '';
             </p>
         </div>
     <?php else: ?>
-        <div class="notice notice-info inline">
+        <div class="">
             <p><?php _e('Configure Telegram to enable this 2FA method.', 'two-factor-login-telegram'); ?></p>
         </div>
 

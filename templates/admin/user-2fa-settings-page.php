@@ -122,13 +122,26 @@ $user_has_active_methods = $user_config['has_2fa'];
                                         echo $icon_html;
                                         ?>
                                         <span><?php echo esc_html($provider->get_name()); ?></span>
+
                                     </div>
 
                                     <div class="provider-status">
                                         <?php if ($user_has_method): ?>
-                                            <span class="ap-text ap-text--success">✓ <?php _e('Configured', 'two-factor-login-telegram'); ?></span>
+<!--                                            <span class="ap-text ap-text--success">✓ --><?php //_e('Configured', 'two-factor-login-telegram'); ?><!--</span>-->
+                                            <label class="ap-switch" aria-label="<?php echo esc_attr($toggle_label); ?>">
+                                                <input type="checkbox"
+                                                       name="wp_factor_providers[<?php echo esc_attr($provider->get_key()); ?>][enabled]"
+                                                       value="1">
+                                                <span class="ap-slider"></span>
+                                            </label>
                                         <?php else: ?>
-                                            <span class="ap-text ap-text--muted"><?php _e('Not configured', 'two-factor-login-telegram'); ?></span>
+<!--                                            <span class="ap-text ap-text--muted">--><?php //_e('Not configured', 'two-factor-login-telegram'); ?><!--</span>-->
+                                            <label class="ap-switch" aria-label="<?php echo esc_attr($toggle_label); ?>">
+                                                <input type="checkbox"
+                                                       name="wp_factor_providers[<?php echo esc_attr($provider->get_key()); ?>][enabled]"
+                                                       value="0">
+                                                <span class="ap-slider"></span>
+                                            </label>
                                         <?php endif; ?>
                                     </div>
                                 </header>
