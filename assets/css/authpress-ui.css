@@ -386,6 +386,7 @@
     margin-bottom: var(--ap-space-lg);
     font-size: 14px;
     display: flex;
+    flex-direction: column;
     align-items: flex-start;
     gap: var(--ap-space-sm);
 }
