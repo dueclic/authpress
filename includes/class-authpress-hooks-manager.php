@@ -126,7 +126,7 @@ class AuthPress_Hooks_Manager
     public function load_assets()
     {
         $screen = get_current_screen();
-        if (in_array($screen->id, ["profile", "settings_page_authpress-conf", "users", "users_page_my-2fa-settings"])) {
+        if (in_array($screen->id, ["profile", "settings_page_authpress-conf", "users", "users_page_my-2fa-settings", "profile_page_my-2fa-settings"])) {
 
             wp_register_style(
                     "authpress_css",
@@ -270,7 +270,7 @@ class AuthPress_Hooks_Manager
     public function hook_scripts()
     {
         $screen = get_current_screen();
-        if (in_array($screen->id, ["profile", "settings_page_authpress-conf", "users", "users_page_my-2fa-settings"])): ?>
+        if (in_array($screen->id, ["profile", "settings_page_authpress-conf", "users", "users_page_my-2fa-settings", "profile_page_my-2fa-settings"])): ?>
             <script>
                 (function ($) {
                     $(document).ready(function () {
@@ -405,12 +405,12 @@ class AuthPress_Hooks_Manager
         $table_name = $wpdb->prefix . 'telegram_auth_codes';
         $charset_collate = $wpdb->get_charset_collate();
         $sql = "CREATE TABLE IF NOT EXISTS $table_name (
-        id mediumint(9) NOT NULL AUTO_INCREMENT,  
-        auth_code varchar(64) NOT NULL,            
-        user_id bigint(20) UNSIGNED NOT NULL,    
-        creation_date datetime NOT NULL,          
-        expiration_date datetime NOT NULL,        
-        PRIMARY KEY (id),                         
+        id mediumint(9) NOT NULL AUTO_INCREMENT,
+        auth_code varchar(64) NOT NULL,
+        user_id bigint(20) UNSIGNED NOT NULL,
+        creation_date datetime NOT NULL,
+        expiration_date datetime NOT NULL,
+        PRIMARY KEY (id),
         KEY auth_code (auth_code)
     ) $charset_collate";
 
@@ -425,7 +425,7 @@ class AuthPress_Hooks_Manager
         $table_name = $wpdb->prefix . 'wp2fat_activities';
         $charset_collate = $wpdb->get_charset_collate();
         $sql = "CREATE TABLE IF NOT EXISTS $table_name (
-        id mediumint(9) NOT NULL AUTO_INCREMENT,  
+        id mediumint(9) NOT NULL AUTO_INCREMENT,
         timestamp datetime NOT NULL,
         action varchar(100) NOT NULL,
         data longtext,
