@@ -594,14 +594,18 @@
         gap: 10px;
         padding: 15px;
     }
-    
+
     .recovery-code-box {
         font-size: 12px;
         padding: 10px 6px;
     }
-    
+
     .tg-modal-recovery-content {
         padding: 24px 20px;
         margin: 20px;
     }
+}
+
+.authpress-provider-options .authpress-provider-option {
+    display: block;
 }
