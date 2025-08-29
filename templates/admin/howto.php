@@ -73,7 +73,8 @@
         <ol>
             <?php
             $bot_username = null;
-            if ($this->telegram->is_valid_bot()) {
+            $is_valid_bot = $this->telegram->get_me() !== false;
+            if ($is_valid_bot) {
                 $me = $this->telegram->get_me();
                 if ($me && isset($me->username)) {
                     $bot_username = $me->username;
