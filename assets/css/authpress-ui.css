@@ -10,7 +10,6 @@
     /* Primary Colors */
     --ap-primary: #667eea;
     --ap-primary-dark: #5a6fd8;
-    --ap-primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
 
     /* Secondary Colors */
     --ap-secondary: #0073aa;
@@ -191,8 +190,9 @@
 }
 
 .ap-button--primary {
-    background: var(--ap-primary-gradient);
+    background: #667eea;
     color: var(--ap-white);
+    border: 1px solid #5a6fd8;
 }
 
 .ap-button--primary:hover {
@@ -658,7 +658,7 @@
     align-items: center;
     justify-content: space-between;
     padding: 20px;
-    background: var(--ap-primary-gradient);
+    background: var(--ap-primary);
     color: white;
 }
 

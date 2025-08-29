@@ -24,20 +24,20 @@ $pending_email = get_user_meta($current_user_id, 'authpress_pending_email', true
         <?php if ($user_has_method): ?>
 
             <div class="authpress-actions mt-8">
-                <button type="button" class="button button-primary" id="reconfigure-email">
+                <button type="button" class="ap-button ap-button--primary" id="reconfigure-email">
                     <?php _e('Change Authentication Email', 'two-factor-login-telegram'); ?>
                 </button>
                 <?php
                 $custom_auth_email = get_user_meta($current_user_id, 'authpress_authentication_email', true);
                 if (!empty($custom_auth_email) && $custom_auth_email !== wp_get_current_user()->user_email) : ?>
-                    <button type="button" class="button button-secondary" id="authpress_reset_email_btn" style="margin-left: 10px;">
+                    <button type="button" class="ap-button ap-button--secondary" id="authpress_reset_email_btn" style="margin-left: 10px;">
                         <?php _e('Reset to default mail', 'two-factor-login-telegram'); ?>
                     </button>
                 <?php endif; ?>
                 <form method="post" action="" class="authpress-disable-form" style="display: inline-block; margin-left: 10px;">
                     <?php wp_nonce_field('wp_factor_disable_email', 'wp_factor_email_disable_nonce'); ?>
                     <input type="hidden" name="wp_factor_action" value="disable_email">
-                    <button type="submit" class="button button-secondary" onclick="return confirm('<?php _e('Are you sure you want to disable Email 2FA?', 'two-factor-login-telegram'); ?>')">
+                    <button type="submit" class="ap-button ap-button--secondary" onclick="return confirm('<?php _e('Are you sure you want to disable Email 2FA?', 'two-factor-login-telegram'); ?>')">
                         <?php _e('Disable Email 2FA', 'two-factor-login-telegram'); ?>
                     </button>
                 </form>
@@ -53,13 +53,13 @@ $pending_email = get_user_meta($current_user_id, 'authpress_pending_email', true
             <p><?php _e('You can specify a different email address for receiving authentication codes. If left blank, your primary WordPress email will be used.', 'two-factor-login-telegram'); ?></p>
 
             <div class="authpress-actions">
-                 <button type="button" class="button button-primary" id="reconfigure-email">
+                 <button type="button" class="ap-button ap-button--primary" id="reconfigure-email">
                     <?php _e('Set Authentication Email', 'two-factor-login-telegram'); ?>
                 </button>
                 <form method="post" action="" id="authpress-enable-email-form" class="authpress-enable-form" style="display: inline-block; margin-left: 10px;">
                     <?php wp_nonce_field('wp_factor_enable_email', 'wp_factor_email_enable_nonce'); ?>
                     <input type="hidden" name="wp_factor_action" value="enable_email">
-                    <button type="submit" class="button button-primary">
+                    <button type="submit" class="ap-button ap-button--primary">
                         <?php _e('Enable Email 2FA', 'two-factor-login-telegram'); ?>
                     </button>
                 </form>
@@ -82,10 +82,10 @@ $pending_email = get_user_meta($current_user_id, 'authpress_pending_email', true
                 </tr>
             </table>
             <p class="submit">
-                <button type="button" id="authpress_send_email_code_btn" class="button button-primary">
+                <button type="button" id="authpress_send_email_code_btn" class="ap-button ap-button--primary">
                     <?php _e('Send Verification Code', 'two-factor-login-telegram'); ?>
                 </button>
-                <button type="button" class="button button-secondary" id="cancel-reconfigure-email" style="margin-left: 10px;">
+                <button type="button" class="ap-button ap-button--secondary" id="cancel-reconfigure-email" style="margin-left: 10px;">
                     <?php _e('Cancel', 'two-factor-login-telegram'); ?>
                 </button>
             </p>
@@ -109,10 +109,10 @@ $pending_email = get_user_meta($current_user_id, 'authpress_pending_email', true
                 </tr>
             </table>
             <p class="submit">
-                <button type="button" id="authpress_verify_email_code_btn" class="button button-primary">
+                <button type="button" id="authpress_verify_email_code_btn" class="ap-button ap-button--primary">
                     <?php _e('Verify & Save', 'two-factor-login-telegram'); ?>
                 </button>
-                <button type="button" class="button button-secondary" id="cancel-verify-email" style="margin-left: 10px;"><?php _e('Cancel', 'two-factor-login-telegram'); ?></button>
+                <button type="button" class="ap-button ap-button--secondary" id="cancel-verify-email" style="margin-left: 10px;"><?php _e('Cancel', 'two-factor-login-telegram'); ?></button>
             </p>
             <div id="authpress-email-verify-status" class="tg-status" style="display: none;"></div>
         </div>

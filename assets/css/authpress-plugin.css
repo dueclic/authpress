@@ -213,8 +213,8 @@
 
 /* Button improvements */
 .tg-action-button {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    border: none;
+    background: #667eea;
+    border: 1px solid #5a6fd8;
     color: white;
     padding: 10px 20px;
     border-radius: 6px;

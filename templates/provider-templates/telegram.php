@@ -19,14 +19,14 @@ $telegram_chat_id = $user_config['chat_id'] ?: '';
     <?php if ($user_has_method): ?>
 
         <div class="authpress-actions">
-            <button type="button" class="button button-primary" id="reconfigure-telegram">
+            <button type="button" class="ap-button ap-button--primary" id="reconfigure-telegram">
                 <?php _e('Change Chat ID', 'two-factor-login-telegram'); ?>
             </button>
 
             <form method="post" action="" class="authpress-disable-form" style="display: inline-block; margin-left: 10px;">
                 <?php wp_nonce_field('wp_factor_disable_telegram', 'wp_factor_telegram_disable_nonce'); ?>
                 <input type="hidden" name="wp_factor_action" value="disable_telegram">
-                <button type="submit" class="button button-secondary" onclick="return confirm('<?php _e('Are you sure you want to disable Telegram 2FA? This will remove your Chat ID and disable Telegram authentication.', 'two-factor-login-telegram'); ?>')">
+                <button type="submit" class="ap-button ap-button--secondary" onclick="return confirm('<?php _e('Are you sure you want to disable Telegram 2FA? This will remove your Chat ID and disable Telegram authentication.', 'two-factor-login-telegram'); ?>')">
                     <?php _e('Disable Telegram 2FA', 'two-factor-login-telegram'); ?>
                 </button>
             </form>
@@ -69,7 +69,7 @@ $telegram_chat_id = $user_config['chat_id'] ?: '';
                         <p class="description"><?php _e('Enter your new Telegram Chat ID', 'two-factor-login-telegram'); ?></p>
                     </td>
                     <td>
-                        <button type="button" class="button button-primary tg-action-button" id="tg_wp_factor_reconfig_send">
+                        <button type="button" class="ap-button ap-button--primary tg-action-button" id="tg_wp_factor_reconfig_send">
                             <?php _e("Send Test Code", "two-factor-login-telegram"); ?>
                         </button>
                         <div id="reconfig-status" class="tg-status" style="display: none;"></div>
@@ -86,7 +86,7 @@ $telegram_chat_id = $user_config['chat_id'] ?: '';
                         <p class="description"><?php _e('Enter the confirmation code you received on Telegram', 'two-factor-login-telegram'); ?></p>
                     </td>
                     <td>
-                        <button type="button" class="button button-primary tg-action-button" id="tg_wp_factor_reconfig_validate">
+                        <button type="button" class="ap-button ap-button--primary tg-action-button" id="tg_wp_factor_reconfig_validate">
                             <?php _e("Validate & Save", "two-factor-login-telegram"); ?>
                         </button>
                         <div id="reconfig-validation-status" class="tg-status" style="display: none;"></div>
@@ -95,7 +95,7 @@ $telegram_chat_id = $user_config['chat_id'] ?: '';
             </table>
 
             <p>
-                <button type="button" class="button button-secondary" id="cancel-reconfigure">
+                <button type="button" class="ap-button ap-button--secondary" id="cancel-reconfigure">
                     <?php _e('Cancel', 'two-factor-login-telegram'); ?>
                 </button>
             </p>
@@ -165,7 +165,7 @@ $telegram_chat_id = $user_config['chat_id'] ?: '';
                                         'two-factor-login-telegram'); ?></span>
                         </td>
                         <td>
-                            <button type="button" class="button button-primary tg-action-button" id="tg_wp_factor_chat_id_send"><?php
+                            <button type="button" class="ap-button ap-button--primary tg-action-button" id="tg_wp_factor_chat_id_send"><?php
                                 _e("Submit code",
                                         "two-factor-login-telegram"); ?></button>
                             <div id="chat-id-status" class="tg-status" style="display: none;"></div>
@@ -188,7 +188,7 @@ $telegram_chat_id = $user_config['chat_id'] ?: '';
                                         'two-factor-login-telegram'); ?></span>
                         </td>
                         <td>
-                            <button type="button" class="button button-primary tg-action-button" id="tg_wp_factor_chat_id_check"><?php
+                            <button type="button" class="ap-button ap-button--primary tg-action-button" id="tg_wp_factor_chat_id_check"><?php
                                 _e("Validate",
                                         "two-factor-login-telegram"); ?></button>
                             <div id="validation-status" class="tg-status" style="display: none;"></div>
@@ -208,7 +208,7 @@ $telegram_chat_id = $user_config['chat_id'] ?: '';
                                 <input type="hidden" name="wp_factor_action" value="save_telegram">
                                 <input type="hidden" name="tg_chat_id" id="tg_chat_id_hidden" value="">
                                 <p class="submit">
-                                    <button type="submit" class="button button-primary">
+                                    <button type="submit" class="ap-button ap-button--primary">
                                         <?php _e('Save Telegram Configuration', 'two-factor-login-telegram'); ?>
                                     </button>
                                 </p>
