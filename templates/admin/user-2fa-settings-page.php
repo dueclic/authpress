@@ -125,25 +125,23 @@ $user_has_active_methods = $user_config['has_2fa'];
 
                                     </div>
 
-                                    <div class="provider-status">
-                                        <?php
-                                        $toggle_label = sprintf(
-                                            $user_has_method ? __('Disable %s for your account', 'two-factor-login-telegram') : __('Enable %s for your account', 'two-factor-login-telegram'),
-                                            $provider->get_name()
-                                        );
-                                        ?>
-                                        <label class="ap-switch" for="provider-toggle-<?php echo esc_attr($provider_key); ?>">
-                                            <input type="checkbox"
-                                                   class="authpress-user-provider-toggle"
-                                                   id="provider-toggle-<?php echo esc_attr($provider_key); ?>"
-                                                   data-provider-key="<?php echo esc_attr($provider_key); ?>"
-                                                   data-user-id="<?php echo esc_attr($current_user_id); ?>"
-                                                   data-nonce="<?php echo wp_create_nonce('authpress_update_user_provider_status_' . $provider_key); ?>"
-                                                   value="1"
-                                                <?php checked($user_has_method); ?>>
-                                            <span class="ap-slider" aria-label="<?php echo esc_attr($toggle_label); ?>"></span>
-                                        </label>
-                                    </div>
+                                    <?php
+                                    $toggle_label = sprintf(
+                                        $user_has_method ? __('Disable %s for your account', 'two-factor-login-telegram') : __('Enable %s for your account', 'two-factor-login-telegram'),
+                                        $provider->get_name()
+                                    );
+                                    $toggle_label = apply_filters('authpress_provider_toggle_label', $toggle_label, $provider, $provider_key, 'user-settings');
+                                    ?>
+                                    <label class="ap-switch" aria-label="<?php echo esc_attr($toggle_label); ?>">
+                                        <input type="checkbox"
+                                               class="authpress-user-provider-toggle"
+                                               data-provider-key="<?php echo esc_attr($provider_key); ?>"
+                                               data-user-id="<?php echo esc_attr($current_user_id); ?>"
+                                               data-nonce="<?php echo wp_create_nonce('authpress_update_user_provider_status_' . $provider_key); ?>"
+                                               value="1"
+                                            <?php checked($user_has_method); ?>>
+                                        <span class="ap-slider"></span>
+                                    </label>
                                 </header>
 
                                 <?php do_action('authpress_provider_card_after_header', $provider, $provider_key, $category_key); ?>
