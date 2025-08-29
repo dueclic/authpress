@@ -274,6 +274,29 @@ var AuthPress_Plugin = function ($) {
             this.value = this.value.replace(/[^0-9]/g, '');
         });
 
+        // Handle Failed Login Reports toggle for Telegram provider
+        $(document).on('change', '#telegram_failed_login_reports', function() {
+            var isEnabled = $(this).val() === '1';
+            var $reportChatIdGroup = $(this).closest('.ap-form').find('#telegram_report_chat_id').closest('.ap-form__group');
+            
+            if (isEnabled) {
+                $reportChatIdGroup.slideDown();
+            } else {
+                $reportChatIdGroup.slideUp();
+            }
+        });
+
+        // Initialize Report Chat Id field visibility on page load
+        var $failedLoginSelect = $('#telegram_failed_login_reports');
+        if ($failedLoginSelect.length) {
+            var isEnabled = $failedLoginSelect.val() === '1';
+            var $reportChatIdGroup = $failedLoginSelect.closest('.ap-form').find('#telegram_report_chat_id').closest('.ap-form__group');
+            
+            if (!isEnabled) {
+                $reportChatIdGroup.hide();
+            }
+        }
+
     }
 
     function initTwoFASettingsPage() {

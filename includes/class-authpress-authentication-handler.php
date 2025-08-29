@@ -4,6 +4,10 @@ namespace Authpress;
 
 class AuthPress_Authentication_Handler
 {
+
+    /**
+     * @var WP_Telegram $telegram
+     */
     private $telegram;
     private $logger;
 

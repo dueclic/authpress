@@ -11,7 +11,11 @@ class WP_Telegram {
 	public $lastError;
 
 	public function __construct() {
-		$this->bot_token = get_option( $this->namespace )['bot_token'];
+
+        $options = authpress_providers();
+        $bot_token = $options['telegram']['bot_token'];
+
+        $this->bot_token = $bot_token;
 		$this->endpoint  = "https://api.telegram.org/bot%s";
 	}
 
