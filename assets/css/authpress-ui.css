@@ -510,12 +510,17 @@
     grid-column: span 6;
 }
 
+
+.ap-col-4 {
+    grid-column: span 4;
+}
+
 .ap-col-12 {
     grid-column: span 12;
 }
 
 @media (max-width: 900px) {
-    .ap-col-6 {
+    .ap-col-6, .ap-col-4 {
         grid-column: span 12;
     }
 }
