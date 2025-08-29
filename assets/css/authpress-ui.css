@@ -61,6 +61,9 @@
     --ap-telegram-provider-color-start: #7c3aed;
     --ap-telegram-provider-color-end: #6366f1;
 
+    --ap-text-size: 16px;
+    --ap-text-size-small: 14px;
+
 
 }
 
@@ -165,13 +168,13 @@
 }
 
 .ap-text {
-    font-size: 14px;
+    font-size: var(--ap-text-size);
     color: var(--ap-gray);
     margin: 0;
 }
 
 .ap-text--small {
-    font-size: 12px;
+    font-size: var(--ap-text-size-small);
 }
 
 .ap-text--bold {
