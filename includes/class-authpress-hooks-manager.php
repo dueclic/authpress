@@ -10,6 +10,10 @@ class AuthPress_Hooks_Manager
     private $admin_manager;
     private $ajax_handler;
     private $telegram;
+
+    /**
+     * @var AuthPress_Logger $logger
+     */
     private $logger;
 
     public function __construct($authentication_handler, $admin_manager, $ajax_handler, $telegram, $logger)
@@ -101,6 +105,9 @@ class AuthPress_Hooks_Manager
         add_action('wp_ajax_disable_user_2fa_telegram', array($this->ajax_handler, 'disable_user_2fa_ajax'));
         add_action('wp_ajax_force_setup_wizard', array($this, 'handle_force_setup_wizard_ajax'));
         add_action('wp_ajax_authpress_update_user_provider_status', array($this->ajax_handler, 'update_user_provider_status'));
+
+        add_action('authpress_user_providers_page_notices', array($this, 'handle_telegram_validation'));
+
     }
 
     private function add_rest_api_hooks()
@@ -177,6 +184,88 @@ class AuthPress_Hooks_Manager
             );
         }
     }
+
+    public function handle_telegram_validation($user) {
+        // Only handle if we're on the current user's profile and we have validation parameters
+        $current_user_id = get_current_user_id();
+        $user_id = isset($_GET['user_id']) ? $_GET['user_id'] : null;
+
+
+        if ($user_id === NULL || $current_user_id != $user_id) {
+            return;
+        }
+
+        if (isset($_GET['action']) && $_GET['action'] === 'telegram_validate') {
+            $user_id = intval($_GET['user_id']);
+            $token = sanitize_text_field($_GET['token']);
+            $chat_id = sanitize_text_field($_GET['chat_id']);
+            $nonce = sanitize_text_field($_GET['nonce']);
+            $validation_success = false;
+
+            // Verify that the user_id matches the current user
+            if ($user_id !== $current_user_id) {
+                echo '<div class="notice notice-error is-dismissible"><p>';
+                _e('❌ Validation failed. Security error: user mismatch.', 'two-factor-login-telegram');
+                echo '</p></div>';
+                return;
+            }
+
+            // Verify nonce
+            if (wp_verify_nonce($nonce, 'telegram_validate_' . $user_id . '_' . $token)) {
+
+                $provider = AuthPress_Provider_Registry::get('telegram');
+
+                // Check if the token is valid using the transient method
+                if ($provider->validate_tokencheck_authcode($token, $chat_id)) {
+
+                    // Save user 2FA settings - this enables 2FA and saves the chat_id
+                    $save_result = $provider->save_user_2fa_settings($user_id, $chat_id, true);
+
+                    if ($save_result) {
+                        $validation_success = true;
+                        // Delete the transient as it's been used
+                        delete_transient('wp2fa_telegram_authcode_' . $chat_id);
+
+                        // Log the successful validation
+                        $this->logger->log_action('telegram_validation_success', array(
+                                'user_id' => $user_id,
+                                'chat_id' => $chat_id,
+                                'method' => 'validate_setup_button'
+                        ));
+                    } else {
+                        $this->logger->log_action('telegram_validation_failed', array(
+                                'user_id' => $user_id,
+                                'token' => $token,
+                                'reason' => 'save_settings_failed'
+                        ));
+                    }
+                } else {
+                    $this->logger->log_action('telegram_validation_failed', array(
+                            'user_id' => $user_id,
+                            'token' => $token,
+                            'reason' => 'invalid_or_expired_token'
+                    ));
+                }
+            } else {
+                $this->logger->log_action('telegram_validation_failed', array(
+                        'user_id' => $user_id,
+                        'token' => $token,
+                        'reason' => 'nonce_verification_failed'
+                ));
+            }
+
+            if ($validation_success) {
+                echo '<div class="notice notice-success is-dismissible"><p>';
+                _e('✅ Telegram validation successful! Your 2FA setup is now confirmed and enabled.', 'two-factor-login-telegram');
+                echo '</p></div>';
+            } else {
+                echo '<div class="notice notice-error is-dismissible"><p>';
+                _e('❌ Validation failed. The token is invalid, has expired, or there was a security error.', 'two-factor-login-telegram');
+                echo '</p></div>';
+            }
+        }
+    }
+
 
     public function hook_scripts()
     {

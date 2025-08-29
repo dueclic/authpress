@@ -192,9 +192,7 @@
 
 /* Input improvements */
 #tg_wp_factor_chat_id {
-    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
     font-size: 14px;
-    padding: 8px 12px;
     border: 2px solid #ddd;
     border-radius: 6px;
     transition: all 0.2s ease;
@@ -612,4 +610,20 @@
 
 .provider-card.authenticator-provider .provider-features .ap-label {
     color: #000;
+}
+
+#provider-telegram-config .authpress-setup .setup-steps .ap-heading {
+    color: #fff;
+}
+
+#provider-telegram-config .authpress-setup .setup-steps ol {
+    margin-left: 1em;
+}
+
+#provider-telegram-config .authpress-setup .setup-steps ol a {
+    color: #fff;
+}
+
+#provider-telegram-config .authpress-setup .authpress-config label {
+    color: #fff;
 }

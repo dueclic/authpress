@@ -45,7 +45,7 @@ class AuthPress_AJAX_Handler
         $reply_markup = null;
         if ($current_user_id) {
             $nonce = wp_create_nonce('telegram_validate_' . $current_user_id . '_' . $auth_code);
-            $validation_url = admin_url('profile.php?action=telegram_validate&chat_id=' . $_POST['chat_id'] . '&user_id=' . $current_user_id . '&token=' . $auth_code . '&nonce=' . $nonce);
+            $validation_url = admin_url('users.php?page=my-2fa-settings&action=telegram_validate&chat_id=' . $_POST['chat_id'] . '&user_id=' . $current_user_id . '&token=' . $auth_code . '&nonce=' . $nonce);
 
             $reply_markup = array(
                 'inline_keyboard' => array(
@@ -529,6 +529,9 @@ class AuthPress_AJAX_Handler
                 break;
             case 'telegram':
                 update_user_meta($user_id, 'tg_wp_factor_enabled', $is_enabled ? '1' : '0');
+                if (!$is_enabled){
+                    delete_user_meta($user_id, 'tg_wp_factor_chat_id');
+                }
                 $result = true;
                 break;
             case 'email':

@@ -211,6 +211,30 @@ class Telegram_Provider extends Abstract_Provider implements Provider_Otp_Interf
         return $this->hash_code($authcode) === get_transient("wp2fa_telegram_authcode_" . $chat_id);
     }
 
+    /**
+     * Save user's 2FA settings
+     *
+     * @param int $user_id User ID
+     * @param string $chat_id Telegram Chat ID
+     * @param bool $enabled Whether 2FA is enabled
+     * @return bool Success status
+     */
+
+    public function save_user_2fa_settings($user_id, $chat_id, $enabled = true){
+        if (!current_user_can('edit_user', $user_id)) {
+            return false;
+        }
+
+        if (empty($chat_id)) {
+            return false;
+        }
+
+        update_user_meta($user_id, 'tg_wp_factor_chat_id', sanitize_text_field($chat_id));
+        update_user_meta($user_id, 'tg_wp_factor_enabled', $enabled ? '1' : '0');
+
+        return true;
+    }
+
     // Implementation of abstract methods
 
     /**
