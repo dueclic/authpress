@@ -44,7 +44,7 @@ $pending_email = get_user_meta($current_user_id, 'authpress_pending_email', true
             </div>
 
         <?php else: ?>
-            <div class="notice notice-info inline">
+            <div class="ap-notice ap-notice--success">
                 <p>
                     <?php _e('📧 Email 2FA is available but not enabled.', 'two-factor-login-telegram'); ?><br>
                     <strong><?php _e('Current Email:', 'two-factor-login-telegram'); ?></strong> <?php echo esc_html($auth_email); ?>
