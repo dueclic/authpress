@@ -141,7 +141,7 @@ $user_has_active_methods = $user_config['has_2fa'];
                                                value="1"
                                                <?php
                                                if ($provider_key === 'telegram') {
-                                                   $is_configured = !empty($user_config['chat_id']);
+                                                   $is_configured = !empty(get_user_meta($current_user_id, 'tg_wp_factor_chat_id', true));
                                                    echo 'data-is-configured="' . ($is_configured ? 'true' : 'false') . '" ';
                                                    echo 'data-config-url="' . esc_url(admin_url('options-general.php?page=authpress-conf')) . '"';
                                                }
