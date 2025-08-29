@@ -37,9 +37,6 @@ $pending_email = get_user_meta($current_user_id, 'authpress_pending_email', true
                 <form method="post" action="" class="authpress-disable-form" style="display: inline-block; margin-left: 10px;">
                     <?php wp_nonce_field('wp_factor_disable_email', 'wp_factor_email_disable_nonce'); ?>
                     <input type="hidden" name="wp_factor_action" value="disable_email">
-                    <button type="submit" class="ap-button ap-button--secondary" onclick="return confirm('<?php _e('Are you sure you want to disable Email 2FA?', 'two-factor-login-telegram'); ?>')">
-                        <?php _e('Disable Email 2FA', 'two-factor-login-telegram'); ?>
-                    </button>
                 </form>
             </div>
 
@@ -59,9 +56,6 @@ $pending_email = get_user_meta($current_user_id, 'authpress_pending_email', true
                 <form method="post" action="" id="authpress-enable-email-form" class="authpress-enable-form" style="display: inline-block; margin-left: 10px;">
                     <?php wp_nonce_field('wp_factor_enable_email', 'wp_factor_email_enable_nonce'); ?>
                     <input type="hidden" name="wp_factor_action" value="enable_email">
-                    <button type="submit" class="ap-button ap-button--primary">
-                        <?php _e('Enable Email 2FA', 'two-factor-login-telegram'); ?>
-                    </button>
                 </form>
             </div>
         <?php endif; ?>

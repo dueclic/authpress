@@ -54,6 +54,14 @@
     /* Transitions */
     --ap-transition: all 0.2s ease;
     --ap-transition-slow: all 0.3s ease;
+
+    --ap-email-provider-color-start: #09a3b8;
+    --ap-email-provider-color-end: #16b88a;
+
+    --ap-telegram-provider-color-start: #7c3aed;
+    --ap-telegram-provider-color-end: #6366f1;
+
+
 }
 
 /* ==========================================================================
@@ -61,7 +69,7 @@
    ========================================================================== */
 
 .authpress-ui {
-    font-family: var(--ap-font-family);
+    font-family: var(--ap-font-family), serif;
     color: var(--ap-dark-gray);
     line-height: 1.5;
 }
@@ -549,7 +557,7 @@
 
 /* Telegram provider - purple gradient */
 .provider-card.messaging-provider.telegram-provider {
-    background: linear-gradient(135deg,#6366f1,#7c3aed);
+    background: linear-gradient(90deg,var(--ap-telegram-provider-color-start),var(--ap-telegram-provider-color-end));
 }
 
 .provider-card.messaging-provider.telegram-provider .provider-card__header {
@@ -582,7 +590,7 @@
 
 /* Email provider - blue-teal gradient */
 .provider-card.messaging-provider.email-provider {
-    background: linear-gradient(135deg,#06b6d4,#10b981);
+    background: linear-gradient(90deg,var(--ap-email-provider-color-start),var(--ap-email-provider-color-end));
 }
 
 .provider-card.messaging-provider.email-provider .provider-card__header {

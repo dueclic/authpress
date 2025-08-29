@@ -100,24 +100,26 @@ $user_has_active_methods = $user_config['has_2fa'];
                             $provider_class = $provider_key . '-provider';
 
                             $card_classes = apply_filters('authpress_provider_card_classes',
-                                trim($base_classes . ' ' . $category_class . ' ' . $provider_class),
-                                $provider, $provider_key, $category_key
+                                    trim($base_classes . ' ' . $category_class . ' ' . $provider_class),
+                                    $provider, $provider_key, $category_key
                             );
 
                             $header_style = apply_filters('authpress_provider_header_style', '', $provider, $provider_key, $category_key);
                             ?>
 
-                            <section class="<?php echo $card_classes; ?> <?php echo $col_class; ?> <?php echo $user_has_method ? 'enabled' : 'disabled'; ?>"
-                                     aria-labelledby="provider-<?php echo esc_attr($provider_key); ?>">
+                            <section
+                                    class="<?php echo $card_classes; ?> <?php echo $col_class; ?> <?php echo $user_has_method ? 'enabled' : 'disabled'; ?>"
+                                    aria-labelledby="provider-<?php echo esc_attr($provider_key); ?>">
 
                                 <?php do_action('authpress_provider_card_before_header', $provider, $provider_key, $category_key); ?>
 
                                 <header class="provider-card__header" <?php echo $header_style ? 'style="' . esc_attr($header_style) . '"' : ''; ?>>
-                                    <div class="provider-card__title" id="provider-<?php echo esc_attr($provider_key); ?>-title">
+                                    <div class="provider-card__title"
+                                         id="provider-<?php echo esc_attr($provider_key); ?>-title">
                                         <?php
                                         $icon_html = apply_filters('authpress_provider_icon_html',
-                                            '<span class="icon-circle" aria-hidden="true">📨</span>',
-                                            $provider, $provider_key, $category_key
+                                                '<span class="icon-circle" aria-hidden="true">📨</span>',
+                                                $provider, $provider_key, $category_key
                                         );
                                         echo $icon_html;
                                         ?>
@@ -127,8 +129,8 @@ $user_has_active_methods = $user_config['has_2fa'];
 
                                     <?php
                                     $toggle_label = sprintf(
-                                        $user_has_method ? __('Disable %s for your account', 'two-factor-login-telegram') : __('Enable %s for your account', 'two-factor-login-telegram'),
-                                        $provider->get_name()
+                                            $user_has_method ? __('Disable %s for your account', 'two-factor-login-telegram') : __('Enable %s for your account', 'two-factor-login-telegram'),
+                                            $provider->get_name()
                                     );
                                     $toggle_label = apply_filters('authpress_provider_toggle_label', $toggle_label, $provider, $provider_key, 'user-settings');
                                     ?>
@@ -139,35 +141,47 @@ $user_has_active_methods = $user_config['has_2fa'];
                                                data-user-id="<?php echo esc_attr($current_user_id); ?>"
                                                data-nonce="<?php echo wp_create_nonce('authpress_update_user_provider_status_' . $provider_key); ?>"
                                                value="1"
-                                            <?php checked($user_has_method); ?>>
+                                                <?php checked($user_has_method); ?>>
                                         <span class="ap-slider"></span>
                                     </label>
                                 </header>
 
                                 <?php do_action('authpress_provider_card_after_header', $provider, $provider_key, $category_key); ?>
 
-                                <div class="provider-card__body" id="provider-<?php echo esc_attr($provider_key); ?>-body">
+                                <div class="provider-card__body"
+                                     id="provider-<?php echo esc_attr($provider_key); ?>-body">
                                     <?php
                                     $provider_description = apply_filters('authpress_provider_description',
-                                        $provider->get_description(),
-                                        $provider, $provider_key, $category_key
+                                            $provider->get_description(),
+                                            $provider, $provider_key, $category_key
                                     );
                                     ?>
 
                                     <p class="ap-text mb-16"><?php echo esc_html($provider_description); ?></p>
 
+                                    <?php do_action('authpress_user_provider_settings_pre_content', $provider_key, $provider); ?>
+                                    <?php do_action('authpress_user_provider_settings_' . $provider_key . '_pre_content', $provider); ?>
+
                                     <?php
                                     // Check if provider has custom user template path method
                                     $template_path = $provider->get_user_template_path();
 
-                                    if (file_exists($template_path)) {
-                                        // Load provider-specific user template
-                                        include $template_path;
-                                    } else {
-                                        // Fallback to generic user provider template
-                                        include dirname(WP_FACTOR_TG_FILE) . '/templates/provider-templates/generic-provider.php';
-                                    }
                                     ?>
+
+                                    <div class="provider-config ap-form"
+                                         id="provider-<?php echo esc_attr($provider_key); ?>-config">
+
+                                        <?php
+
+                                        if (file_exists($template_path)) {
+                                            // Load provider-specific user template
+                                            include $template_path;
+                                        } else {
+                                            // Fallback to generic user provider template
+                                            include dirname(WP_FACTOR_TG_FILE) . '/templates/provider-templates/generic-provider.php';
+                                        }
+                                        ?>
+                                    </div>
                                 </div>
 
                                 <?php do_action('authpress_provider_card_before_footer', $provider, $provider_key, $category_key); ?>
@@ -255,7 +269,8 @@ $user_has_active_methods = $user_config['has_2fa'];
                         </div>
 
                         <div class="save-bar">
-                            <button type="button" id="regenerate_recovery_codes_btn" class="ap-button ap-button--primary"
+                            <button type="button" id="regenerate_recovery_codes_btn"
+                                    class="ap-button ap-button--primary"
                                     data-user-id="<?php echo $current_user_id; ?>"
                                     onclick="if(confirm('<?php _e('Are you sure? This will invalidate your current recovery codes and generate new ones that you must save immediately.', 'two-factor-login-telegram'); ?>')) { regenerateRecoveryCodes(); }">
                                 <?php _e('Regenerate Recovery Codes', 'two-factor-login-telegram'); ?>
