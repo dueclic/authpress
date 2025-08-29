@@ -431,7 +431,7 @@ abstract class Abstract_Provider
      * @param int $user_id The user ID
      * @return void
      */
-    public function remove_method_data($user_id){
+    public function disable_user_method($user_id){
 
     }
 

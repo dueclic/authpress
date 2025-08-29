@@ -364,7 +364,7 @@ class AuthPress_AJAX_Handler
 
             if (!isset($user_available_methods[$provider_key]) || !$user_available_methods[$provider_key]) continue;
 
-            $provider->remove_method_data($user_id);
+            $provider->disable_user_method($user_id);
 
         }
 

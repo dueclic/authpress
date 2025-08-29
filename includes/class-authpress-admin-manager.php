@@ -192,7 +192,7 @@ class AuthPress_Admin_Manager
             }
 
             $provider = AuthPress_Provider_Registry::get('telegram');
-            $provider->remove_method_data($user_id);
+            $provider->disable_user_method($user_id);
 
             add_action('admin_notices', function() {
                 echo '<div class="notice notice-success is-dismissible"><p>' . __('Telegram 2FA has been disabled successfully.', 'two-factor-login-telegram') . '</p></div>';
@@ -469,19 +469,15 @@ class AuthPress_Admin_Manager
             return;
         }
 
-        // Call provider's disable method if it exists
-        if (method_exists($provider, 'disable_user_method')) {
-            $success = $provider->disable_user_method($user_id);
-            if ($success) {
-                $provider_name = $provider->get_name();
-                add_action('admin_notices', function() use ($provider_name) {
-                    echo '<div class="notice notice-success is-dismissible"><p>' .
-                        sprintf(__('%s 2FA has been disabled successfully.', 'two-factor-login-telegram'), $provider_name) .
-                        '</p></div>';
-                });
-            }
+        $success = $provider->disable_user_method($user_id);
+        if ($success) {
+            $provider_name = $provider->get_name();
+            add_action('admin_notices', function() use ($provider_name) {
+                echo '<div class="notice notice-success is-dismissible"><p>' .
+                    sprintf(__('%s 2FA has been disabled successfully.', 'two-factor-login-telegram'), $provider_name) .
+                    '</p></div>';
+            });
         }
-
         // Redirect back to My 2FA Settings page to prevent white page
         wp_safe_redirect(admin_url('users.php?page=my-2fa-settings'));
         exit;

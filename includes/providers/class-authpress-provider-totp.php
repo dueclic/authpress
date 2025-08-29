@@ -342,7 +342,7 @@ class TOTP_Provider extends Abstract_Provider
         return true; // TOTP doesn't need external configuration
     }
 
-    public function remove_method_data($user_id)
+    public function disable_user_method($user_id)
     {
         $this->disable_user_totp($user_id);
     }
