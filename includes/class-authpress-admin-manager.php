@@ -6,12 +6,13 @@ use AuthPress\Providers\Abstract_Provider;
 
 class AuthPress_Admin_Manager
 {
-    private $namespace = "tg_col";
-
     /**
      * @var $telegram WP_Telegram
      */
     private $telegram;
+    /**
+     * @var $logger AuthPress_Logger
+     */
     private $logger;
 
     public function __construct($telegram, $logger)

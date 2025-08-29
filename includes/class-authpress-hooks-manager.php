@@ -185,7 +185,7 @@ class AuthPress_Hooks_Manager
         }
     }
 
-    public function handle_telegram_validation($user) {
+    public function handle_telegram_validation() {
         // Only handle if we're on the current user's profile and we have validation parameters
         $current_user_id = get_current_user_id();
         $user_id = isset($_GET['user_id']) ? $_GET['user_id'] : null;

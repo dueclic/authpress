@@ -20,19 +20,19 @@ function render_telegram_instructions($username_link, $is_reconfigure = false) {
         __('Open a conversation with %s and press on <strong>Start</strong>', "two-factor-login-telegram");
 
     if ($is_reconfigure) {
-        echo '<p>' . __('Follow the steps below to change your Telegram Chat ID:', "two-factor-login-telegram") . '</p>';
+        echo '<p class="ap-text">' . __('Follow the steps below to change your Telegram Chat ID:', "two-factor-login-telegram") . '</p>';
     } else {
         echo '<h4 class="ap-heading">' . __('🚀 Setup Steps', "two-factor-login-telegram") . '</h4>';
     }
     ?>
-    <ol>
-        <li><?php printf($first_step, $username_link); ?></li>
-        <li><?php printf(__('Type command %s to get your current Chat ID.', "two-factor-login-telegram"), '<code>/get_id</code>'); ?></li>
+    <ol class="tg-instructions-list">
+        <li class="ap-text"><?php printf($first_step, $username_link); ?></li>
+        <li class="ap-text"><?php printf(__('Type command %s to get your current Chat ID.', "two-factor-login-telegram"), '<code class="tg-code-style">/get_id</code>'); ?></li>
         <?php if (!$is_reconfigure): ?>
-        <li><?php _e("The bot will reply with your <strong>Chat ID</strong> number", "two-factor-login-telegram"); ?></li>
-        <li><?php _e('Copy your Chat ID and paste it below, then press <strong>Submit code</strong>', "two-factor-login-telegram"); ?></li>
+        <li class="ap-text"><?php _e("The bot will reply with your <strong>Chat ID</strong> number", "two-factor-login-telegram"); ?></li>
+        <li class="ap-text"><?php _e('Copy your Chat ID and paste it below, then press <strong>Submit code</strong>', "two-factor-login-telegram"); ?></li>
         <?php else: ?>
-        <li><?php _e('Copy the new Chat ID and paste it below', "two-factor-login-telegram"); ?></li>
+        <li class="ap-text"><?php _e('Copy the new Chat ID and paste it below', "two-factor-login-telegram"); ?></li>
         <?php endif; ?>
     </ol>
     <?php
@@ -48,75 +48,68 @@ function render_telegram_instructions($username_link, $is_reconfigure = false) {
                 <?php _e('Change Chat ID', "two-factor-login-telegram"); ?>
             </button>
 
-            <form method="post" action="" class="authpress-disable-form"
-                  style="display: inline-block; margin-left: 10px;">
+            <form method="post" action="" class="authpress-disable-form ap-form">
                 <?php wp_nonce_field('wp_factor_disable_telegram', 'wp_factor_telegram_disable_nonce'); ?>
                 <input type="hidden" name="wp_factor_action" value="disable_telegram">
             </form>
         </div>
 
         <!-- Hidden reconfiguration section -->
-        <div class="authpress-reconfig" id="telegram-reconfig-section" style="display: none; margin-top: 20px;">
-            <h4><?php _e('Reconfigure Telegram', "two-factor-login-telegram"); ?></h4>
+        <div class="authpress-reconfig ap-container" id="telegram-reconfig-section">
+            <h4 class="ap-heading"><?php _e('Reconfigure Telegram', "two-factor-login-telegram"); ?></h4>
             <div class="tg-setup-steps">
                 <?php render_telegram_instructions($bot_link, true); ?>
             </div>
 
-            <table class="form-table">
-                <tr>
-                    <th>
-                        <label for="tg_wp_factor_chat_id_reconfig"><?php _e('New Telegram Chat ID', "two-factor-login-telegram"); ?></label>
-                    </th>
-                    <td>
-                        <input type="text" name="tg_wp_factor_chat_id_reconfig" id="tg_wp_factor_chat_id_reconfig"
-                               value="" class="regular-text" placeholder="<?php echo esc_attr($telegram_chat_id); ?>"/>
-                        <p class="description"><?php _e('Enter your new Telegram Chat ID', "two-factor-login-telegram"); ?></p>
-                    </td>
-                    <td>
+            <div class="ap-form">
+                <div class="ap-form__group">
+                    <label class="ap-label" for="tg_wp_factor_chat_id_reconfig"><?php _e('New Telegram Chat ID', "two-factor-login-telegram"); ?></label>
+                    <div class="field-row">
+                        <div class="input-container">
+                            <input type="text" name="tg_wp_factor_chat_id_reconfig" id="tg_wp_factor_chat_id_reconfig"
+                                   value="" class="ap-input" placeholder="<?php echo esc_attr($telegram_chat_id); ?>"/>
+                            <p class="ap-text ap-text--small"><?php _e('Enter your new Telegram Chat ID', "two-factor-login-telegram"); ?></p>
+                        </div>
                         <button type="button" class="ap-button ap-button--primary tg-action-button"
                                 id="tg_wp_factor_reconfig_send">
                             <?php _e("Send Test Code", "two-factor-login-telegram"); ?>
                         </button>
-                        <div id="reconfig-status" class="tg-status" style="display: none;"></div>
-                    </td>
-                </tr>
+                    </div>
+                    <div id="reconfig-status" class="tg-status" style="display: none;"></div>
+                </div>
 
-                <tr id="factor-reconfig-confirm" style="display: none;">
-                    <th>
-                        <label for="tg_wp_factor_reconfig_confirm"><?php _e('Confirmation code', "two-factor-login-telegram"); ?></label>
-                    </th>
-                    <td>
-                        <input type="text" name="tg_wp_factor_reconfig_confirm" id="tg_wp_factor_reconfig_confirm"
-                               value="" class="regular-text"/>
-                        <p class="description"><?php _e('Enter the confirmation code you received on Telegram', "two-factor-login-telegram"); ?></p>
-                    </td>
-                    <td>
+                <div class="ap-form__group" id="factor-reconfig-confirm" style="display: none;">
+                    <label class="ap-label" for="tg_wp_factor_reconfig_confirm"><?php _e('Confirmation code', "two-factor-login-telegram"); ?></label>
+                    <div class="field-row">
+                        <div class="input-container">
+                            <input type="text" name="tg_wp_factor_reconfig_confirm" id="tg_wp_factor_reconfig_confirm"
+                                   value="" class="ap-input"/>
+                            <p class="ap-text ap-text--small"><?php _e('Enter the confirmation code you received on Telegram', "two-factor-login-telegram"); ?></p>
+                        </div>
                         <button type="button" class="ap-button ap-button--primary tg-action-button"
                                 id="tg_wp_factor_reconfig_validate">
                             <?php _e("Validate & Save", "two-factor-login-telegram"); ?>
                         </button>
-                        <div id="reconfig-validation-status" class="tg-status" style="display: none;"></div>
-                    </td>
-                </tr>
-            </table>
+                    </div>
+                    <div id="reconfig-validation-status" class="tg-status" style="display: none;"></div>
+                </div>
+            </div>
 
-            <p>
+            <div class="cancel-button">
                 <button type="button" class="ap-button ap-button--secondary" id="cancel-reconfigure">
                     <?php _e('Cancel', "two-factor-login-telegram"); ?>
                 </button>
-            </p>
+            </div>
         </div>
     <?php else: ?>
-        <div class="">
-            <p><?php _e('Configure Telegram to enable this 2FA method.', "two-factor-login-telegram"); ?></p>
+        <div class="authpress-intro">
+            <p class="ap-text"><?php _e('Configure Telegram to enable this 2FA method.', "two-factor-login-telegram"); ?></p>
         </div>
 
         <div class="authpress-setup">
 
             <div class="setup-steps">
-
                 <?php render_telegram_instructions($bot_link); ?>
-
             </div>
 
             <div class="tg-progress">
@@ -124,51 +117,53 @@ function render_telegram_instructions($username_link, $is_reconfigure = false) {
             </div>
 
             <div class="authpress-config">
-                <div class="form-section">
-                    <div class="form-field">
-                        <label for="tg_wp_factor_chat_id"><?php _e('Telegram Chat ID', "two-factor-login-telegram"); ?></label>
+                <div class="ap-form">
+                    <div class="ap-form__group">
+                        <label class="ap-label" for="tg_wp_factor_chat_id"><?php _e('Telegram Chat ID', "two-factor-login-telegram"); ?></label>
                         <div class="field-row">
-                            <input type="text" name="tg_wp_factor_chat_id"
-                                   id="tg_wp_factor_chat_id" value="<?php echo $telegram_chat_id; ?>"
-                                   class="regular-text"/>
+                            <div class="input-container">
+                                <input type="text" name="tg_wp_factor_chat_id"
+                                       id="tg_wp_factor_chat_id" value="<?php echo $telegram_chat_id; ?>"
+                                       class="ap-input"/>
+                                <span class="ap-text ap-text--small"><?php _e('Put your Telegram Chat ID', "two-factor-login-telegram"); ?></span>
+                            </div>
                             <button type="button" class="ap-button ap-button--primary tg-action-button"
-                                    id="tg_wp_factor_chat_id_send"><?php
-_e("Submit code", "two-factor-login-telegram"); ?></button>
+                                    id="tg_wp_factor_chat_id_send"><?php _e("Submit code", "two-factor-login-telegram"); ?></button>
                         </div>
-                        <span class="description"><?php _e('Put your Telegram Chat ID', "two-factor-login-telegram"); ?></span>
                         <div id="chat-id-status" class="tg-status" style="display: none;"></div>
                     </div>
 
-                    <div class="form-field" id="factor-chat-confirm" style="display: none;">
-                        <label for="tg_wp_factor_chat_id_confirm"><?php _e('Confirmation code', "two-factor-login-telegram"); ?></label>
+                    <div class="ap-form__group" id="factor-chat-confirm" style="display: none;">
+                        <label class="ap-label" for="tg_wp_factor_chat_id_confirm"><?php _e('Confirmation code', "two-factor-login-telegram"); ?></label>
                         <div class="field-row">
-                            <input type="text" name="tg_wp_factor_chat_id_confirm"
-                                   id="tg_wp_factor_chat_id_confirm" value=""
-                                   class="regular-text"/>
+                            <div class="input-container">
+                                <input type="text" name="tg_wp_factor_chat_id_confirm"
+                                       id="tg_wp_factor_chat_id_confirm" value=""
+                                       class="ap-input"/>
+                                <span class="ap-text ap-text--small"><?php _e('Please enter the confirmation code you received on Telegram', "two-factor-login-telegram"); ?></span>
+                            </div>
                             <button type="button" class="ap-button ap-button--primary tg-action-button"
-                                    id="tg_wp_factor_chat_id_check"><?php
-_e("Validate", "two-factor-login-telegram"); ?></button>
+                                    id="tg_wp_factor_chat_id_check"><?php _e("Validate", "two-factor-login-telegram"); ?></button>
                         </div>
-                        <span class="description"><?php _e('Please enter the confirmation code you received on Telegram', "two-factor-login-telegram"); ?></span>
                         <div id="validation-status" class="tg-status" style="display: none;"></div>
                     </div>
 
-                    <div class="form-field" id="factor-chat-response" style="display: none;">
-                        <div class="wpft-notice wpft-notice-warning">
+                    <div class="ap-form__group" id="factor-chat-response" style="display: none;">
+                        <div class="ap-notice ap-notice--warning">
                             <p></p>
                         </div>
                     </div>
 
-                    <div class="form-field" id="factor-chat-save" style="display: none;">
-                        <form method="post" action="" class="authpress-save-form">
+                    <div class="ap-form__group" id="factor-chat-save" style="display: none;">
+                        <form method="post" action="" class="authpress-save-form ap-form">
                             <?php wp_nonce_field('wp_factor_save_telegram', 'wp_factor_telegram_save_nonce'); ?>
                             <input type="hidden" name="wp_factor_action" value="save_telegram">
                             <input type="hidden" name="tg_chat_id" id="tg_chat_id_hidden" value="">
-                            <p class="submit">
+                            <div class="submit">
                                 <button type="submit" class="ap-button ap-button--primary">
                                     <?php _e('Save Telegram Configuration', "two-factor-login-telegram"); ?>
                                 </button>
-                            </p>
+                            </div>
                         </form>
                     </div>
                 </div>
