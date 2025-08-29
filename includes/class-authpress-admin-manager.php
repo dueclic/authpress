@@ -378,7 +378,7 @@ class AuthPress_Admin_Manager
         $sanitized['telegram'] = array(
             'enabled' => isset($input['telegram']['enabled']) ? true : false,
             'bot_token' => isset($input['telegram']['bot_token']) ? sanitize_text_field($input['telegram']['bot_token']) : '',
-            'failed_login_reports' => isset($input['telegram']['failed_login_reports']) ? true : false,
+            'failed_login_reports' => isset($input['telegram']['failed_login_reports']) &&  $input['telegram']['failed_login_reports'],
             'report_chat_id' => isset($input['telegram']['report_chat_id']) ? sanitize_text_field($input['telegram']['report_chat_id']) : ''
         );
 
