@@ -375,32 +375,9 @@
     border: 1px solid #ffeeba;
 }
 
-.tg-status::before {
-    content: '';
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    margin-right: 8px;
-}
-
-.tg-status.success::before {
-    background: #28a745;
-}
-
-.tg-status.error::before {
-    background: #dc3545;
-}
-
-.tg-status.warning::before {
-    background: #ffc107;
-}
-
 /* Confirmation field improvements */
 #factor-chat-confirm {
-    background: #f8f9fa;
     border-radius: 8px;
-    padding: 15px;
-    border: 1px solid #e9ecef;
     margin-top: 15px;
 }
 
