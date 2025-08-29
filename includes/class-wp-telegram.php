@@ -255,9 +255,6 @@ class WP_Telegram {
 			return false;
 		}
 
-		// Get legacy options for backward compatibility
-		$options = get_option($this->namespace);
-
 		/**
 		 * @from 1.2
 		 * Get IP address behind CloudFlare proxy
@@ -266,8 +263,11 @@ class WP_Telegram {
 		// Get IP from computer attempting to login
 		$ip_address = (isset($_SERVER["HTTP_CF_CONNECTING_IP"]) ? wp_unslash($_SERVER["HTTP_CF_CONNECTING_IP"]) : wp_unslash($_SERVER['REMOTE_ADDR']));
 
+        $show_site_name = apply_filters('authpress_provider_telegram_show_site_name', true);
+        $show_site_url = apply_filters('authpress_provider_telegram_show_site_url', true);
 
-		 if ( $options['show_site_name'] === '1' && $options['show_site_url'] === '1' ) {
+
+		 if ( $show_site_name && $show_site_url ) {
 
 			// Get site name
 			$site_name = get_bloginfo('name');
@@ -285,7 +285,7 @@ class WP_Telegram {
 				__("IP Address", "two-factor-login-telegram"), $ip_address
 			);
 
-		 } elseif ( $options['show_site_name'] === '1' ) {
+		 } elseif ( $show_site_name ) {
 
 			// Get site name
 			$site_name = get_bloginfo('name');
@@ -299,7 +299,7 @@ class WP_Telegram {
 				__("IP Address", "two-factor-login-telegram"), $ip_address
 			);
 
-		} elseif ( $options['show_site_url'] === '1' ) {
+		} elseif ( $show_site_url ) {
 
 			// Get site URL
 			$site_url = home_url();
