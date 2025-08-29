@@ -311,20 +311,6 @@ $user_has_active_methods = $user_config['has_2fa'];
                     return;
                 }
 
-                // Special handling for enabling the telegram provider
-                if (providerKey === 'telegram' && isEnabled) {
-                    const isConfigured = this.dataset.isConfigured === 'true';
-                    if (!isConfigured) {
-                        event.preventDefault();
-                        this.checked = false; // Revert toggle
-                        const configUrl = this.dataset.configUrl;
-                        if (confirm('<?php _e('This method must be configured before it can be enabled. Click OK to go to settings.', 'two-factor-login-telegram'); ?>')) {
-                            window.location.href = configUrl;
-                        }
-                        return;
-                    }
-                }
-
                 const userId = this.dataset.userId;
                 const nonce = this.dataset.nonce;
 
