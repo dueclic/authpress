@@ -18,7 +18,7 @@ $telegram_settings = $providers['telegram'] ?? [];
                value="<?php echo esc_attr($telegram_settings['bot_token'] ?? ''); ?>"/>
         <?php if (!empty($telegram_settings['bot_token']) && $this->is_valid_bot_for_providers($telegram_settings['bot_token'])) { ?>
             <div class="ap-notice ap-notice--success mt-8">
-                <span>✔ <?php echo sprintf(__("Bot token is valid (Bot name: @%s)", "two-factor-login-telegram"), $this->telegram->get_me()->username ); ?></span>
+                <span>✔ <?php echo sprintf(__("Bot token is valid (Bot name: @%s)", "two-factor-login-telegram"), $this->telegram->get_me()->username); ?></span>
             </div>
         <?php } elseif (!empty($telegram_settings['bot_token'])) { ?>
             <div class="ap-notice ap-notice--error mt-8">
@@ -35,15 +35,18 @@ $telegram_settings = $providers['telegram'] ?? [];
             <option value="1" <?php selected($telegram_settings['failed_login_reports'] ?? false, true); ?>><?php _e("Send notifications about failed login attempts", "two-factor-login-telegram"); ?></option>
         </select>
     </div>
-    <?php if ($telegram_settings['failed_login_reports'] ?? false) { ?>
-        <div class="ap-form__group">
-            <label class="ap-label"
-                   for="telegram_report_chat_id"><?php _e("Report Chat ID", "two-factor-login-telegram"); ?></label>
-            <input id="telegram_report_chat_id" class="ap-input"
-                   name="wp_factor_providers[telegram][report_chat_id]"
-                   type="text"
-                   placeholder="<?php _e("Enter your Telegram Chat ID", "two-factor-login-telegram"); ?>"
-                   value="<?php echo esc_attr($telegram_settings['report_chat_id'] ?? ''); ?>"/>
-        </div>
-    <?php } ?>
+
+    <?php
+    $show_failed_Login_reports = $telegram_settings['failed_login_reports'] ?? false;
+    ?>
+
+    <div class="ap-form__group <?php if (!$show_failed_Login_reports) { ?>hidden<?php } ?>">
+        <label class="ap-label"
+               for="telegram_report_chat_id"><?php _e("Report Chat ID", "two-factor-login-telegram"); ?></label>
+        <input id="telegram_report_chat_id" class="ap-input"
+               name="wp_factor_providers[telegram][report_chat_id]"
+               type="text"
+               placeholder="<?php _e("Enter your Telegram Chat ID", "two-factor-login-telegram"); ?>"
+               value="<?php echo esc_attr($telegram_settings['report_chat_id'] ?? ''); ?>"/>
+    </div>
 </div>

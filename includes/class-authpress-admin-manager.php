@@ -382,6 +382,10 @@ class AuthPress_Admin_Manager
             'report_chat_id' => isset($input['telegram']['report_chat_id']) ? sanitize_text_field($input['telegram']['report_chat_id']) : ''
         );
 
+        if (empty($sanitized['telegram']['report_chat_id'])){
+            $sanitized['telegram']['failed_login_reports'] = false;
+        }
+
         $sanitized['email'] = array(
             'enabled' => isset($input['email']['enabled']) ? true : false,
             'token_duration' => isset($input['email']['token_duration']) ? absint($input['email']['token_duration']) : 20

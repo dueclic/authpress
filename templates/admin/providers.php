@@ -149,6 +149,13 @@ $provider_categories = authpress_provider_categories(
                                 </button>
                                 <div class="provider-config ap-form" id="provider-<?php echo esc_attr($provider_key); ?>-config" style="display: none;">
                                     <?php include $config_template; ?>
+
+                                    <?php
+                                    $submit_text = apply_filters('authpress_provider_settings_save_button_text', __('Save', 'two-factor-login-telegram'), $provider_key, $provider);
+
+                                    ?>
+
+                                    <input type="submit" class="ap-button ap-button--primary" value="<?php echo esc_attr($submit_text); ?>"/>
                                 </div>
                             <?php endif; ?>
                             <?php
@@ -184,21 +191,6 @@ $provider_categories = authpress_provider_categories(
                 <?php endforeach; ?>
             </div>
         <?php endforeach; ?>
-
-        <?php do_action('authpress_providers_form_before_submit'); ?>
-
-        <div class="save-bar">
-            <?php
-            $submit_text = apply_filters('authpress_providers_submit_text', __('Save Providers Configuration', 'two-factor-login-telegram'));
-            $cancel_text = apply_filters('authpress_providers_cancel_text', __('Cancel', 'two-factor-login-telegram'));
-            ?>
-
-            <?php if (apply_filters('authpress_providers_show_cancel_button', false)): ?>
-                <button type="button" class="ap-button ap-button--secondary"><?php echo esc_html($cancel_text); ?></button>
-            <?php endif; ?>
-
-            <input type="submit" class="ap-button ap-button--primary" value="<?php echo esc_attr($submit_text); ?>"/>
-        </div>
 
         <?php do_action('authpress_providers_form_end'); ?>
     </form>
@@ -246,6 +238,15 @@ document.addEventListener('DOMContentLoaded', function() {
                 targetElement.style.display = 'block';
                 this.setAttribute('aria-expanded', 'true');
             }
+        });
+    });
+
+    // Auto-submit form when provider checkboxes are toggled
+    const providerCheckboxes = document.querySelectorAll('input[type="checkbox"][name*="wp_factor_providers"][name*="[enabled]"]');
+    
+    providerCheckboxes.forEach(checkbox => {
+        checkbox.addEventListener('change', function() {
+            this.form.submit();
         });
     });
 });

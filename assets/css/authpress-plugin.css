@@ -609,3 +609,7 @@
 .authpress-provider-options .authpress-provider-option {
     display: block;
 }
+
+.provider-card.authenticator-provider .provider-features .ap-label {
+    color: #000;
+}
