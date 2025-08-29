@@ -56,7 +56,7 @@ $pending_email = get_user_meta($current_user_id, 'authpress_pending_email', true
                  <button type="button" class="button button-primary" id="reconfigure-email">
                     <?php _e('Set Authentication Email', 'two-factor-login-telegram'); ?>
                 </button>
-                <form method="post" action="" class="authpress-enable-form" style="display: inline-block; margin-left: 10px;">
+                <form method="post" action="" id="authpress-enable-email-form" class="authpress-enable-form" style="display: inline-block; margin-left: 10px;">
                     <?php wp_nonce_field('wp_factor_enable_email', 'wp_factor_email_enable_nonce'); ?>
                     <input type="hidden" name="wp_factor_action" value="enable_email">
                     <button type="submit" class="button button-primary">
