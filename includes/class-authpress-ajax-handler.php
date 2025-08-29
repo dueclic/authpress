@@ -346,8 +346,28 @@ class AuthPress_AJAX_Handler
             wp_die(__('Security verification failed', 'two-factor-login-telegram'));
         }
 
-        update_user_meta($user_id, 'tg_wp_factor_enabled', '0');
-        delete_user_meta($user_id, 'tg_wp_factor_chat_id');
+        $user_available_methods = AuthPress_User_Manager::get_user_available_methods($user_id);
+        $available_providers = AuthPress_Provider_Registry::get_available();
+
+
+        foreach ($available_providers as $provider_key => $provider){
+
+            if ($provider_key === 'authenticator') {
+                $provider_key = 'totp';
+            }
+
+            $provider_key = apply_filters('authpress_provider_key', $provider_key, $provider);
+
+            $provider_sections_disabled = apply_filters('authpress_provider_login_section_disabled', []);
+
+            if (in_array($provider_key, $provider_sections_disabled)) continue;
+
+            if (!isset($user_available_methods[$provider_key]) || !$user_available_methods[$provider_key]) continue;
+
+            $provider->remove_method_data($user_id);
+
+        }
+
 
         $user = get_userdata($user_id);
         $current_user = wp_get_current_user();
@@ -364,7 +384,6 @@ class AuthPress_AJAX_Handler
             'new_status' => '<span style="color: #ccc;">❌ ' . __('Inactive', 'two-factor-login-telegram') . '</span>'
         ));
     }
-	// For testin email service
 	public function handle_test_email()
 	{
 		if (!is_user_logged_in() || !current_user_can('manage_options')) {

@@ -343,4 +343,9 @@ class Email_Provider extends Abstract_Provider implements Provider_Otp_Interface
     {
         return __("Receive authentication codes via email messages", "two-factor-login-telegram");
     }
+
+    public function remove_method_data($user_id){
+        delete_user_meta($user_id, 'wp_factor_email_enabled');
+    }
+
 }

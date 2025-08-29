@@ -191,8 +191,9 @@ class AuthPress_Admin_Manager
                 return;
             }
 
-            update_user_meta($user_id, 'tg_wp_factor_enabled', '0');
-            delete_user_meta($user_id, 'tg_wp_factor_chat_id');
+            $provider = AuthPress_Provider_Registry::get('telegram');
+            $provider->remove_method_data($user_id);
+
             add_action('admin_notices', function() {
                 echo '<div class="notice notice-success is-dismissible"><p>' . __('Telegram 2FA has been disabled successfully.', 'two-factor-login-telegram') . '</p></div>';
             });

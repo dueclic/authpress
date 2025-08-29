@@ -425,4 +425,14 @@ abstract class Abstract_Provider
 
         return $result1 !== false || $result2 !== false;
     }
+
+    /**
+     * Delete all codes for a user
+     * @param int $user_id The user ID
+     * @return void
+     */
+    public function remove_method_data($user_id){
+
+    }
+
 }
