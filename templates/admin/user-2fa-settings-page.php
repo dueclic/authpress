@@ -292,11 +292,27 @@ $user_has_active_methods = $user_config['has_2fa'];
         const toggles = document.querySelectorAll('.authpress-user-provider-toggle');
 
         toggles.forEach(toggle => {
-            toggle.addEventListener('change', function () {
+            toggle.addEventListener('change', function (event) {
                 const providerKey = this.dataset.providerKey;
+                const isEnabled = this.checked;
+
+                // Special handling for enabling the email provider
+                if (providerKey === 'email' && isEnabled) {
+                    event.preventDefault();
+                    const enableForm = document.getElementById('authpress-enable-email-form');
+                    if (enableForm) {
+                        this.disabled = true;
+                        enableForm.submit();
+                    } else {
+                        console.error('AuthPress: Could not find the email enable form.');
+                        alert('<?php _e('An error occurred. The email enable form was not found.', 'two-factor-login-telegram'); ?>');
+                        this.checked = false; // Revert the toggle
+                    }
+                    return;
+                }
+
                 const userId = this.dataset.userId;
                 const nonce = this.dataset.nonce;
-                const isEnabled = this.checked;
 
                 const data = new URLSearchParams();
                 data.append('action', 'authpress_update_user_provider_status');
