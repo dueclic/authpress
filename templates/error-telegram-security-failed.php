@@ -14,8 +14,7 @@ if (!defined('ABSPATH')) {
 $title = __('Security Error', 'two-factor-login-telegram');
 $message = __('Security check failed. The link may have expired or been tampered with.', 'two-factor-login-telegram');
 // Get plugin logo
-$plugin_logo = apply_filters('two_factor_login_telegram_logo',
-    plugins_url('assets/img/plugin_logo.png', WP_FACTOR_TG_FILE));
+$plugin_logo = authpress_logo();
 
 // Set HTTP response code
 http_response_code(403);
@@ -28,7 +27,7 @@ http_response_code(403);
     <title><?php echo esc_html($title); ?> - <?php bloginfo('name'); ?></title>
     <?php wp_head(); ?>
     <style>
-        body { 
+        body {
             font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;
             margin: 0;
             padding: 20px;
