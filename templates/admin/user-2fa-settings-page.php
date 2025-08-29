@@ -139,6 +139,13 @@ $user_has_active_methods = $user_config['has_2fa'];
                                                data-user-id="<?php echo esc_attr($current_user_id); ?>"
                                                data-nonce="<?php echo wp_create_nonce('authpress_update_user_provider_status_' . $provider_key); ?>"
                                                value="1"
+                                               <?php
+                                               if ($provider_key === 'telegram') {
+                                                   $is_configured = !empty($user_config['chat_id']);
+                                                   echo 'data-is-configured="' . ($is_configured ? 'true' : 'false') . '" ';
+                                                   echo 'data-config-url="' . esc_url(admin_url('options-general.php?page=authpress-conf')) . '"';
+                                               }
+                                               ?>
                                             <?php checked($user_has_method); ?>>
                                         <span class="ap-slider"></span>
                                     </label>
