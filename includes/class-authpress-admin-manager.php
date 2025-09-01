@@ -101,7 +101,7 @@ class AuthPress_Admin_Manager
      */
     private function can_disable_provider($user_id, $provider_key)
     {
-        $user_default_provider = get_user_meta($user_id, 'wp_factor_user_default_provider', true);
+        $user_default_provider = get_user_meta($user_id, 'authpress_default_provider', true);
 
         // If no user default is set, any provider can be disabled
         if (empty($user_default_provider)) {
@@ -226,7 +226,7 @@ class AuthPress_Admin_Manager
             }
 
             if (in_array($default_provider, $valid_providers)) {
-                update_user_meta($user_id, 'wp_factor_user_default_provider', $default_provider);
+                update_user_meta($user_id, 'authpress_default_provider', $default_provider);
 
                 // Get provider display name dynamically
                 $provider_name = $this->get_provider_display_name($default_provider);
@@ -283,7 +283,7 @@ class AuthPress_Admin_Manager
 
     public function register_providers_settings()
     {
-        register_setting('wp_factor_providers', 'wp_factor_providers', array(
+        register_setting('authpress_providers', 'authpress_providers', array(
             'sanitize_callback' => array($this, 'sanitize_providers_settings')
         ));
     }

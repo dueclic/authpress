@@ -12,7 +12,7 @@ $telegram_settings = $providers['telegram'] ?? [];
     <div class="ap-form__group">
         <label class="ap-label" for="telegram_bot_token"><?php _e("Bot Token", "two-factor-login-telegram"); ?></label>
         <input id="telegram_bot_token" class="ap-input"
-               name="wp_factor_providers[telegram][bot_token]"
+               name="authpress_providers[telegram][bot_token]"
                type="text"
                placeholder="123456:ABC-DEF1234ghIkl-zyx57W2v1u123ew11"
                value="<?php echo esc_attr($telegram_settings['bot_token'] ?? ''); ?>"/>
@@ -30,7 +30,7 @@ $telegram_settings = $providers['telegram'] ?? [];
         <label class="ap-label"
                for="telegram_failed_login_reports"><?php _e("Failed Login Reports", "two-factor-login-telegram"); ?></label>
         <select id="telegram_failed_login_reports" class="ap-select__control"
-                name="wp_factor_providers[telegram][failed_login_reports]">
+                name="authpress_providers[telegram][failed_login_reports]">
             <option value="0" <?php selected($telegram_settings['failed_login_reports'] ?? false, false); ?>><?php _e("Disabled", "two-factor-login-telegram"); ?></option>
             <option value="1" <?php selected($telegram_settings['failed_login_reports'] ?? false, true); ?>><?php _e("Send notifications about failed login attempts", "two-factor-login-telegram"); ?></option>
         </select>
@@ -44,7 +44,7 @@ $telegram_settings = $providers['telegram'] ?? [];
         <label class="ap-label"
                for="telegram_report_chat_id"><?php _e("Report Chat ID", "two-factor-login-telegram"); ?></label>
         <input id="telegram_report_chat_id" class="ap-input"
-               name="wp_factor_providers[telegram][report_chat_id]"
+               name="authpress_providers[telegram][report_chat_id]"
                type="text"
                placeholder="<?php _e("Enter your Telegram Chat ID", "two-factor-login-telegram"); ?>"
                value="<?php echo esc_attr($telegram_settings['report_chat_id'] ?? ''); ?>"/>

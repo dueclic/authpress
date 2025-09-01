@@ -123,7 +123,7 @@ final class AuthPress_Plugin
                         $new_providers['telegram']['failed_login_reports'] = true;
                     }
 
-                    update_option('wp_factor_providers', $new_providers);
+                    update_option('authpress_providers', $new_providers);
 
                     add_action('admin_notices', function() {
                         echo '<div class="notice notice-success is-dismissible">';

@@ -37,7 +37,7 @@ $provider_categories = authpress_provider_categories(
     <?php do_action('authpress_providers_page_notices'); ?>
 
     <form method="post" action="<?php echo admin_url('options.php'); ?>">
-        <?php settings_fields('wp_factor_providers'); ?>
+        <?php settings_fields('authpress_providers'); ?>
         <?php do_action('authpress_providers_form_start'); ?>
 
         <?php foreach ($provider_categories as $category_key => $category): ?>
@@ -99,7 +99,7 @@ $provider_categories = authpress_provider_categories(
 
                             <label class="ap-switch" aria-label="<?php echo esc_attr($toggle_label); ?>">
                                 <input type="checkbox"
-                                       name="wp_factor_providers[<?php echo esc_attr($provider->get_key()); ?>][enabled]"
+                                       name="authpress_providers[<?php echo esc_attr($provider->get_key()); ?>][enabled]"
                                        value="1"
                                        <?php checked($is_enabled); ?>>
                                 <span class="ap-slider"></span>
@@ -242,7 +242,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // Auto-submit form when provider checkboxes are toggled
-    const providerCheckboxes = document.querySelectorAll('input[type="checkbox"][name*="wp_factor_providers"][name*="[enabled]"]');
+    const providerCheckboxes = document.querySelectorAll('input[type="checkbox"][name*="authpress_providers"][name*="[enabled]"]');
     
     providerCheckboxes.forEach(checkbox => {
         checkbox.addEventListener('change', function() {

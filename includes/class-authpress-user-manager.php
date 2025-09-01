@@ -209,7 +209,7 @@ final class AuthPress_User_Manager
     public static function get_user_effective_provider($user_id)
     {
         // Get user preference
-        $user_preference = get_user_meta($user_id, 'wp_factor_user_default_provider', true);
+        $user_preference = get_user_meta($user_id, 'authpress_default_provider', true);
 
         // Get system default
         $system_default = self::get_system_default_provider();

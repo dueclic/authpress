@@ -239,13 +239,13 @@ class SMS_Aimon_Provider extends Abstract_Provider
 
 ### Integrated Configuration
 
-Since version 3.6.0, all external providers are configured directly in the AuthPress providers interface. Provider settings are stored in the main `wp_factor_providers` option:
+Since version 3.6.0, all external providers are configured directly in the AuthPress providers interface. Provider settings are stored in the main `authpress_providers` option:
 
 ```php
 // Retrieve provider configuration from AuthPress settings
 public function is_configured()
 {
-    $providers = get_option('wp_factor_providers', []);
+    $providers = get_option('authpress_providers', []);
     $config = $providers[$this->get_key()] ?? [];
     
     return !empty($config['api_key']) && !empty($config['other_setting']);
@@ -253,7 +253,7 @@ public function is_configured()
 
 public function send_code($code, $user_id, $options = [])
 {
-    $providers = get_option('wp_factor_providers', []);
+    $providers = get_option('authpress_providers', []);
     $config = $providers[$this->get_key()] ?? [];
     
     $api_key = $config['api_key'] ?? '';
@@ -281,7 +281,7 @@ $api_key = $current_config['api_key'] ?? '';
         <strong><?php _e('API Key:', 'my-textdomain'); ?></strong>
     </label>
     <input type="password" 
-           name="wp_factor_providers[<?php echo esc_attr($provider->get_key()); ?>][api_key]" 
+           name="authpress_providers[<?php echo esc_attr($provider->get_key()); ?>][api_key]" 
            id="my_provider_api_key"
            value="<?php echo esc_attr($api_key); ?>" 
            class="regular-text" />

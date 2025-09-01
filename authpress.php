@@ -100,7 +100,7 @@ function authpress_provider_categories(
 function authpress_providers()
 {
 
-    $authpress_providers = get_option('wp_factor_providers', array(
+    $authpress_providers = get_option('authpress_providers', array(
         'authenticator' => array('enabled' => false),
         'telegram' => array('enabled' => false, 'bot_token' => '', 'failed_login_reports' => false),
         'email' => array('enabled' => false)

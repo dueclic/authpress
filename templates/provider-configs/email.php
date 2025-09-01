@@ -17,7 +17,7 @@ $token_duration = $email_settings['token_duration'] ?? 20; // Default to 20 minu
 	<div class="ap-form">
 		<div class="ap-form__group">
 			<input id="email_token_duration" class="ap-input"
-			       name="wp_factor_providers[email][token_duration]"
+			       name="authpress_providers[email][token_duration]"
 			       type="number"
 			       value="<?php echo esc_attr($token_duration); ?>"/>
 		</div>

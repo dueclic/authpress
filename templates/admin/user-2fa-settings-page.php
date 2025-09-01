@@ -28,7 +28,7 @@ if ($recovery_provider) {
 }
 
 // Get user's preferred default provider
-$user_default_provider = get_user_meta($current_user_id, 'wp_factor_user_default_provider', true);
+$user_default_provider = get_user_meta($current_user_id, 'authpress_default_provider', true);
 if (empty($user_default_provider)) {
     $user_default_provider = $plugin->get_default_provider();
 }
