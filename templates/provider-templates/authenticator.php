@@ -18,16 +18,6 @@ if (!defined('ABSPATH')) {
         <div class="notice notice-success inline">
             <p><?php _e('✅ Authenticator app is configured and active.', 'two-factor-login-telegram'); ?></p>
         </div>
-
-        <form method="post" action="" class="authpress-disable-form">
-            <?php wp_nonce_field('wp_factor_disable_totp', 'wp_factor_totp_disable_nonce'); ?>
-            <input type="hidden" name="wp_factor_action" value="disable_totp">
-            <p>
-                <button type="submit" class="button button-secondary" onclick="return confirm('<?php _e('Are you sure you want to disable the authenticator app?', 'two-factor-login-telegram'); ?>')">
-                    <?php _e('Disable Authenticator App', 'two-factor-login-telegram'); ?>
-                </button>
-            </p>
-        </form>
     <?php else: ?>
         <div class="notice notice-info inline">
             <p><?php _e('Configure your authenticator app to enable this 2FA method.', 'two-factor-login-telegram'); ?></p>

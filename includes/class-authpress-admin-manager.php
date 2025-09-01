@@ -151,70 +151,6 @@ class AuthPress_Admin_Manager
         });
     }
 
-    private function handle_disable_totp($user_id)
-    {
-        if (wp_verify_nonce($_POST['wp_factor_totp_disable_nonce'], 'wp_factor_disable_totp')) {
-            if (!$this->can_disable_provider($user_id, 'totp')) {
-                $this->show_provider_disable_error(__('Authenticator app', 'two-factor-login-telegram'));
-                return;
-            }
-
-            $totp = AuthPress_Auth_Factory::create(AuthPress_Auth_Factory::METHOD_TOTP);
-            if ($totp->disable_user_method($user_id)) {
-                add_action('admin_notices', function() {
-                    echo '<div class="notice notice-success is-dismissible"><p>' . __('Authenticator app has been disabled successfully.', 'two-factor-login-telegram') . '</p></div>';
-                });
-            }
-        }
-    }
-
-    private function handle_disable_telegram($user_id)
-    {
-        if (wp_verify_nonce($_POST['wp_factor_telegram_disable_nonce'], 'wp_factor_disable_telegram')) {
-            if (!$this->can_disable_provider($user_id, 'telegram')) {
-                $this->show_provider_disable_error(__('Telegram', 'two-factor-login-telegram'));
-                return;
-            }
-
-            $provider = AuthPress_Provider_Registry::get('telegram');
-            $provider->disable_user_method($user_id);
-
-            add_action('admin_notices', function() {
-                echo '<div class="notice notice-success is-dismissible"><p>' . __('Telegram 2FA has been disabled successfully.', 'two-factor-login-telegram') . '</p></div>';
-            });
-        }
-    }
-
-    private function handle_enable_email($user_id)
-    {
-        if (wp_verify_nonce($_POST['wp_factor_email_enable_nonce'], 'wp_factor_enable_email')) {
-            if (AuthPress_User_Manager::enable_user_email($user_id)) {
-                add_action('admin_notices', function() {
-                    echo '<div class="notice notice-success is-dismissible"><p>' . __('Email 2FA has been enabled successfully.', 'two-factor-login-telegram') . '</p></div>';
-                });
-            } else {
-                add_action('admin_notices', function() {
-                    echo '<div class="notice notice-error is-dismissible"><p>' . __('Failed to enable Email 2FA. Please ensure you have a valid email address.', 'two-factor-login-telegram') . '</p></div>';
-                });
-            }
-        }
-    }
-
-    private function handle_disable_email($user_id)
-    {
-        if (wp_verify_nonce($_POST['wp_factor_email_disable_nonce'], 'wp_factor_disable_email')) {
-            if (!$this->can_disable_provider($user_id, 'email')) {
-                $this->show_provider_disable_error(__('Email', 'two-factor-login-telegram'));
-                return;
-            }
-
-            AuthPress_User_Manager::disable_user_email($user_id);
-            add_action('admin_notices', function() {
-                echo '<div class="notice notice-success is-dismissible"><p>' . __('Email 2FA has been disabled successfully.', 'two-factor-login-telegram') . '</p></div>';
-            });
-        }
-    }
-
 
     private function handle_save_telegram($user_id)
     {
@@ -433,7 +369,6 @@ class AuthPress_Admin_Manager
             return;
         }
 
-        // Check if provider can be disabled
         if (!$this->can_disable_provider($user_id, $provider_key)) {
             $provider_name = $this->get_provider_display_name($provider_key);
             $this->show_provider_disable_error($provider_name);

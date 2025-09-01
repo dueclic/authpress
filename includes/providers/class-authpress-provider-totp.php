@@ -205,7 +205,7 @@ class TOTP_Provider extends Abstract_Provider
 
     public function is_user_configured($user_id)
     {
-        return !empty(get_user_meta($user_id, 'wp_factor_totp_secret', true));
+        return $this->is_user_totp_enabled($user_id) && !empty(get_user_meta($user_id, 'wp_factor_totp_secret', true));
     }
 
 

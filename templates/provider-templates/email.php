@@ -37,10 +37,6 @@ $pending_email = get_user_meta($current_user_id, 'authpress_pending_email', true
                         <?php _e('Reset to default mail', 'two-factor-login-telegram'); ?>
                     </button>
                 <?php endif; ?>
-                <form method="post" action="" class="authpress-disable-form" style="display: inline-block; margin-left: 10px;">
-                    <?php wp_nonce_field('wp_factor_disable_email', 'wp_factor_email_disable_nonce'); ?>
-                    <input type="hidden" name="wp_factor_action" value="disable_email">
-                </form>
             </div>
 
         <?php else: ?>

@@ -512,7 +512,6 @@ class AuthPress_AJAX_Handler
         }
 
         $is_enabled = isset($_POST['enabled']) && $_POST['enabled'] === '1';
-        $result = false;
 
         $provider = AuthPress_Provider_Registry::get($provider_key);
 
