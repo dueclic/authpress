@@ -20,8 +20,11 @@ $pending_email = get_user_meta($current_user_id, 'authpress_pending_email', true
 
 <div class="authpress-section">
 
-    <?php if ($email_user_available): ?>
-        <?php if ($user_has_method): ?>
+
+    <p class="ap-text mb-8"><?php _e('Current Email:', 'two-factor-login-telegram'); ?> <?php echo esc_html($auth_email); ?></p>
+    <p class="ap-text mb-8"><?php _e('You can specify a different email address for receiving authentication codes. If left blank, your primary WordPress email will be used.', 'two-factor-login-telegram'); ?></p>
+
+    <?php if ($user_has_method): ?>
 
             <div class="authpress-actions mt-8">
                 <button type="button" class="ap-button ap-button--primary" id="reconfigure-email">
@@ -41,14 +44,6 @@ $pending_email = get_user_meta($current_user_id, 'authpress_pending_email', true
             </div>
 
         <?php else: ?>
-            <div class="ap-notice ap-notice--success">
-                <p>
-                    <?php _e('📧 Email 2FA is available but not enabled.', 'two-factor-login-telegram'); ?><br>
-                    <strong><?php _e('Current Email:', 'two-factor-login-telegram'); ?></strong> <?php echo esc_html($auth_email); ?>
-                </p>
-            </div>
-            <p><?php _e('You can specify a different email address for receiving authentication codes. If left blank, your primary WordPress email will be used.', 'two-factor-login-telegram'); ?></p>
-
             <div class="authpress-actions">
                  <button type="button" class="ap-button ap-button--primary" id="reconfigure-email">
                     <?php _e('Set Authentication Email', 'two-factor-login-telegram'); ?>
@@ -109,11 +104,4 @@ $pending_email = get_user_meta($current_user_id, 'authpress_pending_email', true
             </p>
             <div id="authpress-email-verify-status" class="tg-status" style="display: none;"></div>
         </div>
-
-    <?php else: ?>
-        <div class="ap-notice ap-notice--success">
-            <p><?php _e('⚠️ Email 2FA is not available.', 'two-factor-login-telegram'); ?></p>
-        </div>
-        <p><?php _e('You need a valid email address in your profile to use email 2FA. Please update your email address in your user profile.', 'two-factor-login-telegram'); ?></p>
-    <?php endif; ?>
 </div>

@@ -305,109 +305,6 @@ var AuthPress_Plugin = function ($) {
         $(selector).fadeOut(300);
     }
 
-    // TOTP Setup functionality
-    var totpSecret = '';
-
-    function setupTOTP() {
-        $('#totp-setup-section').show();
-        $('#tg-2fa-configuration').hide();
-        $('#2fa-method-selection').hide();
-
-        // Load QR code and secret
-        $.ajax({
-            url: ajaxurl,
-            method: 'POST',
-            dataType: 'json',
-            data: {
-                action: 'setup_totp',
-                _wpnonce: $('#totp-setup-nonce').val() || ''
-            },
-            success: function (res) {
-                if (res.success && res.data) {
-                    totpSecret = res.data.secret;
-                    $('#totp-qr-code').html('<img src="' + res.data.qr_code_url + '" alt="QR Code" style="border: 1px solid #ddd; padding: 10px; background: white;">');
-                    $('#totp-secret-text').text(res.data.secret);
-                } else {
-                    showTOTPStatus('error', res.data && res.data.message ? res.data.message : (tlj.qr_generation_failed || 'Failed to generate QR code'));
-                }
-            },
-            error: function () {
-                showTOTPStatus('error', tlj.network_error || 'Network error occurred');
-            }
-        });
-    }
-
-    function verifyTOTP() {
-        var code = $('#totp-verification-code').val().trim();
-
-        if (code.length !== 6) {
-            showTOTPStatus('error', tlj.enter_6_digit_code || 'Please enter a 6-digit code');
-            return;
-        }
-
-        $('#totp-verify-btn').prop('disabled', true).text(tlj.verifying || 'Verifying...');
-
-        $.ajax({
-            url: ajaxurl,
-            method: 'POST',
-            dataType: 'json',
-            data: {
-                action: 'verify_totp',
-                code: code,
-                _wpnonce: $('#totp-verify-nonce').val() || ''
-            },
-            success: function (res) {
-                $('#totp-verify-btn').prop('disabled', false).text(tlj.verify_enable || 'Verify & Enable');
-
-                if (res.success) {
-                    showTOTPStatus('success', tlj.totp_enabled_success || 'Authenticator app enabled successfully!');
-                    setTimeout(function () {
-                        location.reload();
-                    }, 2000);
-                } else {
-                    showTOTPStatus('error', res.data && res.data.message ? res.data.message : (tlj.invalid_code || 'Invalid code. Please try again.'));
-                }
-            },
-            error: function () {
-                $('#totp-verify-btn').prop('disabled', false).text(tlj.verify_enable || 'Verify & Enable');
-                showTOTPStatus('error', tlj.network_error || 'Network error occurred');
-            }
-        });
-    }
-
-    function disableTOTP() {
-        $.ajax({
-            url: ajaxurl,
-            method: 'POST',
-            dataType: 'json',
-            data: {
-                action: 'disable_totp',
-                _wpnonce: $('#totp-disable-nonce').val() || ''
-            },
-            success: function (res) {
-                if (res.success) {
-                    location.reload();
-                } else {
-                    alert(res.data && res.data.message ? res.data.message : (tlj.disable_totp_failed || 'Failed to disable authenticator'));
-                }
-            },
-            error: function () {
-                alert(tlj.network_error || 'Network error occurred');
-            }
-        });
-    }
-
-    function showTOTPStatus(type, message) {
-        var $status = $('#totp-verification-status');
-        $status.removeClass('success error').addClass(type);
-        $status.text(message).show();
-
-        if (type === 'success') {
-            setTimeout(function () {
-                $status.fadeOut();
-            }, 5000);
-        }
-    }
 
     // Telegram reconfiguration functionality
     function setupTelegramReconfiguration() {
@@ -505,11 +402,13 @@ var AuthPress_Plugin = function ($) {
     function setupEmailReconfiguration() {
         // Show reconfiguration section
         $('#reconfigure-email').on('click', function () {
+            $(this).hide();
             $('#email-reconfig-section').slideDown();
         });
 
         // Cancel reconfiguration
         $('#cancel-reconfigure-email').on('click', function () {
+            $('#reconfigure-email').show();
             $('#email-reconfig-section').slideUp();
         });
 
@@ -592,6 +491,7 @@ var AuthPress_Plugin = function ($) {
         });
 
         $('#cancel-verify-email').on('click', function () {
+            $('#reconfigure-email').show();
             $('#email-verify-section').slideUp();
         });
 

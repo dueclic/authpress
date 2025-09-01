@@ -866,7 +866,7 @@
     border-bottom-right-radius: 8px;
 }
 
-.provider-card.messaging-provider .provider-config.provider-configured:not(.expanded) {
+.provider-card.messaging-provider .provider-config.provider-configured:not(.expanded):not(#provider-email-config) {
     background: none;
     padding: 0;
 }
