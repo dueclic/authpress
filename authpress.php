@@ -37,7 +37,7 @@ if (!function_exists('get_auth_token_duration')) {
 
 /**
  *
- * Full path to the WP Two Factor Telegram File
+ * Full path to the AuthPress File
  *
  */
 

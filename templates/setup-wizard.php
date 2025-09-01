@@ -3,14 +3,9 @@
  * Template for 2FA Setup Wizard - Modular approach using provider registry
  *
  * Available variables:
- * - $user: User object
- * - $redirect_to: Redirect URL after setup
- * - $plugin_logo: URL of the plugin logo
- * - Legacy variables (for backward compatibility):
- *   - $telegram_available: Whether Telegram provider is available
- *   - $email_available: Whether Email provider is available
- *   - $authenticator_enabled: Whether Authenticator provider is available
- *   - $telegram_bot: Bot info for Telegram setup
+ * @var $user: User object
+ * @var $redirect_to: Redirect URL after setup
+ * @var $plugin_logo: URL of the plugin logo
  */
 
 use Authpress\AuthPress_Provider_Registry;

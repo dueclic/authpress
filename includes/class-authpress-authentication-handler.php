@@ -340,20 +340,6 @@ class AuthPress_Authentication_Handler
 
         $plugin_logo = authpress_logo();
 
-        $telegram_available = AuthPress_User_Manager::is_telegram_provider_enabled() && AuthPress_User_Manager::is_telegram_bot_valid();
-        $email_available = AuthPress_User_Manager::is_email_provider_enabled() && AuthPress_User_Manager::user_email_available($user->ID);
-        $authenticator_enabled = AuthPress_User_Manager::is_authenticator_provider_enabled();
-
-        $telegram_bot = null;
-        if ($telegram_available) {
-            $telegram_bot = $this->telegram->get_me();
-        }
-
-        // Get provider instances for icons
-        $telegram_provider = AuthPress_Auth_Factory::create(AuthPress_Auth_Factory::METHOD_TELEGRAM_OTP);
-        $email_provider = AuthPress_Auth_Factory::create(AuthPress_Auth_Factory::METHOD_EMAIL_OTP);
-        $totp_provider = AuthPress_Auth_Factory::create(AuthPress_Auth_Factory::METHOD_TOTP);
-
         require_once(ABSPATH . '/wp-admin/includes/template.php');
         require_once(dirname(WP_FACTOR_TG_FILE) . "/templates/setup-wizard.php");
     }

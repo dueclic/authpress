@@ -12,8 +12,6 @@ final class AuthPress_Plugin
     private $hooks_manager;
     private $logger;
 
-    private $namespace = 'tg_col';
-
     public static function get_instance()
     {
         if (
@@ -101,7 +99,7 @@ final class AuthPress_Plugin
 
     public function migrate_legacy_settings_on_init()
     {
-        $legacy_settings = get_option($this->namespace, array());
+        $legacy_settings = get_option('tg_col', array());
         $providers = authpress_providers();
 
         if (isset($legacy_settings['enabled']) && $legacy_settings['enabled'] === '1') {
@@ -133,7 +131,7 @@ final class AuthPress_Plugin
                         echo '</div>';
                     });
 
-                    delete_option($this->namespace);
+                    delete_option('tg_col');
 
                 }
             }
