@@ -268,33 +268,30 @@ $user_has_active_methods = $user_config['has_2fa'];
                             <p><?php _e('Your recovery codes are hidden for security. Regenerate them to view and save new codes.', 'two-factor-login-telegram'); ?></p>
                         </div>
 
-                        <div class="save-bar">
-                            <button type="button" id="regenerate_recovery_codes_btn"
-                                    class="ap-button ap-button--primary"
-                                    data-user-id="<?php echo $current_user_id; ?>"
-                            >
-                                <?php _e('Regenerate Recovery Codes', 'two-factor-login-telegram'); ?>
-                            </button>
-                            <input type="hidden" id="regenerate_recovery_nonce"
-                                   value="<?php echo wp_create_nonce('tg_regenerate_recovery_codes_' . $current_user_id); ?>"/>
-                        </div>
-
                     <?php else: ?>
                         <div class="notice notice-warning inline">
                             <p><?php _e('You don\'t have any recovery codes yet. Generate them now!', 'two-factor-login-telegram'); ?></p>
                         </div>
-
-                        <div class="save-bar">
-                            <button type="button" id="generate_recovery_codes_btn"
-                                    class="ap-button ap-button--primary"
-                                    data-user-id="<?php echo $current_user_id; ?>"
-                            >
-                                <?php _e('Generate Recovery Codes', 'two-factor-login-telegram'); ?>
-                                <input type="hidden" id="regenerate_recovery_nonce"
-                                       value="<?php echo wp_create_nonce('tg_regenerate_recovery_codes_' . $current_user_id); ?>"/>
-                            </button>
-                        </div>
                     <?php endif; ?>
+
+
+                    <div class="save-bar">
+                        <button type="button" id="regenerate_recovery_codes_btn"
+                                class="ap-button ap-button--primary"
+                                data-user-id="<?php echo $current_user_id; ?>"
+                        >
+                            <?php
+                            if ($has_recovery_codes) {
+                                _e('Regenerate Recovery Codes', 'two-factor-login-telegram');
+                            } else {
+                                _e('Generate Recovery Codes', 'two-factor-login-telegram');
+                            }
+                            ?>
+                        </button>
+                        <input type="hidden" id="regenerate_recovery_nonce"
+                               value="<?php echo wp_create_nonce('tg_regenerate_recovery_codes_' . $current_user_id); ?>"/>
+                    </div>
+
                 </div>
 
             <?php endif; ?>
