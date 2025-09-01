@@ -257,7 +257,6 @@ class AuthPress_Admin_Manager
             case 'authenticator':
                 return __('Authenticator App', 'two-factor-login-telegram');
             default:
-                // For custom providers, get name from provider registry
                 $provider = AuthPress_Provider_Registry::get($provider_key);
                 return $provider ? $provider->get_name() : ucfirst($provider_key);
         }

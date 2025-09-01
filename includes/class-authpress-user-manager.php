@@ -39,7 +39,6 @@ final class AuthPress_User_Manager
      * Check if Telegram provider is enabled
      *
      * @return bool
-     * @deprecated Use AuthPress_Provider_Registry::get('telegram')->is_enabled() instead
      */
     public static function is_telegram_provider_enabled()
     {
@@ -51,7 +50,6 @@ final class AuthPress_User_Manager
      * Check if Email provider is enabled
      *
      * @return bool
-     * @deprecated Use AuthPress_Provider_Registry::get('email')->is_enabled() instead
      */
     public static function is_email_provider_enabled()
     {
@@ -63,7 +61,6 @@ final class AuthPress_User_Manager
      * Check if Authenticator provider is enabled
      *
      * @return bool
-     * @deprecated Use AuthPress_Provider_Registry::get('authenticator')->is_enabled() instead
      */
     public static function is_authenticator_provider_enabled()
     {
