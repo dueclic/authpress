@@ -137,6 +137,8 @@ final class AuthPress_Plugin
             }
         }
     }
+
+
 	/**
 	 * Get the configured default provider
 	 *

@@ -470,8 +470,8 @@ class AuthPress_Hooks_Manager
         $activities_table = $wpdb->prefix . 'wp2fat_activities';
         $wpdb->query("DROP TABLE IF EXISTS $activities_table");
 
-        $wpdb->delete($wpdb->usermeta, array('meta_key' => 'tg_wp_factor_chat_id'));
-        $wpdb->delete($wpdb->usermeta, array('meta_key' => 'tg_wp_factor_enabled'));
+        $wpdb->delete($wpdb->usermeta, array('meta_key' => 'authpress_telegram_chat_id'));
+        $wpdb->delete($wpdb->usermeta, array('meta_key' => 'authpress_telegram_enabled'));
         $wpdb->delete($wpdb->usermeta, array('meta_key' => 'authpress_totp_secret'));
         $wpdb->delete($wpdb->usermeta, array('meta_key' => 'authpress_totp_enabled'));
         $wpdb->delete($wpdb->usermeta, array('meta_key' => 'authpress_recovery_codes'));

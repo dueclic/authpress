@@ -149,7 +149,7 @@ class WP_Telegram {
 	public function send_tg_token( $token, $chat_id = false, $user_id = null ) {
 
 		if ( $chat_id === false ) {
-			$chat_id = get_user_meta( get_current_user_id(), "tg_wp_factor_chat_id" );
+			$chat_id = get_user_meta( get_current_user_id(), "authpress_telegram_chat_id" );
 		}
 
 		$message = sprintf(

@@ -9,7 +9,6 @@ $plugin = \Authpress\AuthPress_Plugin::get_instance();
 // Get centralized user configuration
 $user_config = \Authpress\AuthPress_User_Manager::get_user_2fa_config($current_user_id);
 
-// Use registry to get all providers dynamically
 $enabled_providers = \Authpress\AuthPress_Provider_Registry::get_enabled();
 $available_providers = \Authpress\AuthPress_Provider_Registry::get_available();
 

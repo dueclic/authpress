@@ -91,16 +91,19 @@ final class AuthPress_User_Manager
             return false;
         }
 
-        $enabled = get_the_author_meta("tg_wp_factor_enabled", $user_id) === "1";
-        $chat_id = get_user_meta($user_id, "tg_wp_factor_chat_id", true);
+        // Migrate legacy user meta if needed
+        self::migrate_legacy_user_meta($user_id);
+
+        $enabled = get_the_author_meta("authpress_telegram_enabled", $user_id) === "1";
+        $chat_id = get_user_meta($user_id, "authpress_telegram_chat_id", true);
 
         // More strict validation: chat_id must be a non-empty string and enabled must be exactly "1"
         $has_valid_config = $enabled && is_string($chat_id) && trim($chat_id) !== '';
 
         // Clean up orphaned configuration: if enabled but no valid chat_id, disable it
         if ($enabled && (!is_string($chat_id) || trim($chat_id) === '')) {
-            update_user_meta($user_id, 'tg_wp_factor_enabled', '0');
-            delete_user_meta($user_id, 'tg_wp_factor_chat_id');
+            update_user_meta($user_id, 'authpress_telegram_enabled', '0');
+            delete_user_meta($user_id, 'authpress_telegram_chat_id');
             return false;
         }
 
@@ -295,7 +298,7 @@ final class AuthPress_User_Manager
      */
     public static function get_user_chat_id($user_id)
     {
-        return get_user_meta($user_id, "tg_wp_factor_chat_id", true) ?: false;
+        return get_user_meta($user_id, "authpress_telegram_chat_id", true) ?: false;
     }
 
     /**
@@ -429,7 +432,7 @@ final class AuthPress_User_Manager
             $telegram_users = $wpdb->get_col("
                 SELECT DISTINCT user_id 
                 FROM {$wpdb->usermeta} 
-                WHERE meta_key = 'tg_wp_factor_enabled' 
+                WHERE meta_key = 'authpress_telegram_enabled' 
                 AND meta_value = '1'
             ");
 
@@ -536,5 +539,42 @@ final class AuthPress_User_Manager
         }
 
         return sprintf(__('Enabled (%s)', 'two-factor-login-telegram'), $methods_text);
+    }
+
+    /**
+     * Migrate legacy user meta fields for a specific user
+     * 
+     * Converts:
+     * - tg_wp_factor_chat_id -> authpress_telegram_chat_id
+     * - tg_wp_factor_enabled -> authpress_telegram_enabled
+     * 
+     * @param int $user_id User ID to migrate
+     * @return bool True if migration occurred, false otherwise
+     */
+    private static function migrate_legacy_user_meta($user_id)
+    {
+        $migrated = false;
+        
+        // Check if user has legacy chat_id but no new one
+        $legacy_chat_id = get_user_meta($user_id, 'tg_wp_factor_chat_id', true);
+        $new_chat_id = get_user_meta($user_id, 'authpress_telegram_chat_id', true);
+        
+        if (!empty($legacy_chat_id) && empty($new_chat_id)) {
+            update_user_meta($user_id, 'authpress_telegram_chat_id', sanitize_text_field($legacy_chat_id));
+            delete_user_meta($user_id, 'tg_wp_factor_chat_id');
+            $migrated = true;
+        }
+        
+        // Check if user has legacy enabled status but no new one
+        $legacy_enabled = get_user_meta($user_id, 'tg_wp_factor_enabled', true);
+        $new_enabled = get_user_meta($user_id, 'authpress_telegram_enabled', true);
+        
+        if ($legacy_enabled !== '' && empty($new_enabled)) {
+            update_user_meta($user_id, 'authpress_telegram_enabled', $legacy_enabled === '1' ? '1' : '0');
+            delete_user_meta($user_id, 'tg_wp_factor_enabled');
+            $migrated = true;
+        }
+        
+        return $migrated;
     }
 }

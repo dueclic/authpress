@@ -4,14 +4,13 @@
 
 var AuthPress_Plugin = function ($) {
 
-    var $twfci = $("#tg_wp_factor_chat_id");
-    var $twfciconf = $("#tg_wp_factor_chat_id_confirm");
-    var $twbtn = $("#tg_wp_factor_chat_id_send");
-    var $twctrl = $("#tg_wp_factor_valid");
+    var $twfci = $("#authpress_telegram_chat_id");
+    var $twfciconf = $("#authpress_telegram_chat_id_confirm");
+    var $twbtn = $("#authpress_telegram_chat_id_send");
 
     var $twfcr = $("#factor-chat-response");
     var $twfconf = $("#factor-chat-confirm");
-    var $twfcheck = $("#tg_wp_factor_chat_id_check");
+    var $twfcheck = $("#authpress_telegram_chat_id_check");
     var $twbcheck = $("#checkbot");
     var $twb = $("#bot_token");
     var $twbdesc = $("#bot_token_desc");
@@ -31,7 +30,6 @@ var AuthPress_Plugin = function ($) {
 
             // If value changed from original, require re-validation
             if (currentValue !== originalValue) {
-                $twctrl.val(0);
                 $(this).removeClass('input-valid');
             }
         });
@@ -42,8 +40,6 @@ var AuthPress_Plugin = function ($) {
         }
 
         $twfci.on("change", function (evt) {
-            $twctrl.val(0);
-            // Validate Chat ID format (basic validation)
             validateChatId($(this).val());
         });
 
@@ -146,8 +142,6 @@ var AuthPress_Plugin = function ($) {
 
     function check_tg_bot(bot_token) {
 
-        $twctrl.val(0);
-
         $.ajax({
 
             type: "POST",
@@ -202,7 +196,6 @@ var AuthPress_Plugin = function ($) {
                 if (response.type === "success") {
                     $twfconf.hide();
                     $twfci.addClass("input-valid");
-                    $twctrl.val(1);
                     updateProgress(100);
                     showStatus('#validation-status', 'success', tlj.setup_completed);
 
@@ -212,7 +205,6 @@ var AuthPress_Plugin = function ($) {
                 } else {
                     showStatus('#validation-status', 'error', response.msg);
                     $twfci.removeClass("input-valid");
-                    $twctrl.val(0);
                 }
 
             },

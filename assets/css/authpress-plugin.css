@@ -70,20 +70,20 @@
 }
 
 /* Input improvements */
-#tg_wp_factor_chat_id {
+#authpress_telegram_chat_id {
     font-size: 14px;
     border: 2px solid #ddd;
     border-radius: 6px;
     transition: all 0.2s ease;
 }
 
-#tg_wp_factor_chat_id:focus {
+#authpress_telegram_chat_id:focus {
     border-color: #667eea;
     box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.2);
     outline: none;
 }
 
-#tg_wp_factor_chat_id.input-valid {
+#authpress_telegram_chat_id.input-valid {
     border-color: #46b450 !important;
     box-shadow: 0 0 0 2px rgba(70, 180, 80, 0.2) !important;
 }
