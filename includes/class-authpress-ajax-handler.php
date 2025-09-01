@@ -218,7 +218,7 @@ class AuthPress_AJAX_Handler
         $totp = AuthPress_Auth_Factory::create(AuthPress_Auth_Factory::METHOD_TOTP);
 
         if ($totp->verify_setup_code($code, $user_id)) {
-            $totp->enable_user_totp($user_id);
+            $totp->enable_user_method($user_id);
 
             $this->logger->log_action('totp_enabled', array(
                 'user_id' => $user_id,
@@ -514,61 +514,23 @@ class AuthPress_AJAX_Handler
         $is_enabled = isset($_POST['enabled']) && $_POST['enabled'] === '1';
         $result = false;
 
-        // If enabling, it must be configured. If disabling, it's fine.
-        if ($is_enabled) { // Only check for configuration when ENABLING
-            $is_configured = false;
-            switch ($provider_key) {
-                case 'telegram':
-                    $is_configured = !empty(get_user_meta($user_id, 'tg_wp_factor_chat_id', true));
-                    break;
-                case 'email':
-                    $user = get_userdata($user_id);
-                    $is_configured = !empty($user->user_email);
-                    break;
-                case 'authenticator':
-                    $is_configured = !empty(get_user_meta($user_id, 'wp_factor_totp_secret', true));
-                    break;
-                default:
-                    // For other providers, assume they don't need pre-configuration
-                    // or use a filter to let them add their own check.
-                    $is_configured = apply_filters('authpress_is_provider_configured_for_user', true, $provider_key, $user_id);
-                    break;
-            }
+        $provider = AuthPress_Provider_Registry::get($provider_key);
 
-            if (!$is_configured) {
-                wp_send_json_error(['message' => __('This method must be configured before it can be enabled.', 'two-factor-login-telegram')]);
-            }
+        if (!$provider) {
+            wp_send_json_error(['message' => __('Provider does not exists', 'two-factor-login-telegram')]);
         }
 
-        switch ($provider_key) {
-            case 'authenticator':
-                $totp_provider = \Authpress\AuthPress_Auth_Factory::create(\Authpress\AuthPress_Auth_Factory::METHOD_TOTP);
-                if ($is_enabled) {
-                    $result = $totp_provider->enable_user_totp($user_id);
-                } else {
-                    $result = $totp_provider->disable_user_method($user_id);
-                }
-                break;
-            case 'telegram':
-                update_user_meta($user_id, 'tg_wp_factor_enabled', $is_enabled ? '1' : '0');
-                if (!$is_enabled){
-                    delete_user_meta($user_id, 'tg_wp_factor_chat_id');
-                }
-                $result = true;
-                break;
-            case 'email':
-                if ($is_enabled) {
-                    \Authpress\AuthPress_User_Manager::enable_user_email($user_id);
-                    $result = true;
-                } else {
-                    // Assuming 'wp_factor_email_enabled' is the meta key.
-                    update_user_meta($user_id, 'wp_factor_email_enabled', false);
-                    $result = true;
-                }
-                break;
+        $is_configured = $provider->is_user_configured($user_id);
+        $is_configured = apply_filters('authpress_is_provider_configured_for_user', $is_configured, $provider_key, $user_id);
+
+        if (!$is_configured) {
+            wp_send_json_error(['message' => __('This method must be configured before it can be enabled.', 'two-factor-login-telegram')]);
         }
 
-        if ($result) {
+        $result = $provider->toggle_user_method($user_id, $is_enabled);
+        $result = apply_filters('authpress_is_provider_toggled', $result, $provider_key, $user_id, $is_enabled);
+
+        if ($result !== FALSE) {
             $this->logger->log_action('user_provider_status_changed', [
                 'user_id' => $user_id,
                 'provider' => $provider_key,

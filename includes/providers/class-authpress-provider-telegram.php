@@ -402,6 +402,10 @@ class Telegram_Provider extends Abstract_Provider implements Provider_Otp_Interf
         return __("Receive authentication codes via Telegram messages", "two-factor-login-telegram");
     }
 
+    public function is_user_configured($user_id){
+        return !empty(get_user_meta($user_id, 'tg_wp_factor_chat_id', true));
+    }
+
     public function is_configured()
     {
         if (!$this->is_enabled()) {
@@ -444,6 +448,10 @@ class Telegram_Provider extends Abstract_Provider implements Provider_Otp_Interf
     public function disable_user_method($user_id){
         delete_user_meta($user_id, 'tg_wp_factor_enabled');
         delete_user_meta($user_id, 'tg_wp_factor_chat_id');
+    }
+
+    public function enable_user_method($user_id){
+        update_user_meta($user_id, 'tg_wp_factor_enabled', 1);
     }
 
 }

@@ -79,6 +79,14 @@ abstract class Abstract_Provider
 
 
     /**
+     *  Check if it is configured for user
+     * @param $user_id
+     * @return bool
+     */
+
+    abstract public function is_user_configured($user_id);
+
+    /**
      * Get the icon URL for this provider
      * @return string PNG icon URL
      */
@@ -427,12 +435,32 @@ abstract class Abstract_Provider
     }
 
     /**
-     * Delete all codes for a user
+     * Disable user method
      * @param int $user_id The user ID
      * @return void
      */
-    public function disable_user_method($user_id){
+    abstract public function disable_user_method($user_id);
 
+
+    /**
+     * Enable user method
+     * @param int $user_id The user ID
+     * @return boolean
+     */
+    abstract public function enable_user_method($user_id);
+
+    /**
+     * Toggle user method
+     * @param int $user_id The user ID
+     * @return boolean
+     */
+
+    public function toggle_user_method($user_id, $enabled){
+        error_log("Toggle user method for ".$user_id.", enabled: ".$enabled);
+        if ($enabled){
+            return $this->enable_user_method($user_id);
+        }
+        return $this->disable_user_method($user_id);
     }
 
 }

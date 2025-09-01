@@ -433,11 +433,6 @@ class AuthPress_Admin_Manager
             return;
         }
 
-        // Skip handled providers (they have specific handlers)
-        if (in_array($provider_key, ['telegram', 'email', 'totp', 'authenticator'])) {
-            return;
-        }
-
         // Check if provider can be disabled
         if (!$this->can_disable_provider($user_id, $provider_key)) {
             $provider_name = $this->get_provider_display_name($provider_key);
@@ -484,10 +479,6 @@ class AuthPress_Admin_Manager
             return;
         }
 
-        // Skip handled providers (they have specific handlers)
-        if (in_array($provider_key, ['telegram', 'email', 'totp', 'authenticator'])) {
-            return;
-        }
 
         // Get provider from registry
         $provider = AuthPress_Provider_Registry::get($provider_key);
@@ -498,26 +489,22 @@ class AuthPress_Admin_Manager
             return;
         }
 
-        // Call provider's enable method if it exists
-        if (method_exists($provider, 'enable_user_method')) {
-            $success = $provider->enable_user_method($user_id);
-            if ($success) {
-                $provider_name = $provider->get_name();
-                add_action('admin_notices', function() use ($provider_name) {
-                    echo '<div class="notice notice-success is-dismissible"><p>' .
-                        sprintf(__('%s 2FA has been enabled successfully.', 'two-factor-login-telegram'), $provider_name) .
-                        '</p></div>';
-                });
-            } else {
-                $provider_name = $provider->get_name();
-                add_action('admin_notices', function() use ($provider_name) {
-                    echo '<div class="notice notice-error is-dismissible"><p>' .
-                        sprintf(__('Failed to enable %s 2FA.', 'two-factor-login-telegram'), $provider_name) .
-                        '</p></div>';
-                });
-            }
-        }
+        $success = $provider->enable_user_method($user_id);
+        $provider_name = $provider->get_name();
 
+        if ($success) {
+            add_action('admin_notices', function() use ($provider_name) {
+                echo '<div class="notice notice-success is-dismissible"><p>' .
+                    sprintf(__('%s 2FA has been enabled successfully.', 'two-factor-login-telegram'), $provider_name) .
+                    '</p></div>';
+            });
+        } else {
+            add_action('admin_notices', function() use ($provider_name) {
+                echo '<div class="notice notice-error is-dismissible"><p>' .
+                    sprintf(__('Failed to enable %s 2FA.', 'two-factor-login-telegram'), $provider_name) .
+                    '</p></div>';
+            });
+        }
         // Redirect back to My 2FA Settings page to prevent white page
         wp_safe_redirect(admin_url('users.php?page=my-2fa-settings'));
         exit;

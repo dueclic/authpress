@@ -191,4 +191,22 @@ class Recovery_Codes_Provider extends Abstract_Provider
     {
         return __("One-time backup codes for emergency access", "two-factor-login-telegram");
     }
+
+    public function is_user_configured($user_id)
+    {
+        return !empty($this->get_user_recovery_codes($user_id));
+    }
+
+    public function enable_user_method($user_id)
+    {
+        // dummy method
+        return true;
+    }
+
+    public function disable_user_method($user_id)
+    {
+        // dummy method
+        return true;
+    }
+
 }

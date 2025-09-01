@@ -319,6 +319,12 @@ class Email_Provider extends Abstract_Provider implements Provider_Otp_Interface
         return __('Email', 'two-factor-login-telegram');
     }
 
+    public function is_user_configured($user_id){
+        $user = get_userdata($user_id);
+        return !empty($user->user_email);
+    }
+
+
     /**
      * Get the icon URL for this provider
      * @return string PNG icon URL
@@ -349,6 +355,10 @@ class Email_Provider extends Abstract_Provider implements Provider_Otp_Interface
         delete_user_meta($user_id, 'wp_factor_email_enabled');
         delete_user_meta($user_id, 'authpress_pending_email');
         delete_user_meta($user_id, 'authpress_pending_email_code');
+    }
+
+    public function enable_user_method($user_id){
+        return \Authpress\AuthPress_User_Manager::enable_user_email($user_id);
     }
 
 }

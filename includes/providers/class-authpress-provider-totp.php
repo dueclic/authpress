@@ -203,14 +203,9 @@ class TOTP_Provider extends Abstract_Provider
         return get_user_meta($user_id, 'wp_factor_totp_enabled', true) === '1';
     }
 
-    /**
-     * Enable TOTP for a user
-     * @param int $user_id User ID
-     * @return bool True on success
-     */
-    public function enable_user_totp($user_id)
+    public function is_user_configured($user_id)
     {
-        return update_user_meta($user_id, 'wp_factor_totp_enabled', '1');
+        return !empty(get_user_meta($user_id, 'wp_factor_totp_secret', true));
     }
 
 
@@ -323,6 +318,11 @@ class TOTP_Provider extends Abstract_Provider
     {
         delete_user_meta($user_id, 'wp_factor_totp_enabled');
         delete_user_meta($user_id, 'wp_factor_totp_secret');
+    }
+
+
+    public function enable_user_method($user_id){
+        return update_user_meta($user_id, 'wp_factor_totp_enabled', '1');
     }
 
 }
