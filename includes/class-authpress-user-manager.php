@@ -120,7 +120,7 @@ final class AuthPress_User_Manager
         }
 
         // Check if user has email 2FA enabled
-        $enabled = get_user_meta($user_id, "wp_factor_email_enabled", true) === "1";
+        $enabled = get_user_meta($user_id, "authpress_email_enabled", true) === "1";
         if (!$enabled) {
             return false;
         }
@@ -284,18 +284,7 @@ final class AuthPress_User_Manager
         if (!self::user_email_available($user_id)) {
             return false;
         }
-        return update_user_meta($user_id, 'wp_factor_email_enabled', '1');
-    }
-
-    /**
-     * Disable email 2FA for user
-     *
-     * @param int $user_id User ID
-     * @return bool
-     */
-    public static function disable_user_email($user_id)
-    {
-        return delete_user_meta($user_id, 'wp_factor_email_enabled');
+        return update_user_meta($user_id, 'authpress_email_enabled', '1');
     }
 
     /**
@@ -456,7 +445,7 @@ final class AuthPress_User_Manager
             $totp_users = $wpdb->get_col("
                 SELECT DISTINCT user_id 
                 FROM {$wpdb->usermeta} 
-                WHERE meta_key = 'wp_factor_totp_enabled' 
+                WHERE meta_key = 'authpress_totp_enabled' 
                 AND meta_value = '1'
             ");
 

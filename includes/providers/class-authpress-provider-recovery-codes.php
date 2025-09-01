@@ -27,7 +27,7 @@ class Recovery_Codes_Provider extends Abstract_Provider
      */
     public function get_user_recovery_codes($user_id)
     {
-        $codes = get_user_meta($user_id, 'tg_wp_factor_recovery_codes', true);
+        $codes = get_user_meta($user_id, 'authpress_recovery_codes', true);
         if (!is_array($codes))
             return [];
         return $codes;
@@ -43,7 +43,7 @@ class Recovery_Codes_Provider extends Abstract_Provider
         $hashed = array_map(function ($c) {
             return $this->hash_code($this->normalize_code($c));
         }, $codes);
-        update_user_meta($user_id, 'tg_wp_factor_recovery_codes', $hashed);
+        update_user_meta($user_id, 'authpress_recovery_codes', $hashed);
     }
 
     /**
@@ -59,7 +59,7 @@ class Recovery_Codes_Provider extends Abstract_Provider
         $idx = array_search($hashed, $codes);
         if ($idx !== false) {
             unset($codes[$idx]);
-            update_user_meta($user_id, 'tg_wp_factor_recovery_codes', array_values($codes));
+            update_user_meta($user_id, 'authpress_recovery_codes', array_values($codes));
             return true;
         }
         return false;
@@ -111,15 +111,6 @@ class Recovery_Codes_Provider extends Abstract_Provider
         return $this->consume_recovery_code($user_id, $normalized_code);
     }
 
-    /**
-     * Delete all recovery codes for a user
-     * @param int $user_id
-     */
-    public function delete_user_recovery_codes($user_id)
-    {
-        delete_user_meta($user_id, 'tg_wp_factor_recovery_codes');
-    }
-
     // Implementation of abstract methods
 
     /**
@@ -163,7 +154,7 @@ class Recovery_Codes_Provider extends Abstract_Provider
      */
     public function delete_user_codes($user_id)
     {
-        $this->delete_user_recovery_codes($user_id);
+        delete_user_meta($user_id, 'authpress_recovery_codes');
         return true;
     }
 
@@ -173,7 +164,7 @@ class Recovery_Codes_Provider extends Abstract_Provider
      */
     public function get_icon()
     {
-        $logo = plugin_dir_url(WP_FACTOR_TG_FILE) . '/assets/images/providers/recovery-codes-icon.png';
+        $logo = plugin_dir_url(AUTHPRESS_PLUGIN_FILE) . '/assets/images/providers/recovery-codes-icon.png';
         return apply_filters('authpress_provider_logo', $logo, 'recovery-codes');
     }
 

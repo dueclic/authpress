@@ -20,8 +20,8 @@ if (!defined('ABSPATH')) {
 
         <div class="authpress-actions" style="margin-top: 15px;">
             <form method="post" action="" class="authpress-disable-form" style="display: inline-block;">
-                <?php wp_nonce_field('wp_factor_disable_' . $provider->get_key(), 'wp_factor_' . $provider->get_key() . '_disable_nonce'); ?>
-                <input type="hidden" name="wp_factor_action" value="disable_<?php echo esc_attr($provider->get_key()); ?>">
+                <?php wp_nonce_field('authpress_disable_' . $provider->get_key(), 'wp_factor_' . $provider->get_key() . '_disable_nonce'); ?>
+                <input type="hidden" name="authpress_action" value="disable_<?php echo esc_attr($provider->get_key()); ?>">
                 <button type="submit" class="button button-secondary" onclick="return confirm('<?php printf(__('Are you sure you want to disable %s 2FA?', 'two-factor-login-telegram'), $data['name']); ?>')">
                     <?php printf(__('Disable %s 2FA', 'two-factor-login-telegram'), $provider->get_name()); ?>
                 </button>
@@ -38,7 +38,7 @@ if (!defined('ABSPATH')) {
         <div class="authpress-setup" style="margin-top: 15px;">
             <form method="post" action="" class="authpress-enable-form">
                 <?php wp_nonce_field('wp_factor_enable_' . $provider->get_key(), 'wp_factor_' . $provider->get_key() . '_enable_nonce'); ?>
-                <input type="hidden" name="wp_factor_action" value="enable_<?php echo esc_attr($provider->get_key()); ?>">
+                <input type="hidden" name="authpress_action" value="enable_<?php echo esc_attr($provider->get_key()); ?>">
                 <button type="submit" class="button button-primary">
                     <?php printf(__('Enable %s 2FA', 'two-factor-login-telegram'), $provider->get_name()); ?>
                 </button>

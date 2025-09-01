@@ -208,7 +208,7 @@ class Telegram_Provider extends Abstract_Provider implements Provider_Otp_Interf
      */
     public function validate_tokencheck_authcode($authcode, $chat_id)
     {
-        return $this->hash_code($authcode) === get_transient("wp2fa_telegram_authcode_" . $chat_id);
+        return $this->hash_code($authcode) === get_transient("authpress_telegram_authcode_" . $chat_id);
     }
 
     /**
@@ -383,7 +383,7 @@ class Telegram_Provider extends Abstract_Provider implements Provider_Otp_Interf
      */
     public function get_icon()
     {
-        $logo = plugin_dir_url(WP_FACTOR_TG_FILE) . '/assets/images/providers/telegram-icon.png';
+        $logo = plugin_dir_url(AUTHPRESS_PLUGIN_FILE) . '/assets/images/providers/telegram-icon.png';
         return apply_filters('authpress_provider_logo', $logo, 'telegram');
     }
 

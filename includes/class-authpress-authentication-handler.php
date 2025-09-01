@@ -118,7 +118,7 @@ class AuthPress_Authentication_Handler
         }
 
         require_once(ABSPATH . '/wp-admin/includes/template.php');
-        require_once(dirname(WP_FACTOR_TG_FILE) . "/templates/login-form.php");
+        require_once(dirname(AUTHPRESS_PLUGIN_FILE) . "/templates/login-form.php");
     }
 
     public function validate_authentication()
@@ -341,7 +341,7 @@ class AuthPress_Authentication_Handler
         $plugin_logo = authpress_logo();
 
         require_once(ABSPATH . '/wp-admin/includes/template.php');
-        require_once(dirname(WP_FACTOR_TG_FILE) . "/templates/setup-wizard.php");
+        require_once(dirname(AUTHPRESS_PLUGIN_FILE) . "/templates/setup-wizard.php");
     }
 
     public function handle_setup_wizard_submission()

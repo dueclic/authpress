@@ -183,11 +183,11 @@ class TOTP_Provider extends Abstract_Provider
      */
     public function get_user_secret($user_id)
     {
-        $secret = get_user_meta($user_id, 'wp_factor_totp_secret', true);
+        $secret = get_user_meta($user_id, 'authpress_totp_secret', true);
 
         if (empty($secret)) {
             $secret = $this->generate_secret();
-            update_user_meta($user_id, 'wp_factor_totp_secret', $secret);
+            update_user_meta($user_id, 'authpress_totp_secret', $secret);
         }
 
         return $secret;
@@ -200,12 +200,12 @@ class TOTP_Provider extends Abstract_Provider
      */
     public function is_user_totp_enabled($user_id)
     {
-        return get_user_meta($user_id, 'wp_factor_totp_enabled', true) === '1';
+        return get_user_meta($user_id, 'authpress_totp_enabled', true) === '1';
     }
 
     public function is_user_configured($user_id)
     {
-        return $this->is_user_totp_enabled($user_id) && !empty(get_user_meta($user_id, 'wp_factor_totp_secret', true));
+        return $this->is_user_totp_enabled($user_id) && !empty(get_user_meta($user_id, 'authpress_totp_secret', true));
     }
 
 
@@ -286,7 +286,7 @@ class TOTP_Provider extends Abstract_Provider
      */
     public function get_icon()
     {
-        $logo = plugin_dir_url(WP_FACTOR_TG_FILE) . '/assets/images/providers/authenticator-icon.png';
+        $logo = plugin_dir_url(AUTHPRESS_PLUGIN_FILE) . '/assets/images/providers/authenticator-icon.png';
         return apply_filters('authpress_provider_logo', $logo, 'totp');
     }
 
@@ -316,13 +316,13 @@ class TOTP_Provider extends Abstract_Provider
 
     public function disable_user_method($user_id)
     {
-        delete_user_meta($user_id, 'wp_factor_totp_enabled');
-        delete_user_meta($user_id, 'wp_factor_totp_secret');
+        delete_user_meta($user_id, 'authpress_totp_enabled');
+        delete_user_meta($user_id, 'authpress_totp_secret');
     }
 
 
     public function enable_user_method($user_id){
-        return update_user_meta($user_id, 'wp_factor_totp_enabled', '1');
+        return update_user_meta($user_id, 'authpress_totp_enabled', '1');
     }
 
 }

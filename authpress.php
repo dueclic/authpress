@@ -21,8 +21,8 @@ if (!defined('ABSPATH')) {
     die;
 }
 
-if (!defined('WP_FACTOR_PLUGIN_VERSION')) {
-    define('WP_FACTOR_PLUGIN_VERSION', '6.8.2');
+if (!defined('AUTHPRESS_PLUGIN_VERSION')) {
+    define('AUTHPRESS_PLUGIN_VERSION', '3.6.0');
 }
 
 if (!function_exists('get_auth_token_duration')) {
@@ -41,7 +41,7 @@ if (!function_exists('get_auth_token_duration')) {
  *
  */
 
-define('WP_FACTOR_TG_FILE', __FILE__);
+define('AUTHPRESS_PLUGIN_FILE', __FILE__);
 
 define('WP_FACTOR_TG_GETME_TRANSIENT', 'tg_wp_factor_valid_bot');
 
@@ -123,7 +123,7 @@ function authpress_provider_config(
 function authpress_logo()
 {
 
-    $plugin_logo = plugins_url('assets/img/plugin_logo.png', WP_FACTOR_TG_FILE);
+    $plugin_logo = plugins_url('assets/img/plugin_logo.png', AUTHPRESS_PLUGIN_FILE);
 
     $plugin_logo = apply_filters_deprecated(
         'two_factor_login_telegram_logo',
@@ -141,7 +141,7 @@ function authpress_logo()
 function authpress_get_template($template_path, $context = array(), $full_path = false)
 {
 
-    $full_path = $full_path ? $template_path : plugin_dir_path(WP_FACTOR_TG_FILE) . $template_path;
+    $full_path = $full_path ? $template_path : plugin_dir_path(AUTHPRESS_PLUGIN_FILE) . $template_path;
 
     if (!file_exists($full_path)) {
         return '';

@@ -39,8 +39,8 @@ class AuthPress_Hooks_Manager
         add_action('wp_login_failed', array($this->telegram, 'send_tg_failed_login'), 10, 2);
 
         // Plugin lifecycle hooks
-        register_activation_hook(WP_FACTOR_TG_FILE, array($this, 'plugin_activation'));
-        register_deactivation_hook(WP_FACTOR_TG_FILE, array($this, 'plugin_deactivation'));
+        register_activation_hook(AUTHPRESS_PLUGIN_FILE, array($this, 'plugin_activation'));
+        register_deactivation_hook(AUTHPRESS_PLUGIN_FILE, array($this, 'plugin_deactivation'));
         add_action('plugins_loaded', array($this, 'check_plugin_update'));
 
         // Admin hooks
@@ -76,7 +76,7 @@ class AuthPress_Hooks_Manager
         add_filter('authpress_provider_card_col_class', array($this->admin_manager, 'provider_card_col_class'), 10, 4);
         add_filter('authpress_user_provider_card_col_class', array($this->admin_manager, 'provider_card_col_class'), 10, 4);
         add_filter(
-                "plugin_action_links_" . plugin_basename(WP_FACTOR_TG_FILE),
+                "plugin_action_links_" . plugin_basename(AUTHPRESS_PLUGIN_FILE),
                 array($this->admin_manager, 'action_links')
         );
     }
@@ -130,25 +130,25 @@ class AuthPress_Hooks_Manager
 
             wp_register_style(
                     "authpress_css",
-                    plugins_url("assets/css/authpress-plugin.css", WP_FACTOR_TG_FILE),
+                    plugins_url("assets/css/authpress-plugin.css", AUTHPRESS_PLUGIN_FILE),
                     array(),
-                    WP_FACTOR_PLUGIN_VERSION
+                    AUTHPRESS_PLUGIN_VERSION
             );
             wp_enqueue_style("authpress_css");
 
             wp_register_style(
                     "authpress_ui_css",
-                    plugins_url("assets/css/authpress-ui.css", WP_FACTOR_TG_FILE),
+                    plugins_url("assets/css/authpress-ui.css", AUTHPRESS_PLUGIN_FILE),
                     array(),
-                    WP_FACTOR_PLUGIN_VERSION
+                    AUTHPRESS_PLUGIN_VERSION
             );
             wp_enqueue_style("authpress_ui_css");
 
             wp_register_script(
                     "tg_lib_js",
-                    plugins_url("assets/js/authpress-plugin.js", WP_FACTOR_TG_FILE),
+                    plugins_url("assets/js/authpress-plugin.js", AUTHPRESS_PLUGIN_FILE),
                     array('jquery'),
-                    WP_FACTOR_PLUGIN_VERSION,
+                    AUTHPRESS_PLUGIN_VERSION,
                     true
             );
 
@@ -175,13 +175,6 @@ class AuthPress_Hooks_Manager
             ));
 
             wp_enqueue_script("tg_lib_js");
-
-            wp_enqueue_script('jquery-ui-accordion');
-            wp_enqueue_script(
-                    'custom-accordion',
-                    plugins_url('assets/js/authpress-accordion.js', WP_FACTOR_TG_FILE),
-                    array('jquery', 'jquery-ui-core', 'jquery-ui-accordion')
-            );
         }
     }
 
@@ -224,7 +217,7 @@ class AuthPress_Hooks_Manager
                     if ($save_result) {
                         $validation_success = true;
                         // Delete the transient as it's been used
-                        delete_transient('wp2fa_telegram_authcode_' . $chat_id);
+                        delete_transient('authpress_telegram_authcode_' . $chat_id);
 
                         // Log the successful validation
                         $this->logger->log_action('telegram_validation_success', array(
@@ -368,7 +361,7 @@ class AuthPress_Hooks_Manager
         $this->create_or_update_telegram_auth_codes_table();
         $this->create_or_update_activities_table();
         $this->migrate_logs_to_activities_table();
-        update_option('wp_factor_plugin_version', WP_FACTOR_PLUGIN_VERSION);
+        update_option('AUTHPRESS_PLUGIN_VERSION', AUTHPRESS_PLUGIN_VERSION);
 
         $this->add_telegram_rewrite_rules();
         flush_rewrite_rules();
@@ -387,13 +380,13 @@ class AuthPress_Hooks_Manager
 
     public function check_plugin_update()
     {
-        $installed_version = get_option('wp_factor_plugin_version');
+        $installed_version = get_option('AUTHPRESS_PLUGIN_VERSION');
 
-        if ($installed_version !== WP_FACTOR_PLUGIN_VERSION) {
+        if ($installed_version !== AUTHPRESS_PLUGIN_VERSION) {
             $this->create_or_update_telegram_auth_codes_table();
             $this->create_or_update_activities_table();
             $this->migrate_logs_to_activities_table();
-            update_option('wp_factor_plugin_version', WP_FACTOR_PLUGIN_VERSION);
+            update_option('AUTHPRESS_PLUGIN_VERSION', AUTHPRESS_PLUGIN_VERSION);
         }
     }
 
@@ -468,7 +461,7 @@ class AuthPress_Hooks_Manager
         global $wpdb;
 
         delete_option('tg_col');
-        delete_option('wp_factor_plugin_version');
+        delete_option('AUTHPRESS_PLUGIN_VERSION');
         delete_option('telegram_bot_logs');
 
         $auth_codes_table = $wpdb->prefix . 'telegram_auth_codes';
@@ -479,12 +472,12 @@ class AuthPress_Hooks_Manager
 
         $wpdb->delete($wpdb->usermeta, array('meta_key' => 'tg_wp_factor_chat_id'));
         $wpdb->delete($wpdb->usermeta, array('meta_key' => 'tg_wp_factor_enabled'));
-        $wpdb->delete($wpdb->usermeta, array('meta_key' => 'wp_factor_totp_secret'));
-        $wpdb->delete($wpdb->usermeta, array('meta_key' => 'wp_factor_totp_enabled'));
-        $wpdb->delete($wpdb->usermeta, array('meta_key' => 'tg_wp_factor_recovery_codes'));
+        $wpdb->delete($wpdb->usermeta, array('meta_key' => 'authpress_totp_secret'));
+        $wpdb->delete($wpdb->usermeta, array('meta_key' => 'authpress_totp_enabled'));
+        $wpdb->delete($wpdb->usermeta, array('meta_key' => 'authpress_recovery_codes'));
 
-        $wpdb->query("DELETE FROM $wpdb->options WHERE option_name LIKE '_transient_wp2fa_telegram_authcode_%'");
-        $wpdb->query("DELETE FROM $wpdb->options WHERE option_name LIKE '_transient_timeout_wp2fa_telegram_authcode_%'");
+        $wpdb->query("DELETE FROM $wpdb->options WHERE option_name LIKE '_transient_authpress_telegram_authcode_%'");
+        $wpdb->query("DELETE FROM $wpdb->options WHERE option_name LIKE '_transient_timeout_authpress_telegram_authcode_%'");
         $wpdb->query("DELETE FROM $wpdb->options WHERE option_name LIKE '_transient_" . WP_FACTOR_TG_GETME_TRANSIENT . "%'");
         $wpdb->query("DELETE FROM $wpdb->options WHERE option_name LIKE '_transient_timeout_" . WP_FACTOR_TG_GETME_TRANSIENT . "%'");
     }
@@ -538,7 +531,7 @@ class AuthPress_Hooks_Manager
             ));
 
             // Include error template
-            require_once(dirname(WP_FACTOR_TG_FILE) . "/templates/error-telegram-security-failed.php");
+            require_once(dirname(AUTHPRESS_PLUGIN_FILE) . "/templates/error-telegram-security-failed.php");
         }
 
         /**
@@ -568,16 +561,16 @@ class AuthPress_Hooks_Manager
 
             // Include appropriate error template
             if ($authcode_validation === 'expired') {
-                require_once(dirname(WP_FACTOR_TG_FILE) . "/templates/error-telegram-expired-token.php");
+                require_once(dirname(AUTHPRESS_PLUGIN_FILE) . "/templates/error-telegram-expired-token.php");
             } else {
-                require_once(dirname(WP_FACTOR_TG_FILE) . "/templates/error-telegram-invalid-token.php");
+                require_once(dirname(AUTHPRESS_PLUGIN_FILE) . "/templates/error-telegram-invalid-token.php");
             }
         }
 
         // Get user
         $user = get_userdata($user_id);
         if (!$user) {
-            require_once(dirname(WP_FACTOR_TG_FILE) . "/templates/error-telegram-invalid-token.php");
+            require_once(dirname(AUTHPRESS_PLUGIN_FILE) . "/templates/error-telegram-invalid-token.php");
         }
 
         // Log the user in
@@ -741,13 +734,13 @@ class AuthPress_Hooks_Manager
 
     public function enqueue_login_scripts()
     {
-        $plugin_url = plugin_dir_url(WP_FACTOR_TG_FILE);
+        $plugin_url = plugin_dir_url(AUTHPRESS_PLUGIN_FILE);
 
         wp_enqueue_script(
                 'authpress-login-method-switcher',
                 $plugin_url . 'assets/js/authpress-login-method-switcher.js',
                 array('jquery'),
-                WP_FACTOR_PLUGIN_VERSION,
+                AUTHPRESS_PLUGIN_VERSION,
                 true
         );
 
@@ -755,7 +748,7 @@ class AuthPress_Hooks_Manager
                 'authpress-login-code-sender',
                 $plugin_url . 'assets/js/authpress-login-code-sender.js',
                 array('jquery'),
-                WP_FACTOR_PLUGIN_VERSION,
+                AUTHPRESS_PLUGIN_VERSION,
                 true
         );
 
@@ -763,7 +756,7 @@ class AuthPress_Hooks_Manager
                 'authpress-login-token-expiry',
                 $plugin_url . 'assets/js/authpress-login-token-expiry.js',
                 array('jquery'),
-                WP_FACTOR_PLUGIN_VERSION,
+                AUTHPRESS_PLUGIN_VERSION,
                 true
         );
     }

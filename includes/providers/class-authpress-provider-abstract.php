@@ -97,7 +97,7 @@ abstract class Abstract_Provider
         }
 
         // Fallback for providers that don't override this method
-        return plugin_dir_url(WP_FACTOR_TG_FILE) . 'assets/icons/default-provider.png';
+        return plugin_dir_url(AUTHPRESS_PLUGIN_FILE) . 'assets/icons/default-provider.png';
     }
 
     /**
@@ -134,7 +134,7 @@ abstract class Abstract_Provider
     public function get_config_template_path()
     {
         // Default: look for template in AuthPress main plugin directory
-        $default_path = dirname(WP_FACTOR_TG_FILE) . "/templates/provider-configs/{$this->get_key()}.php";
+        $default_path = dirname(AUTHPRESS_PLUGIN_FILE) . "/templates/provider-configs/{$this->get_key()}.php";
 
         if (file_exists($default_path)) {
             return $default_path;
@@ -149,13 +149,13 @@ abstract class Abstract_Provider
      */
     public function get_user_template_path()
     {
-        $template_path = dirname(WP_FACTOR_TG_FILE) . "/templates/provider-templates/{$this->get_key()}.php";
+        $template_path = dirname(AUTHPRESS_PLUGIN_FILE) . "/templates/provider-templates/{$this->get_key()}.php";
 
         if (file_exists($template_path)) {
             return $template_path;
         }
 
-        return dirname(WP_FACTOR_TG_FILE) . "/templates/provider-templates/{$this->get_key()}.php";
+        return dirname(AUTHPRESS_PLUGIN_FILE) . "/templates/provider-templates/{$this->get_key()}.php";
     }
 
     /**
@@ -165,7 +165,7 @@ abstract class Abstract_Provider
     public function get_features_template_path()
     {
         // Default: look for template in AuthPress main plugin directory
-        $default_path = dirname(WP_FACTOR_TG_FILE) . "/templates/provider-features/{$this->get_key()}.php";
+        $default_path = dirname(AUTHPRESS_PLUGIN_FILE) . "/templates/provider-features/{$this->get_key()}.php";
 
         if (file_exists($default_path)) {
             return $default_path;
@@ -181,13 +181,13 @@ abstract class Abstract_Provider
     public function get_login_template_path()
     {
         // Default: look for template in AuthPress main plugin directory
-        $default_path = dirname(WP_FACTOR_TG_FILE) . "/templates/provider-login/{$this->get_key()}.php";
+        $default_path = dirname(AUTHPRESS_PLUGIN_FILE) . "/templates/provider-login/{$this->get_key()}.php";
 
         if (file_exists($default_path)) {
             return $default_path;
         }
 
-        return dirname(WP_FACTOR_TG_FILE) . "/templates/provider-login.php";
+        return dirname(AUTHPRESS_PLUGIN_FILE) . "/templates/provider-login.php";
     }
 
     /**

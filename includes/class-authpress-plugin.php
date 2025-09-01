@@ -45,7 +45,7 @@ final class AuthPress_Plugin
 
     public function includes()
     {
-        $base_path = dirname(WP_FACTOR_TG_FILE) . "/includes/";
+        $base_path = dirname(AUTHPRESS_PLUGIN_FILE) . "/includes/";
 
         // Core classes
         require_once($base_path . "class-wp-telegram.php");

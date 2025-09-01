@@ -17,7 +17,7 @@ if (isset($_GET['tab'])) {
 
     <div class="ap-topbar">
         <div class="ap-logo-section">
-            <img src="<?php echo plugins_url("assets/img/plugin_logo.png", WP_FACTOR_TG_FILE); ?>"
+            <img src="<?php echo plugins_url("assets/img/plugin_logo.png", AUTHPRESS_PLUGIN_FILE); ?>"
                  alt="AuthPress"
                  class="ap-logo"
                  width="120"
@@ -31,7 +31,7 @@ if (isset($_GET['tab'])) {
             </a>
             <a href="<?php echo admin_url('options-general.php?page=authpress-conf&tab=howto'); ?>"
                class="ap-tab <?php echo $active_tab == 'howto' ? 'ap-tab--active' : ''; ?>">
-                <?php _e("FAQ", "two-factor-login-telegram"); ?>
+                <?php _e("Setup Guide", "two-factor-login-telegram"); ?>
             </a>
             <a href="<?php echo admin_url('options-general.php?page=authpress-conf&tab=logs'); ?>"
                class="ap-tab <?php echo $active_tab == 'logs' ? 'ap-tab--active' : ''; ?>">

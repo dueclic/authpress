@@ -93,7 +93,7 @@ function render_telegram_instructions($username_link, $is_reconfigure = false) {
             <div class="ap-form__group" id="factor-chat-save" style="display: none;">
                 <form method="post" action="" class="authpress-save-form ap-form">
                     <?php wp_nonce_field('wp_factor_save_telegram', 'wp_factor_telegram_save_nonce'); ?>
-                    <input type="hidden" name="wp_factor_action" value="save_telegram">
+                    <input type="hidden" name="authpress_action" value="save_telegram">
                     <input type="hidden" name="tg_chat_id" id="tg_chat_id_hidden" value="">
                     <div class="submit">
                         <button type="submit" class="ap-button ap-button--primary">

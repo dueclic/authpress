@@ -1,5 +1,5 @@
 /**
- * WP Factor Telegram Plugin
+ * AuthPress Plugin
  */
 
 #factor-chat-confirm {
@@ -12,69 +12,6 @@
 
 .load-spinner {
     float:left;
-}
-
-.wpft-container {
-    width: 100%;
-    background: #fff;
-    box-sizing: border-box;
-    overflow: hidden;
-    position: relative;
-    padding: 20px 20px 20px 20px;
-    margin-bottom: 30px;
-}
-
-.wpft-notice {
-    background: #fff;
-    border-left: 4px solid #fff;
-    -webkit-box-shadow: 0 1px 1px 0 rgba(0, 0, 0, .1);
-    box-shadow: 0 1px 1px 0 rgba(0, 0, 0, .1);
-    margin: 5px 15px 2px;
-    padding: 1px 12px
-}
-
-.wpft-notice {
-    background: #fff;
-    border-left: 4px solid #fff;
-    -webkit-box-shadow: 0 1px 1px 0 rgba(0, 0, 0, .1);
-    box-shadow: 0 1px 1px 0 rgba(0, 0, 0, .1);
-    margin: 5px 15px 2px;
-    padding: 12px 12px
-}
-
-.wpft-notice-warning {
-    border-left-color: #ffb900;
-}
-
-.wpft-notice-success {
-    border-left-color: #46b450;
-}
-
-.wpft-notice-error {
-    border-left-color: #ed0d00;
-}
-
-.wpft-notice p {
-    margin: .5em 0;
-    padding: 2px;
-    font-size: 13px;
-}
-
-.wpft-notice p:before {
-    margin-right: 6px;
-    vertical-align: bottom;
-}
-
-.wft-settings-description span.success {
-    color: #6495ED;
-    font-weight: 700;
-    font-style: normal;
-}
-
-.wft-settings-description span.error {
-    color: #ed0d00;
-    font-weight: 700;
-    font-style: normal;
 }
 
 .input-valid {
@@ -102,64 +39,6 @@
 
 .heading-top h1 {
     text-align:center;
-}
-
-#wpft-howto {
-    margin: 20px auto;
-}
-
-#wpft-howto .ui-accordion-content {
-    background-color: #f3f3f3;
-    width: 100%;
-    color: #777;
-    font-size: 1em;
-    line-height: 1.2;
-}
-
-#wpft-howto .ui-accordion-content > * {
-    margin: 0;
-    padding: 20px;
-}
-
-#wpft-howto .ui-accordion-content ol {
-    list-style-position: inside;
-}
-
-#wpft-howto .ui-accordion-header {
-    color: white;
-    line-height: 2.625;
-    display: block;
-    font-size: 1.2em;
-    width: 100%;
-    cursor:pointer;
-    text-indent: 10px;
-}
-
-#wpft-howto .ui-accordion-header {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-}
-
-/* 2FA Configuration Improvements */
-#tg-2fa-configuration {
-    opacity: 0;
-    max-height: 0;
-    overflow: hidden;
-    transition: all 0.3s ease-in-out;
-    transform: translateY(-10px);
-}
-
-#tg-2fa-configuration.show {
-    opacity: 1;
-    max-height: 1000px;
-    transform: translateY(0);
-}
-
-#tg-2fa-configuration .form-table {
-    background: #f9f9f9;
-    border-radius: 8px;
-    padding: 20px;
-    margin-top: 15px;
-    border: 1px solid #e1e1e1;
 }
 
 /* Step indicator */
@@ -244,84 +123,6 @@
     display: inline-block;
     margin-left: 10px;
     vertical-align: middle;
-}
-
-/* FAQ Section Styling */
-#wpft-howto {
-    margin: 20px 0;
-}
-
-#wpft-howto h3 {
-    background-color: #389abe;
-    color: white;
-    padding: 15px 20px;
-    margin: 20px 0 0 0;
-    font-size: 16px;
-    border-radius: 5px 5px 0 0;
-}
-
-#wpft-howto .faq-content {
-    background-color: #f9f9f9;
-    padding: 20px;
-    border: 1px solid #ddd;
-    border-top: none;
-    border-radius: 0 0 5px 5px;
-    margin-bottom: 20px;
-}
-
-#wpft-howto p {
-    margin: 10px 0;
-    line-height: 1.6;
-}
-
-#wpft-howto ol {
-    margin: 15px 0;
-    padding-left: 20px;
-}
-
-#wpft-howto li {
-    margin-bottom: 10px;
-    line-height: 1.5;
-}
-
-#wpft-howto .command {
-    background: #333;
-    color: #fff;
-    padding: 2px 6px;
-    border-radius: 3px;
-    font-family: monospace;
-    font-size: 13px;
-}
-
-#wpft-howto .screenshot-container {
-    margin: 15px 0;
-    text-align: center;
-    padding: 10px;
-    background: #fff;
-    border: 1px solid #ddd;
-    border-radius: 3px;
-}
-
-#wpft-howto .help-screenshot {
-    max-width: 100%;
-    height: auto;
-    border: 1px solid #ccc;
-}
-
-#wpft-howto .notice {
-    padding: 12px;
-    margin: 15px 0;
-    border-left: 4px solid #00a0d2;
-    background: #f7fcfe;
-}
-
-#wpft-howto .external-link {
-    color: #0073aa;
-    text-decoration: none;
-}
-
-#wpft-howto .external-link:hover {
-    text-decoration: underline;
 }
 
 .load-spinner img {

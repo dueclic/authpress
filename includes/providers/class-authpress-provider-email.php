@@ -331,7 +331,7 @@ class Email_Provider extends Abstract_Provider implements Provider_Otp_Interface
      */
     public function get_icon()
     {
-        $logo = plugin_dir_url(WP_FACTOR_TG_FILE) . '/assets/images/providers/email-icon.png';
+        $logo = plugin_dir_url(AUTHPRESS_PLUGIN_FILE) . '/assets/images/providers/email-icon.png';
         return apply_filters('authpress_provider_logo', $logo, 'email');
     }
 
@@ -352,7 +352,7 @@ class Email_Provider extends Abstract_Provider implements Provider_Otp_Interface
 
     public function disable_user_method($user_id){
         delete_user_meta($user_id, 'authpress_authentication_email');
-        delete_user_meta($user_id, 'wp_factor_email_enabled');
+        delete_user_meta($user_id, 'authpress_email_enabled');
         delete_user_meta($user_id, 'authpress_pending_email');
         delete_user_meta($user_id, 'authpress_pending_email_code');
     }

@@ -6,7 +6,7 @@
 
 <h2><?php _e("Suggestions", "two-factor-login-telegram"); ?></h2>
 
-<div id="wpft-suggestions">
+<div id="suggestions">
     <p>
         <?php _e("We would love to hear your feedback and suggestions! You can share them with us in three ways:", "two-factor-login-telegram"); ?>
     </p>

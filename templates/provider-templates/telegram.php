@@ -25,8 +25,8 @@ $bot_link = '<a href="https://telegram.me/' . $username . '" target="_blank">@' 
                 <?php _e('Change Settings', "two-factor-login-telegram"); ?>
             </button>
             <form method="post" action="" class="authpress-disable-form ap-form">
-                <?php wp_nonce_field('wp_factor_disable_telegram', 'wp_factor_telegram_disable_nonce'); ?>
-                <input type="hidden" name="wp_factor_action" value="disable_telegram">
+                <?php wp_nonce_field('authpress_disable_telegram', 'wp_factor_telegram_disable_nonce'); ?>
+                <input type="hidden" name="authpress_action" value="disable_telegram">
             </form>
         </div>
     <?php else: ?>
@@ -39,7 +39,7 @@ $bot_link = '<a href="https://telegram.me/' . $username . '" target="_blank">@' 
 
     <div class="authpress-config" id="telegram-config-section">
         <?php
-        require(dirname(WP_FACTOR_TG_FILE) . "/templates/provider-templates/telegram/setup-steps.php");
+        require(dirname(AUTHPRESS_PLUGIN_FILE) . "/templates/provider-templates/telegram/setup-steps.php");
         ?>
     </div>
 

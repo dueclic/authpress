@@ -87,7 +87,7 @@
                     <div class="visual-helper">
                         <div class="screenshot-container">
                             <img class="help-screenshot"
-                                 src="<?php echo plugins_url("/assets/img/help-api-token.png", WP_FACTOR_TG_FILE); ?>"
+                                 src="<?php echo plugins_url("/assets/img/help-api-token.png", AUTHPRESS_PLUGIN_FILE); ?>"
                                  alt="<?php _e('Bot token example', 'two-factor-login-telegram'); ?>">
                         </div>
                     </div>

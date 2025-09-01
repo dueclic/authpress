@@ -43,7 +43,7 @@ $user_has_active_methods = $user_config['has_2fa'];
 
         <div class="ap-topbar">
             <div class="ap-logo-section">
-                <img src="<?php echo plugins_url("assets/img/plugin_logo.png", WP_FACTOR_TG_FILE); ?>"
+                <img src="<?php echo plugins_url("assets/img/plugin_logo.png", AUTHPRESS_PLUGIN_FILE); ?>"
                      alt="AuthPress"
                      class="ap-logo"
                      width="120"
@@ -178,7 +178,7 @@ $user_has_active_methods = $user_config['has_2fa'];
                                         if (file_exists($template_path)) {
                                             include $template_path;
                                         } else {
-                                            include dirname(WP_FACTOR_TG_FILE) . '/templates/provider-templates/generic-provider.php';
+                                            include dirname(AUTHPRESS_PLUGIN_FILE) . '/templates/provider-templates/generic-provider.php';
                                         }
                                         ?>
                                     </div>
@@ -219,7 +219,7 @@ $user_has_active_methods = $user_config['has_2fa'];
 
                         <form method="post" action="" class="authpress-default-provider-form">
                             <?php wp_nonce_field('wp_factor_set_default_provider', 'wp_factor_default_provider_nonce'); ?>
-                            <input type="hidden" name="wp_factor_action" value="set_default_provider">
+                            <input type="hidden" name="authpress_action" value="set_default_provider">
 
                             <div class="authpress-provider-options">
                                 <?php foreach ($available_providers as $available_provider):
@@ -286,7 +286,7 @@ $user_has_active_methods = $user_config['has_2fa'];
 
                         <form method="post" action="">
                             <?php wp_nonce_field('wp_factor_generate_recovery', 'wp_factor_recovery_nonce'); ?>
-                            <input type="hidden" name="wp_factor_action" value="generate_recovery">
+                            <input type="hidden" name="authpress_action" value="generate_recovery">
                             <div class="save-bar">
                                 <button type="submit" class="ap-button ap-button--primary">
                                     <?php _e('Generate Recovery Codes', 'two-factor-login-telegram'); ?>

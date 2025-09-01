@@ -24,21 +24,21 @@ class AuthPress_Admin_Manager
     public function configure_admin_page()
     {
         $providers = authpress_providers();
-        require_once(dirname(WP_FACTOR_TG_FILE) . "/templates/admin/configuration.php");
+        require_once(dirname(AUTHPRESS_PLUGIN_FILE) . "/templates/admin/configuration.php");
     }
 
     public function show_user_2fa_page()
     {
-        require_once(dirname(WP_FACTOR_TG_FILE) . "/templates/admin/user-2fa-settings-page.php");
+        require_once(dirname(AUTHPRESS_PLUGIN_FILE) . "/templates/admin/user-2fa-settings-page.php");
     }
 
     public function handle_2fa_settings_forms()
     {
-        if (!isset($_POST['wp_factor_action']) || !is_user_logged_in()) {
+        if (!isset($_POST['authpress_action']) || !is_user_logged_in()) {
             return;
         }
 
-        $action = sanitize_text_field($_POST['wp_factor_action']);
+        $action = sanitize_text_field($_POST['authpress_action']);
         $current_user_id = get_current_user_id();
 
         switch ($action) {
@@ -362,7 +362,7 @@ class AuthPress_Admin_Manager
     {
         // Verify nonce
         $nonce_field = 'wp_factor_' . $provider_key . '_disable_nonce';
-        $nonce_action = 'wp_factor_disable_' . $provider_key;
+        $nonce_action = 'authpress_disable_' . $provider_key;
 
         if (!wp_verify_nonce($_POST[$nonce_field], $nonce_action)) {
             return;
