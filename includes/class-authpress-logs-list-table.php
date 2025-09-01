@@ -123,7 +123,7 @@ class Authpress_Logs_List_Table extends \WP_List_Table
         $current_page = $this->get_pagenum();
         $offset = ($current_page - 1) * $per_page;
 
-        $table_name = $wpdb->prefix . 'wp2fat_activities';
+        $table_name = $wpdb->prefix . 'authpress_activities';
 
         // Handle sorting
         $orderby = (!empty($_GET['orderby'])) ? $_GET['orderby'] : 'timestamp';
@@ -169,7 +169,7 @@ class Authpress_Logs_List_Table extends \WP_List_Table
     public function process_bulk_action()
     {
         global $wpdb;
-        $table_name = $wpdb->prefix . 'wp2fat_activities';
+        $table_name = $wpdb->prefix . 'authpress_activities';
 
         if ('delete' === $this->current_action()) {
             if (isset($_POST['log_ids']) && is_array($_POST['log_ids'])) {

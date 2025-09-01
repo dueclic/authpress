@@ -29,7 +29,7 @@ class Email_Provider extends Abstract_Provider implements Provider_Otp_Interface
         $hashed_code = $this->hash_code($normalized_for_storage);
 
         global $wpdb;
-        $table_name = $wpdb->prefix . 'telegram_auth_codes';
+        $table_name = $wpdb->prefix . 'authpress_telegram_auth_codes';
 
         // Clean up old codes for this user
         $wpdb->delete(
@@ -89,7 +89,7 @@ class Email_Provider extends Abstract_Provider implements Provider_Otp_Interface
         $hashed_code = $this->hash_code($normalized_code);
 
         global $wpdb;
-        $table_name = $wpdb->prefix . 'telegram_auth_codes';
+        $table_name = $wpdb->prefix . 'authpress_telegram_auth_codes';
 
         $stored_code = $wpdb->get_row($wpdb->prepare(
             "SELECT * FROM $table_name WHERE user_id = %d AND auth_code = %s AND expiration_date > %s ORDER BY creation_date DESC LIMIT 1",
@@ -127,7 +127,7 @@ class Email_Provider extends Abstract_Provider implements Provider_Otp_Interface
         $hashed_code = $this->hash_code($normalized_code);
 
         global $wpdb;
-        $table_name = $wpdb->prefix . 'telegram_auth_codes';
+        $table_name = $wpdb->prefix . 'authpress_telegram_auth_codes';
 
         // Check if code exists and is valid
         $stored_code = $wpdb->get_row($wpdb->prepare(
@@ -189,7 +189,7 @@ class Email_Provider extends Abstract_Provider implements Provider_Otp_Interface
     public function delete_user_codes($user_id)
     {
         global $wpdb;
-        $table_name = $wpdb->prefix . 'telegram_auth_codes';
+        $table_name = $wpdb->prefix . 'authpress_telegram_auth_codes';
 
         $result = $wpdb->delete(
             $table_name,
@@ -266,7 +266,7 @@ class Email_Provider extends Abstract_Provider implements Provider_Otp_Interface
         $hashed_code = $this->hash_code($auth_code);
 
         global $wpdb;
-        $table_name = $wpdb->prefix . 'telegram_auth_codes';
+        $table_name = $wpdb->prefix . 'authpress_telegram_auth_codes';
 
         $creation_date = current_time('mysql');
         $expiration_date = date('Y-m-d H:i:s', strtotime($creation_date) + get_auth_token_duration());

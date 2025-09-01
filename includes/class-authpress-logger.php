@@ -8,7 +8,7 @@ class AuthPress_Logger
     {
         global $wpdb;
 
-        $activities_table = $wpdb->prefix . 'wp2fat_activities';
+        $activities_table = $wpdb->prefix . 'authpress_activities';
 
         $wpdb->insert(
             $activities_table,

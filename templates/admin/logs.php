@@ -8,7 +8,7 @@ use Authpress\Authpress_Logs_List_Table;
 
 global $wpdb;
 
-$activities_table = $wpdb->prefix . 'wp2fat_activities';
+$activities_table = $wpdb->prefix . 'authpress_activities';
 
 // Create an instance of our package class
 $logs_list_table = new Authpress_Logs_List_Table();

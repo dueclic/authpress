@@ -36,7 +36,7 @@ class Telegram_Provider extends Abstract_Provider implements Provider_Otp_Interf
     {
         global $wpdb;
 
-        $table_name = $wpdb->prefix . 'telegram_auth_codes';
+        $table_name = $wpdb->prefix . 'authpress_telegram_auth_codes';
         $current_datetime = current_time('mysql');
         $hashed_token = $this->hash_code($this->normalize_code($token));
 
@@ -60,7 +60,7 @@ class Telegram_Provider extends Abstract_Provider implements Provider_Otp_Interf
     {
         global $wpdb;
 
-        $table_name = $wpdb->prefix . 'telegram_auth_codes';
+        $table_name = $wpdb->prefix . 'authpress_telegram_auth_codes';
 
         $result = $wpdb->update(
             $table_name,
@@ -82,7 +82,7 @@ class Telegram_Provider extends Abstract_Provider implements Provider_Otp_Interf
     {
         global $wpdb;
 
-        $table_name = $wpdb->prefix . 'telegram_auth_codes';
+        $table_name = $wpdb->prefix . 'authpress_telegram_auth_codes';
 
         // Count existing codes for the user
         $auth_codes_count = $wpdb->get_var($wpdb->prepare(
@@ -121,7 +121,7 @@ class Telegram_Provider extends Abstract_Provider implements Provider_Otp_Interf
     {
         global $wpdb;
 
-        $table_name = $wpdb->prefix . 'telegram_auth_codes';
+        $table_name = $wpdb->prefix . 'authpress_telegram_auth_codes';
         $auth_code = $this->get_unique_auth_code($authcode_length);
         $user_id = is_object($user) ? $user->ID : intval($user);
 
@@ -159,7 +159,7 @@ class Telegram_Provider extends Abstract_Provider implements Provider_Otp_Interf
     {
         global $wpdb;
 
-        $table_name = $wpdb->prefix . 'telegram_auth_codes';
+        $table_name = $wpdb->prefix . 'authpress_telegram_auth_codes';
         $hashed_auth_code = $this->hash_code($authcode);
         $current_datetime = current_time('mysql');
 
@@ -272,7 +272,7 @@ class Telegram_Provider extends Abstract_Provider implements Provider_Otp_Interf
     {
         global $wpdb;
 
-        $table_name = $wpdb->prefix . 'telegram_auth_codes';
+        $table_name = $wpdb->prefix . 'authpress_telegram_auth_codes';
         $current_datetime = current_time('mysql');
 
         $count = $wpdb->get_var($wpdb->prepare(
@@ -295,7 +295,7 @@ class Telegram_Provider extends Abstract_Provider implements Provider_Otp_Interf
     {
         global $wpdb;
 
-        $table_name = $wpdb->prefix . 'telegram_auth_codes';
+        $table_name = $wpdb->prefix . 'authpress_telegram_auth_codes';
 
         $result = $wpdb->delete(
             $table_name,

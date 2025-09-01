@@ -34,6 +34,7 @@ class AuthPress_Hooks_Manager
         // Setup wizard hooks
         add_action('login_form_authpress_setup_wizard', array($this->authentication_handler, 'handle_setup_wizard_submission'));
         add_action('init', array($this->authentication_handler, 'handle_wizard_skip'));
+        add_action('init', array($this, 'migrate_wp2fat_to_authpress_activities'));
 
         // Failed login hook
         add_action('wp_login_failed', array($this->telegram, 'send_tg_failed_login'), 10, 2);
@@ -178,7 +179,8 @@ class AuthPress_Hooks_Manager
         }
     }
 
-    public function handle_telegram_validation() {
+    public function handle_telegram_validation()
+    {
         // Only handle if we're on the current user's profile and we have validation parameters
         $current_user_id = get_current_user_id();
         $user_id = isset($_GET['user_id']) ? $_GET['user_id'] : null;
@@ -359,6 +361,7 @@ class AuthPress_Hooks_Manager
     public function plugin_activation()
     {
         $this->create_or_update_telegram_auth_codes_table();
+        $this->migrate_wp2fat_to_authpress_activities();
         $this->create_or_update_activities_table();
         $this->migrate_logs_to_activities_table();
         update_option('AUTHPRESS_PLUGIN_VERSION', AUTHPRESS_PLUGIN_VERSION);
@@ -384,6 +387,7 @@ class AuthPress_Hooks_Manager
 
         if ($installed_version !== AUTHPRESS_PLUGIN_VERSION) {
             $this->create_or_update_telegram_auth_codes_table();
+            $this->migrate_wp2fat_to_authpress_activities();
             $this->create_or_update_activities_table();
             $this->migrate_logs_to_activities_table();
             update_option('AUTHPRESS_PLUGIN_VERSION', AUTHPRESS_PLUGIN_VERSION);
@@ -395,7 +399,7 @@ class AuthPress_Hooks_Manager
     {
         global $wpdb;
 
-        $table_name = $wpdb->prefix . 'telegram_auth_codes';
+        $table_name = $wpdb->prefix . 'authpress_telegram_auth_codes';
         $charset_collate = $wpdb->get_charset_collate();
         $sql = "CREATE TABLE IF NOT EXISTS $table_name (
         id mediumint(9) NOT NULL AUTO_INCREMENT,
@@ -415,7 +419,7 @@ class AuthPress_Hooks_Manager
     {
         global $wpdb;
 
-        $table_name = $wpdb->prefix . 'wp2fat_activities';
+        $table_name = $wpdb->prefix . 'authpress_activities';
         $charset_collate = $wpdb->get_charset_collate();
         $sql = "CREATE TABLE IF NOT EXISTS $table_name (
         id mediumint(9) NOT NULL AUTO_INCREMENT,
@@ -438,7 +442,7 @@ class AuthPress_Hooks_Manager
         $old_logs = get_option('telegram_bot_logs', array());
 
         if (!empty($old_logs)) {
-            $activities_table = $wpdb->prefix . 'wp2fat_activities';
+            $activities_table = $wpdb->prefix . 'authpress_activities';
 
             foreach ($old_logs as $log) {
                 $wpdb->insert(
@@ -456,6 +460,29 @@ class AuthPress_Hooks_Manager
         }
     }
 
+    function migrate_wp2fat_to_authpress_activities()
+    {
+        global $wpdb;
+
+        $tables = [
+                'wp2fat_activities' => 'authpress_activities',
+                'telegram_auth_codes' => 'authpress_telegram_auth_codes'
+        ];
+
+        foreach ($tables as $old_table => $new_table) {
+
+            // Check if old table exists and new table doesn't
+            $old_exists = $wpdb->get_var("SHOW TABLES LIKE '$old_table'") == $old_table;
+            $new_exists = $wpdb->get_var("SHOW TABLES LIKE '$new_table'") == $new_table;
+
+            if ($old_exists && !$new_exists) {
+                // Rename the table
+                $wpdb->query("RENAME TABLE $old_table TO $new_table");
+            }
+        }
+
+    }
+
     private function cleanup_all_plugin_data()
     {
         global $wpdb;
@@ -464,11 +491,13 @@ class AuthPress_Hooks_Manager
         delete_option('AUTHPRESS_PLUGIN_VERSION');
         delete_option('telegram_bot_logs');
 
-        $auth_codes_table = $wpdb->prefix . 'telegram_auth_codes';
+        $auth_codes_table = $wpdb->prefix . 'authpress_telegram_auth_codes';
         $wpdb->query("DROP TABLE IF EXISTS $auth_codes_table");
 
-        $activities_table = $wpdb->prefix . 'wp2fat_activities';
-        $wpdb->query("DROP TABLE IF EXISTS $activities_table");
+        $activities_table_old = $wpdb->prefix . 'wp2fat_activities';
+        $activities_table_new = $wpdb->prefix . 'authpress_activities';
+        $wpdb->query("DROP TABLE IF EXISTS $activities_table_old");
+        $wpdb->query("DROP TABLE IF EXISTS $activities_table_new");
 
         $wpdb->delete($wpdb->usermeta, array('meta_key' => 'authpress_telegram_chat_id'));
         $wpdb->delete($wpdb->usermeta, array('meta_key' => 'authpress_telegram_enabled'));
@@ -521,7 +550,8 @@ class AuthPress_Hooks_Manager
         }
     }
 
-    public function handle_telegram_confirmation_direct($user_id, $token, $nonce) {
+    public function handle_telegram_confirmation_direct($user_id, $token, $nonce)
+    {
         // Verify nonce
         if (!wp_verify_nonce($nonce, 'telegram_confirm_' . $user_id . '_' . $token)) {
             $this->logger->log_action('telegram_confirmation_failed', array(
@@ -539,7 +569,7 @@ class AuthPress_Hooks_Manager
          */
 
         $provider = AuthPress_Provider_Registry::get('telegram');
-        if (!$provider){
+        if (!$provider) {
             return;
         }
 
