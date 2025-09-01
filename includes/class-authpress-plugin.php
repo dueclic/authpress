@@ -64,6 +64,9 @@ final class AuthPress_Plugin
         require_once($base_path . "providers/class-authpress-provider-totp.php");
         require_once($base_path . "providers/class-authpress-provider-recovery-codes.php");
 
+        // Ui components
+        require_once($base_path . "ui/class-authpress-ui-modal.php");
+        require_once($base_path . "ui/modals/class-authpress-ui-modal-recovery-codes.php");
         // Provider registry and factory
         require_once($base_path . "class-authpress-provider-registry.php");
         require_once($base_path . "class-authpress-auth-factory.php");
@@ -74,6 +77,7 @@ final class AuthPress_Plugin
         require_once($base_path . "class-authpress-admin-manager.php");
         require_once($base_path . "class-authpress-ajax-handler.php");
         require_once($base_path . "class-authpress-hooks-manager.php");
+
     }
 
     private function setup_dependencies()

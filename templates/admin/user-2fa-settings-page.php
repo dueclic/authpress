@@ -272,7 +272,7 @@ $user_has_active_methods = $user_config['has_2fa'];
                             <button type="button" id="regenerate_recovery_codes_btn"
                                     class="ap-button ap-button--primary"
                                     data-user-id="<?php echo $current_user_id; ?>"
-                                    onclick="if(confirm('<?php _e('Are you sure? This will invalidate your current recovery codes and generate new ones that you must save immediately.', 'two-factor-login-telegram'); ?>')) { regenerateRecoveryCodes(); }">
+                            >
                                 <?php _e('Regenerate Recovery Codes', 'two-factor-login-telegram'); ?>
                             </button>
                             <input type="hidden" id="regenerate_recovery_nonce"

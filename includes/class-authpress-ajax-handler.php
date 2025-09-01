@@ -2,6 +2,8 @@
 
 namespace Authpress;
 
+use Authpress\Ui\Modals\RecoveryCodesModal;
+
 class AuthPress_AJAX_Handler
 {
     private $telegram;
@@ -155,17 +157,18 @@ class AuthPress_AJAX_Handler
         if (!wp_verify_nonce($_POST['_wpnonce'], 'tg_regenerate_recovery_codes_' . $user_id)) {
             wp_send_json_error(['message' => __('Invalid request.', 'two-factor-login-telegram')]);
         }
-        $recovery_codes = AuthPress_Auth_Factory::create(AuthPress_Auth_Factory::METHOD_RECOVERY_CODES);
+        $recovery_codes = AuthPress_Provider_Registry::get('recovery_codes');
         $codes = $recovery_codes->regenerate_recovery_codes($user_id, 8, 10);
 
-        $plugin_logo = authpress_logo();
-        $redirect_to = $_POST['redirect_to'] ?? admin_url('profile.php');
-        ob_start();
         define('IS_PROFILE_PAGE', true);
-        require(dirname(WP_FACTOR_TG_FILE) . '/templates/recovery-codes-wizard.php');
-        $html = ob_get_clean();
 
-        wp_send_json_success(['html' => $html]);
+        $modal = new RecoveryCodesModal(
+            $codes,
+            IS_PROFILE_PAGE,
+            'authpress-recovery-codes-modal'
+        );
+
+        wp_send_json_success(['html' => $modal->render()]);
     }
 
     public function setup_totp()

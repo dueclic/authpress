@@ -25,7 +25,7 @@ var AuthPress_Plugin = function ($) {
 
 
         // Watch for changes in Chat ID when in edit mode
-        $twfci.on("input", function(){
+        $twfci.on("input", function () {
             var currentValue = $(this).val();
             var originalValue = $(this).data('original-value');
 
@@ -41,13 +41,13 @@ var AuthPress_Plugin = function ($) {
             $twfci.data('original-value', $twfci.val());
         }
 
-        $twfci.on("change", function(evt){
-           $twctrl.val(0);
-           // Validate Chat ID format (basic validation)
-           validateChatId($(this).val());
+        $twfci.on("change", function (evt) {
+            $twctrl.val(0);
+            // Validate Chat ID format (basic validation)
+            validateChatId($(this).val());
         });
 
-        $twbtn.on("click", function(evt){
+        $twbtn.on("click", function (evt) {
             evt.preventDefault();
             var chat_id = $twfci.val();
 
@@ -59,7 +59,7 @@ var AuthPress_Plugin = function ($) {
             send_tg_token(chat_id);
         });
 
-        $twfcheck.on("click", function(evt){
+        $twfcheck.on("click", function (evt) {
             evt.preventDefault();
             var token = $twfciconf.val();
             var chat_id = $twfci.val();
@@ -72,7 +72,7 @@ var AuthPress_Plugin = function ($) {
             check_tg_token(token, chat_id);
         });
 
-        $twbcheck.on("click", function(evt){
+        $twbcheck.on("click", function (evt) {
 
             evt.preventDefault();
             var bot_token = $twb.val();
@@ -81,7 +81,7 @@ var AuthPress_Plugin = function ($) {
         });
 
         // Handle Test Email button click
-        $(document).on('click', '#authpress-test-email', function(e) {
+        $(document).on('click', '#authpress-test-email', function (e) {
             e.preventDefault();
             var $btn = $(this);
             var $status = $('#authpress-test-email-status');
@@ -97,24 +97,24 @@ var AuthPress_Plugin = function ($) {
                     action: 'authpress_test_email',
                     _wpnonce: tlj.test_email_nonce
                 },
-                success: function(response) {
+                success: function (response) {
                     if (response.success) {
                         $status.removeClass('error').addClass('success').text(response.data.message);
                     } else {
                         $status.removeClass('success').addClass('error').text(response.data.message);
                     }
                 },
-                error: function() {
+                error: function () {
                     $status.removeClass('success').addClass('error').text(tlj.ajax_error || 'A network error occurred.');
                 },
-                complete: function() {
+                complete: function () {
                     $btn.prop('disabled', false).text('Send Test Email');
                 }
             });
         });
 
         // Handle Failed Login Reports toggle for Telegram provider
-        $(document).on('change', '#telegram_failed_login_reports', function() {
+        $(document).on('change', '#telegram_failed_login_reports', function () {
             var isEnabled = $(this).val() === '1';
             var $reportChatIdGroup = $(this).closest('.ap-form').find('#telegram_report_chat_id').closest('.ap-form__group');
 
@@ -137,41 +137,40 @@ var AuthPress_Plugin = function ($) {
         }
 
     }
+
     function initTwoFASettingsPage() {
         setupTelegramReconfiguration();
         setupEmailReconfiguration();
         setupAuthenticatorConfiguration();
     }
 
-    function check_tg_bot(bot_token){
+    function check_tg_bot(bot_token) {
 
         $twctrl.val(0);
 
         $.ajax({
 
-            type:"POST",
+            type: "POST",
             url: ajaxurl,
             data: {
                 'nonce': tlj.checkbot_nonce,
-                'action' : 'check_bot',
-                'bot_token' : bot_token
+                'action': 'check_bot',
+                'bot_token': bot_token
             },
-            beforeSend: function(){
-                $twbcheck.addClass('disabled').after('<div class="load-spinner"><img src="'+tlj.spinner+'" /></div>');
+            beforeSend: function () {
+                $twbcheck.addClass('disabled').after('<div class="load-spinner"><img src="' + tlj.spinner + '" /></div>');
             },
             dataType: 'json',
-            success: function(response) {
+            success: function (response) {
 
                 if (response.type === "success") {
-                    $twbdesc.html("Bot info: <span class='success'>"+response.args.first_name+" (@"+response.args.username+")</span>");
-                }
-
-                else {
-                    $twbdesc.html("<span class='error'>"+response.msg+"</span>");
+                    $twbdesc.html("Bot info: <span class='success'>" + response.args.first_name + " (@" + response.args.username + ")</span>");
+                } else {
+                    $twbdesc.html("<span class='error'>" + response.msg + "</span>");
                 }
 
             },
-            complete: function() {
+            complete: function () {
                 $twbcheck.removeClass('disabled');
                 $(".load-spinner").remove();
             }
@@ -180,25 +179,25 @@ var AuthPress_Plugin = function ($) {
 
     }
 
-    function check_tg_token(token, chat_id){
+    function check_tg_token(token, chat_id) {
 
         $.ajax({
 
             type: "POST",
             url: ajaxurl,
             data: {
-                'action' : 'token_check',
+                'action': 'token_check',
                 'nonce': tlj.sendtoken_nonce,
                 'chat_id': chat_id,
-                'token' : token
+                'token': token
             },
-            beforeSend: function(){
-                $twfcheck.addClass('disabled').after('<div class="load-spinner"><img src="'+tlj.spinner+'" /></div>');
+            beforeSend: function () {
+                $twfcheck.addClass('disabled').after('<div class="load-spinner"><img src="' + tlj.spinner + '" /></div>');
                 $twfcr.hide();
                 hideStatus('#validation-status');
             },
             dataType: "json",
-            success: function(response){
+            success: function (response) {
 
                 if (response.type === "success") {
                     $twfconf.hide();
@@ -210,19 +209,18 @@ var AuthPress_Plugin = function ($) {
                     // Show save button and populate hidden chat ID field
                     $('#factor-chat-save').show();
                     $('#tg_chat_id_hidden').val(chat_id);
-                }
-                else {
+                } else {
                     showStatus('#validation-status', 'error', response.msg);
                     $twfci.removeClass("input-valid");
                     $twctrl.val(0);
                 }
 
             },
-            error: function(xhr, ajaxOptions, thrownError){
-                showStatus('#validation-status', 'error', tlj.ajax_error+" "+thrownError+" ("+xhr.state+")");
+            error: function (xhr, ajaxOptions, thrownError) {
+                showStatus('#validation-status', 'error', tlj.ajax_error + " " + thrownError + " (" + xhr.state + ")");
                 $twfci.removeClass("input-valid");
             },
-            complete: function() {
+            complete: function () {
                 $twfcheck.removeClass('disabled');
                 $(".load-spinner").remove();
             }
@@ -238,34 +236,33 @@ var AuthPress_Plugin = function ($) {
             type: "POST",
             url: ajaxurl,
             data: {
-                'action' : 'send_token_check',
+                'action': 'send_token_check',
                 'nonce': tlj.tokencheck_nonce,
-                'chat_id' : chat_id
+                'chat_id': chat_id
             },
-            beforeSend: function(){
-                $twbtn.addClass('disabled').after('<div class="load-spinner"><img src="'+tlj.spinner+'" /></div>');
+            beforeSend: function () {
+                $twbtn.addClass('disabled').after('<div class="load-spinner"><img src="' + tlj.spinner + '" /></div>');
                 $twfcr.hide();
                 $twfconf.hide();
                 hideStatus('#chat-id-status');
             },
             dataType: "json",
-            success: function(response){
+            success: function (response) {
 
                 if (response.type === "success") {
                     $twfconf.show();
                     $twfci.removeClass("input-valid");
                     updateProgress(75);
                     showStatus('#chat-id-status', 'success', tlj.code_sent);
-                }
-                else {
+                } else {
                     showStatus('#chat-id-status', 'error', response.msg);
                 }
 
             },
-            error: function(xhr, ajaxOptions, thrownError){
-                showStatus('#chat-id-status', 'error', tlj.ajax_error+" "+thrownError+" ("+xhr.state+")");
+            error: function (xhr, ajaxOptions, thrownError) {
+                showStatus('#chat-id-status', 'error', tlj.ajax_error + " " + thrownError + " (" + xhr.state + ")");
             },
-            complete: function() {
+            complete: function () {
                 $twbtn.removeClass('disabled');
                 $(".load-spinner").remove();
                 $twfci.removeClass("input-valid");
@@ -299,14 +296,15 @@ var AuthPress_Plugin = function ($) {
     function showStatus(selector, type, message) {
         var $status = $(selector);
         $status.removeClass('success error warning')
-               .addClass(type)
-               .text(message)
-               .fadeIn(300);
+            .addClass(type)
+            .text(message)
+            .fadeIn(300);
     }
 
     function hideStatus(selector) {
         $(selector).fadeOut(300);
     }
+
     // TOTP Setup functionality
     var totpSecret = '';
 
@@ -324,7 +322,7 @@ var AuthPress_Plugin = function ($) {
                 action: 'setup_totp',
                 _wpnonce: $('#totp-setup-nonce').val() || ''
             },
-            success: function(res) {
+            success: function (res) {
                 if (res.success && res.data) {
                     totpSecret = res.data.secret;
                     $('#totp-qr-code').html('<img src="' + res.data.qr_code_url + '" alt="QR Code" style="border: 1px solid #ddd; padding: 10px; background: white;">');
@@ -333,7 +331,7 @@ var AuthPress_Plugin = function ($) {
                     showTOTPStatus('error', res.data && res.data.message ? res.data.message : (tlj.qr_generation_failed || 'Failed to generate QR code'));
                 }
             },
-            error: function() {
+            error: function () {
                 showTOTPStatus('error', tlj.network_error || 'Network error occurred');
             }
         });
@@ -358,19 +356,19 @@ var AuthPress_Plugin = function ($) {
                 code: code,
                 _wpnonce: $('#totp-verify-nonce').val() || ''
             },
-            success: function(res) {
+            success: function (res) {
                 $('#totp-verify-btn').prop('disabled', false).text(tlj.verify_enable || 'Verify & Enable');
 
                 if (res.success) {
                     showTOTPStatus('success', tlj.totp_enabled_success || 'Authenticator app enabled successfully!');
-                    setTimeout(function() {
+                    setTimeout(function () {
                         location.reload();
                     }, 2000);
                 } else {
                     showTOTPStatus('error', res.data && res.data.message ? res.data.message : (tlj.invalid_code || 'Invalid code. Please try again.'));
                 }
             },
-            error: function() {
+            error: function () {
                 $('#totp-verify-btn').prop('disabled', false).text(tlj.verify_enable || 'Verify & Enable');
                 showTOTPStatus('error', tlj.network_error || 'Network error occurred');
             }
@@ -386,14 +384,14 @@ var AuthPress_Plugin = function ($) {
                 action: 'disable_totp',
                 _wpnonce: $('#totp-disable-nonce').val() || ''
             },
-            success: function(res) {
+            success: function (res) {
                 if (res.success) {
                     location.reload();
                 } else {
                     alert(res.data && res.data.message ? res.data.message : (tlj.disable_totp_failed || 'Failed to disable authenticator'));
                 }
             },
-            error: function() {
+            error: function () {
                 alert(tlj.network_error || 'Network error occurred');
             }
         });
@@ -405,7 +403,7 @@ var AuthPress_Plugin = function ($) {
         $status.text(message).show();
 
         if (type === 'success') {
-            setTimeout(function() {
+            setTimeout(function () {
                 $status.fadeOut();
             }, 5000);
         }
@@ -414,13 +412,13 @@ var AuthPress_Plugin = function ($) {
     // Telegram reconfiguration functionality
     function setupTelegramReconfiguration() {
         // Show reconfiguration section
-        $('#reconfigure-telegram').on('click', function() {
+        $('#reconfigure-telegram').on('click', function () {
             $('#provider-telegram-config').addClass('expanded');
             $('#telegram-config-section').slideDown();
             $(this).hide();
         });
 
-        $('#cancel-telegram-reconfigure').on('click', function() {
+        $('#cancel-telegram-reconfigure').on('click', function () {
             $('#provider-telegram-config').removeClass('expanded');
             $('#telegram-config-section').slideUp();
             $('#reconfigure-telegram').show();
@@ -428,13 +426,14 @@ var AuthPress_Plugin = function ($) {
         });
 
     }
+
     function resetReconfigurationForm() {
         $('#factor-reconfig-confirm').hide();
         $('#reconfig-status, #reconfig-validation-status').hide();
     }
 
-    function setupAuthenticatorConfiguration(){
-        $(document).on('click', '#wp_factor_generate_qr', function(e) {
+    function setupAuthenticatorConfiguration() {
+        $(document).on('click', '#wp_factor_generate_qr', function (e) {
             e.preventDefault();
             var $btn = $(this);
             var $qrSection = $('#wp_factor_qr_code');
@@ -450,7 +449,7 @@ var AuthPress_Plugin = function ($) {
                     action: 'setup_totp',
                     _wpnonce: $('input[name="wp_factor_totp_setup_nonce"]').val()
                 },
-                success: function(response) {
+                success: function (response) {
                     if (response.success) {
                         $qrSection.attr('src', response.data.qr_code_url).show();
                         $verificationSection.show();
@@ -460,13 +459,13 @@ var AuthPress_Plugin = function ($) {
                         $btn.prop('disabled', false).text('Generate QR Code');
                     }
                 },
-                error: function() {
+                error: function () {
                     alert('Error generating QR code');
                     $btn.prop('disabled', false).text('Generate QR Code');
                 }
             });
         });
-        $(document).on('submit', '#wp_factor_verify_form', function(e) {
+        $(document).on('submit', '#wp_factor_verify_form', function (e) {
             e.preventDefault();
             var $form = $(this);
             var $messageDiv = $('#wp_factor_totp_message');
@@ -486,17 +485,17 @@ var AuthPress_Plugin = function ($) {
                     code: code,
                     _wpnonce: $('input[name="wp_factor_totp_nonce"]').val()
                 },
-                success: function(response) {
+                success: function (response) {
                     if (response.success) {
                         $messageDiv.removeClass('notice-error').addClass('notice notice-success').html('<p>' + response.data.message + '</p>').show();
-                        setTimeout(function() {
+                        setTimeout(function () {
                             location.reload();
                         }, 2000);
                     } else {
                         $messageDiv.removeClass('notice-success').addClass('notice notice-error').html('<p>' + response.data.message + '</p>').show();
                     }
                 },
-                error: function() {
+                error: function () {
                     $messageDiv.removeClass('notice-success').addClass('notice notice-error').html('<p>Network error occurred</p>').show();
                 }
             });
@@ -505,17 +504,17 @@ var AuthPress_Plugin = function ($) {
 
     function setupEmailReconfiguration() {
         // Show reconfiguration section
-        $('#reconfigure-email').on('click', function() {
+        $('#reconfigure-email').on('click', function () {
             $('#email-reconfig-section').slideDown();
         });
 
         // Cancel reconfiguration
-        $('#cancel-reconfigure-email').on('click', function() {
+        $('#cancel-reconfigure-email').on('click', function () {
             $('#email-reconfig-section').slideUp();
         });
 
         // Send verification code for email
-        $('#authpress_send_email_code_btn').on('click', function() {
+        $('#authpress_send_email_code_btn').on('click', function () {
             var $btn = $(this);
             var email = $('#authpress_auth_email').val().trim();
             if (!email) {
@@ -535,7 +534,7 @@ var AuthPress_Plugin = function ($) {
                     authpress_auth_email: email,
                     _wpnonce: $('#authpress_email_nonce').val()
                 },
-                success: function(response) {
+                success: function (response) {
                     $btn.prop('disabled', false).text('Send Verification Code');
                     if (response.success) {
                         showStatus('#authpress-email-send-status', 'success', response.data.message);
@@ -546,7 +545,7 @@ var AuthPress_Plugin = function ($) {
                         showStatus('#authpress-email-send-status', 'error', response.data.message);
                     }
                 },
-                error: function() {
+                error: function () {
                     $btn.prop('disabled', false).text('Send Verification Code');
                     showStatus('#authpress-email-send-status', 'error', 'Network error. Please try again.');
                 }
@@ -554,7 +553,7 @@ var AuthPress_Plugin = function ($) {
         });
 
         // Verify and save email
-        $('#authpress_verify_email_code_btn').on('click', function() {
+        $('#authpress_verify_email_code_btn').on('click', function () {
             var $btn = $(this);
             var verificationCode = $('#authpress_verification_code').val().trim();
             if (!verificationCode) {
@@ -574,30 +573,30 @@ var AuthPress_Plugin = function ($) {
                     authpress_verification_code: verificationCode,
                     _wpnonce: $('#authpress_email_verification_nonce').val()
                 },
-                success: function(response) {
+                success: function (response) {
                     $btn.prop('disabled', false).text('Verify & Save');
                     if (response.success) {
                         showStatus('#authpress-email-verify-status', 'success', response.data.message);
-                        setTimeout(function() {
+                        setTimeout(function () {
                             location.reload();
                         }, 2000);
                     } else {
                         showStatus('#authpress-email-verify-status', 'error', response.data.message);
                     }
                 },
-                error: function() {
+                error: function () {
                     $btn.prop('disabled', false).text('Verify & Save');
                     showStatus('#authpress-email-verify-status', 'error', 'Network error. Please try again.');
                 }
             });
         });
 
-        $('#cancel-verify-email').on('click', function() {
+        $('#cancel-verify-email').on('click', function () {
             $('#email-verify-section').slideUp();
         });
 
         // Reset email to default
-        $('#authpress_reset_email_btn').on('click', function() {
+        $('#authpress_reset_email_btn').on('click', function () {
             var $btn = $(this);
             if (!confirm('Are you sure you want to reset to your default WordPress email address?')) {
                 return;
@@ -613,7 +612,7 @@ var AuthPress_Plugin = function ($) {
                     action: 'reset_auth_email',
                     _wpnonce: $('#authpress_email_nonce').val() // Re-using the nonce for simplicity
                 },
-                success: function(response) {
+                success: function (response) {
                     if (response.success) {
                         alert(response.data.message);
                         location.reload();
@@ -622,7 +621,7 @@ var AuthPress_Plugin = function ($) {
                         $btn.prop('disabled', false).text('Reset default mail');
                     }
                 },
-                error: function() {
+                error: function () {
                     alert('Network error. Please try again.');
                     $btn.prop('disabled', false).text('Reset default mail');
                 }
@@ -632,7 +631,7 @@ var AuthPress_Plugin = function ($) {
 
 }(jQuery);
 
-jQuery(function($) {
+jQuery(function ($) {
 
     $('.authpress-user-provider-toggle').on('change', function () {
         var $toggle = $(this);
@@ -672,68 +671,12 @@ jQuery(function($) {
         });
     });
 
-    window.openRecoveryCodesModal = function (url, redirect_to, html) {
-        $('#tg-modal-recovery').remove();
+    $("#regenerate_recovery_codes_btn").on("click", function () {
 
-        if (html) {
-            var $div = $('<div>').html(html);
-            var $modalElement = $div.find('#tg-modal-recovery').first();
-            if ($modalElement.length === 0) {
-                $modalElement = $div.children().first();
-            }
-
-            if ($modalElement.length) {
-                $('body').append($modalElement);
-
-                $('#confirm-recovery-codes').off('click').on('click', function () {
-                    window.location.href = redirect_to;
-                });
-            }
+        if (!confirm('Are you sure? This will invalidate your current recovery codes and generate new ones that you must save immediately.')) {
             return;
         }
 
-        $.ajax({
-            url: url,
-            method: 'GET',
-            dataType: 'html',
-            success: function (response) {
-                var $div = $('<div>').html(response);
-                var $modalElement = $div.find('#tg-modal-recovery').first();
-                if ($modalElement.length === 0) {
-                    $modalElement = $div.children().first();
-                }
-
-                if ($modalElement.length) {
-                    $('body').append($modalElement);
-
-                    $('#confirm-recovery-codes').off('click').on('click', function () {
-                        window.location.href = redirect_to;
-                    });
-                }
-            },
-            error: function () {
-                alert('Failed to load recovery codes modal');
-            }
-        });
-    };
-
-    window.closeRecoveryModal = function () {
-        $('#tg-modal-recovery').remove();
-    };
-
-    window.copyRecoveryCodes = function () {
-        var codes = $('.recovery-code-box').map(function () {
-            return $(this).text();
-        }).get().join('\n');
-
-        navigator.clipboard.writeText(codes).then(function () {
-            alert('Codes copied to clipboard!');
-        }).catch(function () {
-            alert('Failed to copy codes to clipboard');
-        });
-    }
-
-    window.regenerateRecoveryCodes = function () {
         var $btn = $('#regenerate_recovery_codes_btn');
         var originalText = $btn.text();
         var nonce = $('#regenerate_recovery_nonce').val();
@@ -752,7 +695,7 @@ jQuery(function($) {
                 $btn.prop('disabled', false).text(originalText);
 
                 if (response.success && response.data.html) {
-                    openRecoveryCodesModal('', window.location.href, response.data.html);
+                    $('body').append(response.data.html);
                 } else {
                     alert(response.data && response.data.message ? response.data.message : 'Failed to regenerate recovery codes');
                 }
@@ -762,6 +705,7 @@ jQuery(function($) {
                 alert('Network error occurred while regenerating recovery codes');
             }
         });
-    }
+
+    });
 
 });
