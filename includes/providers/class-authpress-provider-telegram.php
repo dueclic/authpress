@@ -442,7 +442,7 @@ class Telegram_Provider extends Abstract_Provider implements Provider_Otp_Interf
     }
 
     public function disable_user_method($user_id){
-        update_user_meta($user_id, 'tg_wp_factor_enabled', '0');
+        delete_user_meta($user_id, 'tg_wp_factor_enabled');
         delete_user_meta($user_id, 'tg_wp_factor_chat_id');
     }
 

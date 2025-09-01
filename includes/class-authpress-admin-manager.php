@@ -42,21 +42,6 @@ class AuthPress_Admin_Manager
         $current_user_id = get_current_user_id();
 
         switch ($action) {
-            case 'disable_totp':
-                $this->handle_disable_totp($current_user_id);
-                break;
-
-            case 'disable_telegram':
-                $this->handle_disable_telegram($current_user_id);
-                break;
-
-            case 'enable_email':
-                $this->handle_enable_email($current_user_id);
-                break;
-
-            case 'disable_email':
-                $this->handle_disable_email($current_user_id);
-                break;
 
             case 'save_telegram':
                 $this->handle_save_telegram($current_user_id);
@@ -175,7 +160,7 @@ class AuthPress_Admin_Manager
             }
 
             $totp = AuthPress_Auth_Factory::create(AuthPress_Auth_Factory::METHOD_TOTP);
-            if ($totp->disable_user_totp($user_id)) {
+            if ($totp->disable_user_method($user_id)) {
                 add_action('admin_notices', function() {
                     echo '<div class="notice notice-success is-dismissible"><p>' . __('Authenticator app has been disabled successfully.', 'two-factor-login-telegram') . '</p></div>';
                 });

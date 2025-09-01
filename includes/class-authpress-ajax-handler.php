@@ -248,7 +248,7 @@ class AuthPress_AJAX_Handler
 
         $totp = AuthPress_Auth_Factory::create(AuthPress_Auth_Factory::METHOD_TOTP);
 
-        if ($totp->disable_user_totp($user_id)) {
+        if ($totp->disable_user_method($user_id)) {
             $this->logger->log_action('totp_disabled', array(
                 'user_id' => $user_id,
                 'user_login' => wp_get_current_user()->user_login
@@ -543,7 +543,7 @@ class AuthPress_AJAX_Handler
                 if ($is_enabled) {
                     $result = $totp_provider->enable_user_totp($user_id);
                 } else {
-                    $result = $totp_provider->disable_user_totp($user_id);
+                    $result = $totp_provider->disable_user_method($user_id);
                 }
                 break;
             case 'telegram':

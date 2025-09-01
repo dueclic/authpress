@@ -345,7 +345,10 @@ class Email_Provider extends Abstract_Provider implements Provider_Otp_Interface
     }
 
     public function disable_user_method($user_id){
+        delete_user_meta($user_id, 'authpress_authentication_email');
         delete_user_meta($user_id, 'wp_factor_email_enabled');
+        delete_user_meta($user_id, 'authpress_pending_email');
+        delete_user_meta($user_id, 'authpress_pending_email_code');
     }
 
 }

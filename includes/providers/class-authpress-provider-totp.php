@@ -213,19 +213,6 @@ class TOTP_Provider extends Abstract_Provider
         return update_user_meta($user_id, 'wp_factor_totp_enabled', '1');
     }
 
-    /**
-     * Disable TOTP for a user
-     * @param int $user_id User ID
-     * @return bool True on success
-     */
-    public function disable_user_totp($user_id)
-    {
-        delete_user_meta($user_id, 'wp_factor_totp_enabled');
-        delete_user_meta($user_id, 'wp_factor_totp_secret');
-        return true;
-    }
-
-    // Implementation of abstract methods
 
     /**
      * Validate a code for a specific user
@@ -299,16 +286,6 @@ class TOTP_Provider extends Abstract_Provider
     }
 
     /**
-     * Delete all codes for a user (disable TOTP)
-     * @param int $user_id The user ID
-     * @return bool True on success, false on failure
-     */
-    public function delete_user_codes($user_id)
-    {
-        return $this->disable_user_totp($user_id);
-    }
-
-    /**
      * Get the icon URL for this provider
      * @return string PNG icon URL
      */
@@ -344,7 +321,8 @@ class TOTP_Provider extends Abstract_Provider
 
     public function disable_user_method($user_id)
     {
-        $this->disable_user_totp($user_id);
+        delete_user_meta($user_id, 'wp_factor_totp_enabled');
+        delete_user_meta($user_id, 'wp_factor_totp_secret');
     }
 
 }

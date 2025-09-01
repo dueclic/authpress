@@ -113,69 +113,6 @@ var AuthPress_Plugin = function ($) {
             });
         });
 
-        // Method selection buttons
-        $(document).on('click', '#setup-telegram-btn, #add-telegram-btn', function() {
-            $('#2fa-method-selection').hide();
-            $('#tg-2fa-configuration').show();
-            $('#totp-setup-section').hide();
-
-            // Smooth scroll to configuration section
-            $('html, body').animate({
-                scrollTop: $('#tg-2fa-configuration').offset().top - 50
-            }, 500);
-        });
-
-        $(document).on('click', '#setup-totp-btn, #add-totp-btn', function() {
-            $('#2fa-method-selection').hide();
-            setupTOTP();
-
-            // Smooth scroll to TOTP setup section
-            $('html, body').animate({
-                scrollTop: $('#totp-setup-section').offset().top - 50
-            }, 500);
-        });
-
-        // TOTP configuration buttons
-        $(document).on('click', '#totp-reconfigure-btn', function() {
-            setupTOTP();
-
-            // Smooth scroll to TOTP setup section
-            $('html, body').animate({
-                scrollTop: $('#totp-setup-section').offset().top - 50
-            }, 500);
-        });
-
-        $(document).on('click', '#totp-disable-btn', function() {
-            if (confirm(tlj.confirm_disable_totp || 'Are you sure you want to disable the Authenticator app? You will lose this 2FA method.')) {
-                disableTOTP();
-            }
-        });
-
-        $(document).on('click', '#totp-show-secret-btn', function() {
-            $('#totp-secret-manual').toggle();
-        });
-
-        $(document).on('click', '#totp-verify-btn', function() {
-            verifyTOTP();
-        });
-
-        // Back buttons to return to method selection
-        $(document).on('click', '.back-to-method-selection', function() {
-            $('#2fa-method-selection').show();
-            $('#tg-2fa-configuration').hide();
-            $('#totp-setup-section').hide();
-
-            // Smooth scroll to method selection
-            $('html, body').animate({
-                scrollTop: $('#2fa-method-selection').offset().top - 50
-            }, 500);
-        });
-
-        // TOTP verification code input - only allow numbers
-        $(document).on('input', '#totp-verification-code', function() {
-            this.value = this.value.replace(/[^0-9]/g, '');
-        });
-
         // Handle Failed Login Reports toggle for Telegram provider
         $(document).on('change', '#telegram_failed_login_reports', function() {
             var isEnabled = $(this).val() === '1';
@@ -782,7 +719,7 @@ jQuery(function($) {
 
     window.closeRecoveryModal = function () {
         $('#tg-modal-recovery').remove();
-    }
+    };
 
     window.copyRecoveryCodes = function () {
         var codes = $('.recovery-code-box').map(function () {

@@ -913,3 +913,8 @@
 .provider-card.messaging-provider .ap-button.ap-button--primary:hover {
     background: rgb(255,255,255,0.8);
 }
+
+
+.provider-card.messaging-provider .ap-button.ap-button--secondary {
+    border: 1px solid #fff;
+}
