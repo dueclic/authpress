@@ -34,6 +34,7 @@ if (empty($user_default_provider)) {
 
 // Check if user has any active 2FA methods
 $user_has_active_methods = $user_config['has_2fa'];
+
 ?>
 
 
@@ -283,15 +284,16 @@ $user_has_active_methods = $user_config['has_2fa'];
                             <p><?php _e('You don\'t have any recovery codes yet. Generate them now!', 'two-factor-login-telegram'); ?></p>
                         </div>
 
-                        <form method="post" action="">
-                            <?php wp_nonce_field('wp_factor_generate_recovery', 'wp_factor_recovery_nonce'); ?>
-                            <input type="hidden" name="authpress_action" value="generate_recovery">
-                            <div class="save-bar">
-                                <button type="submit" class="ap-button ap-button--primary">
-                                    <?php _e('Generate Recovery Codes', 'two-factor-login-telegram'); ?>
-                                </button>
-                            </div>
-                        </form>
+                        <div class="save-bar">
+                            <button type="button" id="generate_recovery_codes_btn"
+                                    class="ap-button ap-button--primary"
+                                    data-user-id="<?php echo $current_user_id; ?>"
+                            >
+                                <?php _e('Generate Recovery Codes', 'two-factor-login-telegram'); ?>
+                                <input type="hidden" id="regenerate_recovery_nonce"
+                                       value="<?php echo wp_create_nonce('tg_regenerate_recovery_codes_' . $current_user_id); ?>"/>
+                            </button>
+                        </div>
                     <?php endif; ?>
                 </div>
 

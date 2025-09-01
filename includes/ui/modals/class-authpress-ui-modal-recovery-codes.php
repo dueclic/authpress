@@ -110,6 +110,7 @@ class RecoveryCodesModal extends UI_Modal {
                           window.recoveryCodesCallback();
                       }
                       closeAuthPressModal("authpress-recovery-codes-modal");
+                      window.location.reload();
                   }
               ');
 
