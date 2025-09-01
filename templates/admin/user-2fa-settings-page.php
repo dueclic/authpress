@@ -168,16 +168,16 @@ $user_has_active_methods = $user_config['has_2fa'];
 
                                     ?>
 
-                                    <div class="provider-config ap-form"
+                                    <div class="provider-config ap-form <?php if ($user_has_method) {
+                                        echo 'provider-configured';
+                                    } ?>"
                                          id="provider-<?php echo esc_attr($provider_key); ?>-config">
 
                                         <?php
 
                                         if (file_exists($template_path)) {
-                                            // Load provider-specific user template
                                             include $template_path;
                                         } else {
-                                            // Fallback to generic user provider template
                                             include dirname(WP_FACTOR_TG_FILE) . '/templates/provider-templates/generic-provider.php';
                                         }
                                         ?>

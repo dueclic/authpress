@@ -744,6 +744,15 @@
     border-bottom-right-radius: 8px;
 }
 
+.provider-card.messaging-provider .provider-config.provider-configured:not(.expanded) {
+    background: none;
+    padding: 0;
+}
+
+.provider-card.messaging-provider .provider-config.provider-configured:not(.expanded) .authpress-config{
+    display: none;
+}
+
 .provider-card.messaging-provider .provider-config .ap-label {
     color: #ffffff;
     font-weight: 600;
@@ -753,7 +762,6 @@
 .provider-card.messaging-provider .provider-config .ap-button {
     background: rgba(255, 255, 255, 0.2);
     color: #ffffff;
-    border: 1px solid rgba(255, 255, 255, 0.3);
     transition: all 0.2s ease;
 }
 

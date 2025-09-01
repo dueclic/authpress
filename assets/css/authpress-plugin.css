@@ -380,22 +380,6 @@
     border-radius: 8px;
     margin-top: 15px;
 }
-
-#tg_wp_factor_chat_id_confirm {
-    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
-    font-size: 14px;
-    padding: 8px 12px;
-    border: 2px solid #ddd;
-    border-radius: 6px;
-    transition: all 0.2s ease;
-}
-
-#tg_wp_factor_chat_id_confirm:focus {
-    border-color: #667eea;
-    box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.2);
-    outline: none;
-}
-
 /* Responsive improvements */
 @media (max-width: 768px) {
     #tg-2fa-configuration .form-table td {
@@ -613,7 +597,6 @@
 
 .authpress-reconfig {
     display: none;
-    margin-top: var(--ap-space-lg);
 }
 
 .authpress-intro {
@@ -642,7 +625,6 @@
 }
 
 .tg-code-style {
-    background: var(--ap-light-gray);
     padding: 2px 6px;
     border-radius: var(--ap-radius-sm);
     font-family: var(--ap-font-mono), monospace;
