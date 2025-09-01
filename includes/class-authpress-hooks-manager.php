@@ -538,7 +538,7 @@ class AuthPress_Hooks_Manager
             ));
 
             // Include error template
-            require_once(dirname(WP_FACTOR_TG_FILE) . "/templates/error-security-failed.php");
+            require_once(dirname(WP_FACTOR_TG_FILE) . "/templates/error-telegram-security-failed.php");
         }
 
         /**
