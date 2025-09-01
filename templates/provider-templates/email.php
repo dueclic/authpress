@@ -62,7 +62,6 @@ $pending_email = get_user_meta($current_user_id, 'authpress_pending_email', true
 
         <!-- Hidden reconfiguration section -->
         <div class="authpress-reconfig" id="email-reconfig-section" style="display: none; margin-top: 20px;">
-            <h4 class="ap-notice ap-notice--info"><?php _e('Set Authentication Email', 'two-factor-login-telegram'); ?></h4>
             <?php wp_nonce_field('authpress_save_auth_email_' . $current_user_id, 'authpress_email_nonce'); ?>
             <table class="form-table">
                 <tr>
@@ -71,7 +70,7 @@ $pending_email = get_user_meta($current_user_id, 'authpress_pending_email', true
                     </th>
                     <td>
                         <input type="email" id="authpress_auth_email" class="ap-input" name="authpress_auth_email" value="<?php echo esc_attr($auth_email); ?>" class="regular-text" />
-                        <p class="description"><?php _e('Enter the email address to receive 2FA codes.', 'two-factor-login-telegram'); ?></p>
+                        <p class="ap-label"><?php _e('Enter the email address to receive 2FA codes.', 'two-factor-login-telegram'); ?></p>
                     </td>
                 </tr>
             </table>
@@ -94,11 +93,11 @@ $pending_email = get_user_meta($current_user_id, 'authpress_pending_email', true
             <table class="form-table">
                 <tr>
                     <th scope="row">
-                        <label for="authpress_verification_code"><?php _e('Verification Code', 'two-factor-login-telegram'); ?></label>
+                        <label class="ap-label" for="authpress_verification_code"><?php _e('Verification Code', 'two-factor-login-telegram'); ?></label>
                     </th>
                     <td>
                         <input type="text" id="authpress_verification_code" name="authpress_verification_code" value="" class="regular-text" />
-                        <p class="description"><?php _e('Enter the verification code you received in your email.', 'two-factor-login-telegram'); ?></p>
+                        <p class="ap-label"><?php _e('Enter the verification code you received in your email.', 'two-factor-login-telegram'); ?></p>
                     </td>
                 </tr>
             </table>
