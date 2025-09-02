@@ -499,11 +499,14 @@
 
 .provider-card .provider-card__body {
     background: transparent;
-    color: white;
     padding: 0 20px 16px 20px;
 }
 
-.provider-card .provider-card__body .ap-text {
+.provider-card:not(.setup-card) .provider-card__body {
+    color: white;
+}
+
+.provider-card:not(.setup-card) .provider-card__body .ap-text {
     color: #ffffff;
 }
 
@@ -604,7 +607,7 @@
     align-items: center;
     justify-content: space-between;
     padding: 20px;
-    color: white;
+    color: #000;
 }
 
 .provider-card__title {
@@ -705,9 +708,12 @@
 /* Configuration toggle button styling for messaging providers */
 .provider-card .provider-card__toggle {
     background: rgba(255, 255, 255, 0.1);
-    color: #ffffff;
     border-bottom: 1px solid rgba(255, 255, 255, 0.2);
     font-weight: 500;
+}
+
+.provider-card:not(.setup-card) .provider-card__toggle {
+    color: #ffffff;
 }
 
 .provider-card .provider-card__toggle:hover {
