@@ -1,35 +1,55 @@
-# AuthPress - Two-Factor Authentication with Telegram and Authenticator Apps
+# AuthPress - Advanced WordPress 2FA Plugin
 
-A WordPress plugin for two-factor authentication that supports both Telegram and authenticator apps (Google Authenticator, Authy, Microsoft Authenticator, etc.).
+**AuthPress** is a comprehensive two-factor authentication plugin for WordPress that started with Telegram support and has evolved into a flexible multi-provider 2FA solution. Secure your WordPress site with multiple authentication methods and extensible provider system.
 
-## Features
+## 🚀 Key Features
 
-### 🔐 Authentication Providers
+### 🔐 Multiple Authentication Providers
 
-- **Telegram**: Receive authentication codes via Telegram messages
-- **Authenticator Apps**: Use standard TOTP apps like Google Authenticator, Authy, Microsoft Authenticator
-- **Multi-Provider Support**: Users can configure both methods for enhanced security
+- **Telegram** 📱: Our original provider - receive codes via Telegram messages
+- **Email** 📧: Send verification codes via email
+- **Authenticator Apps** 🔐: TOTP support for Google Authenticator, Authy, Microsoft Authenticator, and more
+- **Recovery Codes** 🔑: Emergency backup codes for account recovery
+- **Custom Providers** 🔧: Extensible system supporting SMS, Passkey, and other custom implementations
 
-### 📱 Telegram Provider
+### 📱 Telegram Provider (Original)
 
-- Automatic authentication code delivery
+- Instant authentication code delivery via Telegram bot
 - Failed login attempt notifications
-- Works on any device with Telegram
-- Simple configuration via Bot Token
+- Works on any device with Telegram installed
+- Simple setup with Bot Token from @BotFather
+- Admin alerts for security monitoring
 
-### 🔐 Authenticator Provider
+### 📧 Email Provider
 
-- TOTP (Time-based One-Time Password) standard
-- Works offline (no internet connection required)
+- Send verification codes via email
+- Configurable token duration
+- Compatible with all email clients
+- Fallback option when other methods unavailable
+
+### 🔐 Authenticator Apps (TOTP)
+
+- Standard TOTP (Time-based One-Time Password) support
+- Works completely offline
 - Compatible with all major authenticator apps
-- QR codes for quick setup
+- Easy setup with QR codes or manual entry
+- 30-second rotating codes
 
-### 🛡️ Security Features
+### 🔧 Extensibility & Custom Providers
 
-- Recovery codes for emergency access
-- Detailed activity logging
-- Centralized provider management
-- Compatibility with existing systems
+- **Developer-friendly**: Simple API for creating custom providers
+- **SMS Support**: Ready-to-use SMS providers (via extensions)
+- **Passkey Support**: Modern WebAuthn implementation available
+- **Plugin Architecture**: Each provider can be a separate plugin
+- **Seamless Integration**: All providers work together in the same interface
+
+### 🛡️ Security & Management
+
+- **Recovery Codes**: Single-use emergency access codes
+- **Advanced Logging**: Detailed activity monitoring with pagination
+- **Centralized Management**: All providers configured in one place
+- **Rate Limiting**: Protection against brute force attacks
+- **Secure Storage**: Hashed codes and encrypted user data
 
 ## Installation
 
@@ -42,11 +62,13 @@ A WordPress plugin for two-factor authentication that supports both Telegram and
 
 ### 1. Provider Configuration
 
-Go to **Settings > AuthPress > Providers** to:
+Go to **Settings > AuthPress > Providers** to configure available 2FA methods:
 
-- **Enable/Disable Providers**: Choose which 2FA methods to make available
-- **Configure Telegram**: Enter Bot Token and configure notifications
-- **Configure Authenticator**: Enable support for authenticator apps
+- **Telegram Provider**: Enter Bot Token and configure notifications
+- **Email Provider**: Set token duration and email templates
+- **Authenticator Provider**: Enable TOTP support for authenticator apps
+- **Recovery Codes**: Configure emergency access codes
+- **Custom Providers**: Configure any installed third-party providers (SMS, Passkey, etc.)
 
 ### 2. Telegram Configuration
 
@@ -57,15 +79,17 @@ Go to **Settings > AuthPress > Providers** to:
 
 ### 3. User Configuration
 
-Users can configure 2FA in their profile:
+Users can enable and configure 2FA in their WordPress profile:
 
-1. Go to **User Profile**
-2. **AuthPress** section
-3. Enable 2FA
-4. Choose preferred method:
-   - **Telegram**: Enter Chat ID and verify
-   - **Authenticator**: Scan QR code or enter manual code
-5. Configure recovery codes
+1. Navigate to **Users > Your Profile**
+2. Scroll to the **AuthPress** section
+3. Choose and configure your preferred 2FA methods:
+   - **Telegram**: Enter Chat ID and verify with test code
+   - **Email**: Automatically uses account email
+   - **Authenticator**: Scan QR code or manually enter secret
+   - **Recovery Codes**: Generate and securely store backup codes
+4. Users can enable multiple providers for redundancy
+5. Test each method before relying on it for login
 
 ## Usage
 
@@ -82,22 +106,33 @@ When a user with 2FA enabled logs in:
 ### Authentication Methods
 
 #### Telegram
+- Receive a 6-digit code via Telegram message
+- Instant delivery with confirmation buttons
+- Codes expire after 5 minutes for security
+- Admin notifications for failed attempts
 
-- Receive a code via Telegram message
-- Enter the code on the login page
-- Code automatically expires after 5 minutes
+#### Email
+- Verification codes sent to registered email address
+- Configurable expiration time (default: 20 minutes)
+- HTML formatted emails with security information
+- Works with all email providers
 
-#### Authenticator App
-
-- Open your authenticator app
-- Enter the displayed 6-digit code
-- Code updates every 30 seconds
+#### Authenticator App (TOTP)
+- Use Google Authenticator, Authy, Microsoft Authenticator, or any TOTP app
+- 6-digit codes that refresh every 30 seconds
+- Works completely offline
+- Scan QR code for quick setup
 
 #### Recovery Codes
+- Emergency single-use backup codes (typically 8 codes)
+- Use when primary methods are unavailable
+- Regenerate new codes anytime
+- Store securely offline
 
-- Use one of the generated recovery codes
-- Codes are single-use
-- You can regenerate new codes when needed
+#### Custom Providers
+- SMS codes via various SMS providers
+- Passkey/WebAuthn for biometric authentication
+- Any custom implementation following AuthPress API
 
 ## Administration
 
@@ -158,31 +193,84 @@ Administrators can:
 - Server-side validation
 - Protection against brute force attacks
 
-## Support
+## 🔧 For Developers
+
+### Creating Custom Providers
+
+AuthPress features a powerful extensible architecture that allows developers to create custom 2FA providers. The system supports:
+
+- **SMS Providers**: Integrate with services like Twilio, MessageBird, etc.
+- **Push Notifications**: Mobile app-based authentication
+- **Hardware Tokens**: YubiKey, RSA tokens, etc.
+- **Biometric Authentication**: Passkey/WebAuthn support
+- **Custom APIs**: Any external authentication service
+
+### Getting Started with Custom Providers
+
+1. **Study the Documentation**: Check `https://github.com/dueclic/authpress/custom_providers/DEVELOPER-GUIDE-CUSTOM-PROVIDERS.md`
+2. **Simple API**: Extend the `Abstract_Provider` class
+3**WordPress Integration**: Use standard WordPress hooks and filters
+
+```php
+// Register your provider
+function my_sms_provider_register($providers) {
+    $providers['my_sms'] = 'MyPlugin\\SMS_Provider';
+    return $providers;
+}
+add_filter('authpress_register_providers', 'my_sms_provider_register');
+```
+
+### Available Extensions
+
+- **AuthPress SMS with Aimon** - SMS provider using Aimon service
+- **AuthPress Passkey** - WebAuthn/Passkey implementation
+- **More providers** - Check WordPress repository for additional providers
+
+## 📞 Support
 
 For support and assistance:
 
 - **Email**: info@dueclic.com
 - **WordPress.org**: [Support Section](https://wordpress.org/support/plugin/two-factor-login-telegram/)
 - **GitHub**: [Issues](https://github.com/dueclic/authpress/issues)
+- **Developer Documentation**: `https://github.com/dueclic/authpress/custom_providers/DEVELOPER-GUIDE-CUSTOM-PROVIDERS.md`
 
 ## Changelog
 
-### Version 2.0.0
+### Version 4.0.0 - "AuthPress" (Current)
 
-- ✨ New provider system (Telegram + Authenticator)
-- 🔐 Support for TOTP authenticator apps
-- 📱 Improved user interface for method selection
-- 🛡️ Centralized settings management
-- 📊 Enhanced logging for all methods
-- 🔄 Compatibility with existing configurations
+- 🎉 **Rebranded to AuthPress** - reflecting the evolution beyond Telegram
+- 🔧 **Extensible Provider System** - developers can create custom 2FA providers
+- 📧 **Email Provider** - built-in email-based 2FA support
+- 🔐 **Enhanced TOTP** - improved authenticator app support
+- 🛠️ **Developer API** - comprehensive system for custom providers
+- 📊 **Professional Logging** - WP_List_Table implementation with pagination
+- 🗄️ **Database Migration** - moved from WordPress options to MySQL tables
+- 🎨 **UI/UX Overhaul** - completely redesigned interface
+- 🌐 **Better i18n** - improved internationalization support
+- 🔒 **Enhanced Security** - improved validation and rate limiting
 
-### Previous Versions
+### Version 3.5.x
 
-- Telegram support with notifications
-- Recovery codes
-- Activity logging
-- User management
+- Enhanced logs system with professional interface
+- Better user management in admin area
+- Improved Chat ID validation
+- JavaScript translations
+- Template system for error handling
+
+### Version 3.0-3.4
+
+- Webhook system for Telegram user_id retrieval
+- Activity logs implementation
+- WordPress 6.x compatibility updates
+- Security improvements and bug fixes
+
+### Earlier Versions (1.0-2.9)
+
+- Original Telegram-only implementation
+- Basic 2FA functionality
+- WordPress compatibility updates
+- Foundation features and security fixes
 
 ## License
 

@@ -2,6 +2,7 @@
 /.git
 /.github
 /node_modules
+/custom_providers
 
 .distignore
 .gitignore
