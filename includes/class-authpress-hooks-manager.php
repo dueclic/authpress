@@ -471,6 +471,9 @@ class AuthPress_Hooks_Manager
 
         foreach ($tables as $old_table => $new_table) {
 
+            $old_table = $wpdb->prefix.$old_table;
+            $new_table = $wpdb->prefix.$new_table;
+
             // Check if old table exists and new table doesn't
             $old_exists = $wpdb->get_var("SHOW TABLES LIKE '$old_table'") == $old_table;
             $new_exists = $wpdb->get_var("SHOW TABLES LIKE '$new_table'") == $new_table;
