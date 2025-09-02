@@ -26,7 +26,7 @@
             <?php
             printf(__('Submit your issues or ideas on our <a href="%s" target="_blank">GitHub project page</a>.',
                 "two-factor-login-telegram"),
-                'https://github.com/debba/wp-two-factor-authentication-with-telegram/issues');
+                'https://github.com/dueclic/authpress/issues');
             ?>
         </li>
     </ol>

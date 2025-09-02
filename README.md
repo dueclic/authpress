@@ -164,7 +164,7 @@ For support and assistance:
 
 - **Email**: info@dueclic.com
 - **WordPress.org**: [Support Section](https://wordpress.org/support/plugin/two-factor-login-telegram/)
-- **GitHub**: [Issues](https://github.com/debba/wp-two-factor-authentication-with-telegram/issues)
+- **GitHub**: [Issues](https://github.com/dueclic/authpress/issues)
 
 ## Changelog
 
