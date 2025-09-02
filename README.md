@@ -220,12 +220,6 @@ function my_sms_provider_register($providers) {
 add_filter('authpress_register_providers', 'my_sms_provider_register');
 ```
 
-### Available Extensions
-
-- **AuthPress SMS with Aimon** - SMS provider using Aimon service
-- **AuthPress Passkey** - WebAuthn/Passkey implementation
-- **More providers** - Check WordPress repository for additional providers
-
 ## 📞 Support
 
 For support and assistance:
