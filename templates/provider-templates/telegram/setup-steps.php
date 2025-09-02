@@ -56,12 +56,12 @@ function render_telegram_instructions($username_link, $is_reconfigure = false) {
         <div class="ap-form">
             <div class="ap-form__group">
                 <label class="ap-label" for="authpress_telegram_chat_id"><?php _e('Telegram Chat ID', "two-factor-login-telegram"); ?></label>
+                <p class="ap-text ap-text--small mb-8"><?php _e('Put your Telegram Chat ID', "two-factor-login-telegram"); ?></p>
                 <div class="field-row">
                     <div class="input-container">
                         <input type="text" name="authpress_telegram_chat_id"
                                id="authpress_telegram_chat_id" value="<?php echo $telegram_chat_id; ?>"
                                class="ap-input"/>
-                        <span class="ap-text ap-text--small"><?php _e('Put your Telegram Chat ID', "two-factor-login-telegram"); ?></span>
                     </div>
                     <button type="button" class="ap-button ap-button--primary tg-action-button"
                             id="authpress_telegram_chat_id_send"><?php _e("Submit code", "two-factor-login-telegram"); ?></button>
@@ -71,12 +71,12 @@ function render_telegram_instructions($username_link, $is_reconfigure = false) {
 
             <div class="ap-form__group" id="factor-chat-confirm" style="display: none;">
                 <label class="ap-label" for="authpress_telegram_chat_id_confirm"><?php _e('Confirmation code', "two-factor-login-telegram"); ?></label>
+                <p class="ap-text ap-text--small mb-8"><?php _e('Please enter the confirmation code you received on Telegram', "two-factor-login-telegram"); ?></p>
                 <div class="field-row">
                     <div class="input-container">
                         <input type="text" name="authpress_telegram_chat_id_confirm"
                                id="authpress_telegram_chat_id_confirm" value=""
                                class="ap-input"/>
-                        <span class="ap-text ap-text--small"><?php _e('Please enter the confirmation code you received on Telegram', "two-factor-login-telegram"); ?></span>
                     </div>
                     <button type="button" class="ap-button ap-button--primary tg-action-button"
                             id="authpress_telegram_chat_id_check"><?php _e("Validate", "two-factor-login-telegram"); ?></button>

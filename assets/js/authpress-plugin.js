@@ -356,12 +356,11 @@ var AuthPress_Plugin = function ($) {
         });
         $(document).on('submit', '#wp_factor_verify_form', function (e) {
             e.preventDefault();
-            var $form = $(this);
             var $messageDiv = $('#wp_factor_totp_message');
-            var code = $('#wp_factor_totp_code').val().trim();
+            var code = $('#authpress_authenticator_totp_code').val().trim();
 
             if (code.length !== 6) {
-                $messageDiv.removeClass('notice-success').addClass('notice notice-error').html('<p>Please enter a 6-digit code</p>').show();
+                $messageDiv.removeClass('ap-notice--success').addClass('ap-notice--error').html('<p>Please enter a 6-digit code</p>').show();
                 return;
             }
 
@@ -376,16 +375,16 @@ var AuthPress_Plugin = function ($) {
                 },
                 success: function (response) {
                     if (response.success) {
-                        $messageDiv.removeClass('notice-error').addClass('notice notice-success').html('<p>' + response.data.message + '</p>').show();
+                        $messageDiv.removeClass('ap-notice--error').addClass('ap-notice--success').html('<p>' + response.data.message + '</p>').show();
                         setTimeout(function () {
                             location.reload();
                         }, 2000);
                     } else {
-                        $messageDiv.removeClass('notice-success').addClass('notice notice-error').html('<p>' + response.data.message + '</p>').show();
+                        $messageDiv.removeClass('ap-notice--success').addClass('ap-notice--error').html('<p>' + response.data.message + '</p>').show();
                     }
                 },
                 error: function () {
-                    $messageDiv.removeClass('notice-success').addClass('notice notice-error').html('<p>Network error occurred</p>').show();
+                    $messageDiv.removeClass('ap-notice--success').addClass('ap-notice--error').html('<p>Network error occurred</p>').show();
                 }
             });
         });

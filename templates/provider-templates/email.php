@@ -60,7 +60,7 @@ $pending_email = get_user_meta($current_user_id, 'authpress_pending_email', true
                         <label class="ap-label" for="authpress_auth_email"><?php _e('New Authentication Email', 'two-factor-login-telegram'); ?></label>
                     </th>
                     <td>
-                        <input type="email" id="authpress_auth_email" class="ap-input" name="authpress_auth_email" value="<?php echo esc_attr($auth_email); ?>" class="regular-text" />
+                        <input type="email" id="authpress_auth_email" class="ap-input" name="authpress_auth_email" value="<?php echo esc_attr($auth_email); ?>"/>
                         <p class="ap-label"><?php _e('Enter the email address to receive 2FA codes.', 'two-factor-login-telegram'); ?></p>
                     </td>
                 </tr>

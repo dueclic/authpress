@@ -55,11 +55,14 @@
     --ap-transition: all 0.2s ease;
     --ap-transition-slow: all 0.3s ease;
 
-    --ap-email-provider-color-start: #09a3b8;
-    --ap-email-provider-color-end: #16b88a;
+    --ap-email-provider-color-start: #005293;
+    --ap-email-provider-color-end: #007BFF;
 
-    --ap-telegram-provider-color-start: #7c3aed;
-    --ap-telegram-provider-color-end: #6366f1;
+    --ap-telegram-provider-color-start: #0077b3;
+    --ap-telegram-provider-color-end: #33a4d6;
+
+    --ap-authenticator-provider-color-start: #81939c;
+    --ap-authenticator-provider-color-end: #B0BEC5;
 
     --ap-text-size: 16px;
     --ap-text-size-small: 14px;
