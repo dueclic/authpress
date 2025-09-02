@@ -35,7 +35,7 @@ final class AuthPress_Plugin
         do_action_deprecated(
             'wp_factor_telegram_loaded',
             array(),
-            '3.6.0',
+            '4.0.0',
             'authpress_loaded',
             __('The action wp_factor_telegram_loaded is deprecated. Use authpress_loaded instead.', 'two-factor-login-telegram')
         );

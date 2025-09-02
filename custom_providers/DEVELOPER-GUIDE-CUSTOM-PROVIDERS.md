@@ -239,7 +239,7 @@ class SMS_Aimon_Provider extends Abstract_Provider
 
 ### Integrated Configuration
 
-Since version 3.6.0, all external providers are configured directly in the AuthPress providers interface. Provider settings are stored in the main `authpress_providers` option:
+Since version 4.0.0, all external providers are configured directly in the AuthPress providers interface. Provider settings are stored in the main `authpress_providers` option:
 
 ```php
 // Retrieve provider configuration from AuthPress settings
