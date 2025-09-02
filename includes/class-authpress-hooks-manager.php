@@ -235,7 +235,7 @@ class AuthPress_Hooks_Manager
                 $provider = AuthPress_Provider_Registry::get('telegram');
 
                 // Check if the token is valid using the transient method
-                if ($provider->validate_tokencheck_authcode($token, $chat_id)) {
+                if ($provider && $provider->validate_tokencheck_authcode($token, $chat_id)) {
 
                     // Save user 2FA settings - this enables 2FA and saves the chat_id
                     $save_result = $provider->save_user_2fa_settings($user_id, $chat_id, true);
