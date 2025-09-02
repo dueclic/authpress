@@ -73,6 +73,8 @@ class AuthPress_Hooks_Manager
         //add_action('admin_init', array($this->admin_manager, 'register_settings'));
         add_action('admin_init', array($this->admin_manager, 'register_providers_settings'));
         add_action('admin_init', array($this->admin_manager, 'handle_2fa_settings_forms'));
+        add_action('admin_init', array($this, 'handle_telegram_validation'));
+        add_action('authpress_user_providers_page_notices', array($this, 'handle_authpress_user_provider_page_notices'));
         add_action("admin_menu", array($this->admin_manager, 'load_menu'));
         add_filter('authpress_provider_card_col_class', array($this->admin_manager, 'provider_card_col_class'), 10, 4);
         add_filter('authpress_user_provider_card_col_class', array($this->admin_manager, 'provider_card_col_class'), 10, 4);
@@ -106,9 +108,6 @@ class AuthPress_Hooks_Manager
         add_action('wp_ajax_disable_user_2fa_telegram', array($this->ajax_handler, 'disable_user_2fa_ajax'));
         add_action('wp_ajax_force_setup_wizard', array($this, 'handle_force_setup_wizard_ajax'));
         add_action('wp_ajax_authpress_update_user_provider_status', array($this->ajax_handler, 'update_user_provider_status'));
-
-        add_action('authpress_user_providers_page_notices', array($this, 'handle_telegram_validation'));
-
     }
 
     private function add_rest_api_hooks()
@@ -179,6 +178,32 @@ class AuthPress_Hooks_Manager
         }
     }
 
+    public function handle_authpress_user_provider_page_notices()
+    {
+        $authpress_page_notice = get_transient('authpress_user_providers_page_notice');
+
+        if (!$authpress_page_notice) {
+            return;
+        }
+
+        if ($authpress_page_notice === 'telegram_security_error') {
+            echo '<div class="notice notice-error is-dismissible"><p>';
+            _e('❌ Validation failed. Security error: user mismatch.', 'two-factor-login-telegram');
+            echo '</p></div>';
+        } else if ($authpress_page_notice === 'telegram_validation_success') {
+            echo '<div class="notice notice-success is-dismissible"><p>';
+            _e('✅ Telegram validation successful! Your 2FA setup is now confirmed and enabled.', 'two-factor-login-telegram');
+            echo '</p></div>';
+        } else if ($authpress_page_notice === 'telegram_validation_failed') {
+            echo '<div class="notice notice-error is-dismissible"><p>';
+            _e('❌ Validation failed. The token is invalid, has expired, or there was a security error.', 'two-factor-login-telegram');
+            echo '</p></div>';
+        }
+
+        delete_transient('authpress_user_providers_page_notice');
+
+    }
+
     public function handle_telegram_validation()
     {
         // Only handle if we're on the current user's profile and we have validation parameters
@@ -199,9 +224,8 @@ class AuthPress_Hooks_Manager
 
             // Verify that the user_id matches the current user
             if ($user_id !== $current_user_id) {
-                echo '<div class="notice notice-error is-dismissible"><p>';
-                _e('❌ Validation failed. Security error: user mismatch.', 'two-factor-login-telegram');
-                echo '</p></div>';
+                set_transient('authpress_user_providers_page_notice', 'telegram_security_error', 60);
+                wp_safe_redirect(admin_url('users.php?page=my-2fa-settings'));
                 return;
             }
 
@@ -249,15 +273,15 @@ class AuthPress_Hooks_Manager
                 ));
             }
 
-            if ($validation_success) {
-                echo '<div class="notice notice-success is-dismissible"><p>';
-                _e('✅ Telegram validation successful! Your 2FA setup is now confirmed and enabled.', 'two-factor-login-telegram');
-                echo '</p></div>';
-            } else {
-                echo '<div class="notice notice-error is-dismissible"><p>';
-                _e('❌ Validation failed. The token is invalid, has expired, or there was a security error.', 'two-factor-login-telegram');
-                echo '</p></div>';
-            }
+            set_transient(
+                    'authpress_user_providers_page_notice', $validation_success ?
+                    'telegram_validation_success' :
+                    'telegram_validation_failed',
+                    60
+            );
+
+            wp_safe_redirect(admin_url('users.php?page=my-2fa-settings'));
+
         }
     }
 
@@ -471,8 +495,8 @@ class AuthPress_Hooks_Manager
 
         foreach ($tables as $old_table => $new_table) {
 
-            $old_table = $wpdb->prefix.$old_table;
-            $new_table = $wpdb->prefix.$new_table;
+            $old_table = $wpdb->prefix . $old_table;
+            $new_table = $wpdb->prefix . $new_table;
 
             // Check if old table exists and new table doesn't
             $old_exists = $wpdb->get_var("SHOW TABLES LIKE '$old_table'") == $old_table;
