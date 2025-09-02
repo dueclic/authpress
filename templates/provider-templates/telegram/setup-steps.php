@@ -66,7 +66,7 @@ function render_telegram_instructions($username_link, $is_reconfigure = false) {
                     <button type="button" class="ap-button ap-button--primary tg-action-button"
                             id="authpress_telegram_chat_id_send"><?php _e("Submit code", "two-factor-login-telegram"); ?></button>
                 </div>
-                <div id="chat-id-status" class="tg-status" style="display: none;"></div>
+                <div id="chat-id-status" class="mt-8 tg-status" style="display: none;"></div>
             </div>
 
             <div class="ap-form__group" id="factor-chat-confirm" style="display: none;">

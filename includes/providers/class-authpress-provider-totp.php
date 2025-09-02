@@ -280,16 +280,6 @@ class TOTP_Provider extends Abstract_Provider
         return $this->is_user_totp_enabled($user_id) && !empty($this->get_user_secret($user_id));
     }
 
-    /**
-     * Get the icon URL for this provider
-     * @return string PNG icon URL
-     */
-    public function get_icon()
-    {
-        $logo = plugin_dir_url(AUTHPRESS_PLUGIN_FILE) . '/assets/images/providers/authenticator-icon.png';
-        return apply_filters('authpress_provider_logo', $logo, 'totp');
-    }
-
     public function get_key()
     {
         return 'authenticator';

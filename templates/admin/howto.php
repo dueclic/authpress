@@ -53,20 +53,20 @@
                             <div class="instruction-icon">📱</div>
                             <div class="instruction-text">
                                 <strong><?php _e('Open Telegram', 'two-factor-login-telegram'); ?></strong>
-                                <p><?php printf(__('Start a conversation with %s', "two-factor-login-telegram"), 
+                                <p><?php printf(__('Start a conversation with %s', "two-factor-login-telegram"),
                                     '<a href="https://telegram.me/botfather" target="_blank" class="external-link">@BotFather</a>'); ?></p>
                             </div>
                         </div>
-                        
+
                         <div class="instruction-item">
                             <div class="instruction-icon">⚡</div>
                             <div class="instruction-text">
                                 <strong><?php _e('Create new bot', 'two-factor-login-telegram'); ?></strong>
-                                <p><?php printf(__('Type command %s to start bot creation', "two-factor-login-telegram"), 
+                                <p><?php printf(__('Type command %s to start bot creation', "two-factor-login-telegram"),
                                     '<code class="command">/newbot</code>'); ?></p>
                             </div>
                         </div>
-                        
+
                         <div class="instruction-item">
                             <div class="instruction-icon">⚙️</div>
                             <div class="instruction-text">
@@ -74,7 +74,7 @@
                                 <p><?php _e('Follow the prompts to set a name and username for your bot', 'two-factor-login-telegram'); ?></p>
                             </div>
                         </div>
-                        
+
                         <div class="instruction-item">
                             <div class="instruction-icon">🔑</div>
                             <div class="instruction-text">
@@ -87,7 +87,7 @@
                     <div class="visual-helper">
                         <div class="screenshot-container">
                             <img class="help-screenshot"
-                                 src="<?php echo plugins_url("/assets/img/help-api-token.png", AUTHPRESS_PLUGIN_FILE); ?>"
+                                 src="<?php echo plugins_url("/assets/images/help-api-token.png", AUTHPRESS_PLUGIN_FILE); ?>"
                                  alt="<?php _e('Bot token example', 'two-factor-login-telegram'); ?>">
                         </div>
                     </div>
@@ -134,16 +134,16 @@
                                         '<a href="https://telegram.me/' . $bot_username . '" target="_blank" class="external-link">@' . $bot_username . '</a>'); ?></p>
                                 </div>
                             </div>
-                            
+
                             <div class="instruction-item">
                                 <div class="instruction-icon">📱</div>
                                 <div class="instruction-text">
                                     <strong><?php _e('Get your ID', 'two-factor-login-telegram'); ?></strong>
-                                    <p><?php printf(__('Type %s to get your Chat ID', "two-factor-login-telegram"), 
+                                    <p><?php printf(__('Type %s to get your Chat ID', "two-factor-login-telegram"),
                                         '<code class="command">/get_id</code>'); ?></p>
                                 </div>
                             </div>
-                            
+
                             <div class="instruction-item">
                                 <div class="instruction-icon">📋</div>
                                 <div class="instruction-text">
@@ -157,7 +157,7 @@
                             <p><strong><?php _e('Bot not configured yet', 'two-factor-login-telegram'); ?></strong></p>
                             <p><?php _e('Configure your bot token in the Providers tab first, then return here for personalized instructions.', "two-factor-login-telegram"); ?></p>
                         </div>
-                        
+
                         <div class="alternative-method">
                             <h4><?php _e('Alternative method', 'two-factor-login-telegram'); ?></h4>
                             <p><?php printf(__('Use %s and type %s to get your Chat ID.', "two-factor-login-telegram"),
@@ -218,7 +218,7 @@
                             <p><?php _e('No configuration required - uses your account email automatically', 'two-factor-login-telegram'); ?></p>
                         </div>
                     </div>
-                    
+
                     <div class="instruction-item">
                         <div class="instruction-icon">⚡</div>
                         <div class="instruction-text">
@@ -255,7 +255,7 @@
                                 <p><?php _e('Configure how long email codes remain valid (default: 20 minutes)', 'two-factor-login-telegram'); ?></p>
                             </div>
                         </div>
-                        
+
                         <div class="instruction-item">
                             <div class="instruction-icon">📬</div>
                             <div class="instruction-text">
@@ -263,7 +263,7 @@
                                 <p><?php _e('Optionally set a different email address for 2FA in your profile', 'two-factor-login-telegram'); ?></p>
                             </div>
                         </div>
-                        
+
                         <div class="instruction-item">
                             <div class="instruction-icon">🧪</div>
                             <div class="instruction-text">
@@ -704,11 +704,11 @@
     .flow-steps {
         grid-template-columns: 1fr;
     }
-    
+
     .comparison-table {
         overflow-x: auto;
     }
-    
+
     .ap-grid {
         grid-template-columns: 1fr;
     }

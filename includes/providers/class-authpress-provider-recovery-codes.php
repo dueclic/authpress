@@ -158,16 +158,6 @@ class Recovery_Codes_Provider extends Abstract_Provider
         return true;
     }
 
-    /**
-     * Get the icon URL for this provider
-     * @return string PNG icon URL
-     */
-    public function get_icon()
-    {
-        $logo = plugin_dir_url(AUTHPRESS_PLUGIN_FILE) . '/assets/images/providers/recovery-codes-icon.png';
-        return apply_filters('authpress_provider_logo', $logo, 'recovery-codes');
-    }
-
     public function get_key()
     {
         return 'recovery_codes';

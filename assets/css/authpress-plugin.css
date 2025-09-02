@@ -364,8 +364,12 @@
     }
 }
 
-.authpress-provider-options .authpress-provider-option {
+.authpress-default-provider-options .authpress-provider-option {
     display: block;
+}
+
+.authpress-default-provider-options .authpress-provider-option .provider-name {
+    font-weight: bold;
 }
 
 #provider-telegram-config .authpress-setup .setup-steps .ap-heading {
@@ -609,6 +613,13 @@
     gap: 10px;
     font-size: 18px;
     font-weight: 700;
+}
+
+.provider-card__title .icon-circle {
+    background-size: 18px 18px;
+    color: #fff;
+    background-repeat: no-repeat;
+    background-position: center center;
 }
 
 .provider-card__body {

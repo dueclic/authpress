@@ -81,15 +81,17 @@ $provider_categories = authpress_provider_categories(
                         <?php do_action('authpress_provider_card_before_header', $provider, $provider_key, $category_key); ?>
 
                         <header class="provider-card__header" <?php echo $header_style ? 'style="' . esc_attr($header_style) . '"' : ''; ?>>
-                            <div class="provider-card__title" id="provider-<?php echo esc_attr($provider_key); ?>-title">
+                            <div class="provider-card__title"
+                                 id="provider-<?php echo esc_attr($provider_key); ?>-title">
                                 <?php
                                 $icon_html = apply_filters('authpress_provider_icon_html',
-                                    '<span class="icon-circle" aria-hidden="true">📨</span>',
-                                    $provider, $provider_key, $category_key
+                                        '<span class="icon-circle" aria-hidden="true" style="background-image: url('.esc_attr($provider->get_icon()).');"></span>',
+                                        $provider, $provider_key, $category_key
                                 );
                                 echo $icon_html;
                                 ?>
                                 <span><?php echo esc_html($provider->get_name()); ?></span>
+
                             </div>
 
                             <?php $toggle_label = apply_filters('authpress_provider_toggle_label',
@@ -243,7 +245,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Auto-submit form when provider checkboxes are toggled
     const providerCheckboxes = document.querySelectorAll('input[type="checkbox"][name*="authpress_providers"][name*="[enabled]"]');
-    
+
     providerCheckboxes.forEach(checkbox => {
         checkbox.addEventListener('change', function() {
             this.form.submit();

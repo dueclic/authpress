@@ -378,16 +378,6 @@ class Telegram_Provider extends Abstract_Provider implements Provider_Otp_Interf
         return __('Telegram', 'two-factor-login-telegram');
     }
 
-    /**
-     * Get the icon URL for this provider
-     * @return string PNG icon URL
-     */
-    public function get_icon()
-    {
-        $logo = plugin_dir_url(AUTHPRESS_PLUGIN_FILE) . '/assets/images/providers/telegram-icon.png';
-        return apply_filters('authpress_provider_logo', $logo, 'telegram');
-    }
-
     public function get_key()
     {
         return 'telegram';

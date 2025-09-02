@@ -20,26 +20,20 @@ abstract class Abstract_Provider
     protected $description;
 
     /**
-     * @var string Provider icon URL
-     */
-    protected $icon_url;
-
-    /**
      * Constructor for external providers
      * @param string $key Provider key
      * @param string $name Provider name
      * @param string $description Provider description
-     * @param string $icon_url Provider icon URL
      */
-    public function __construct($key = null, $name = null, $description = null, $icon_url = null)
+    public function __construct($key = null, $name = null, $description = null)
     {
         if ($key !== null) {
             $this->key = $key;
             $this->name = $name;
             $this->description = $description;
-            $this->icon_url = $icon_url;
         }
     }
+
     /**
      * Generate a random authentication code
      * @param int $length Code length
@@ -92,12 +86,8 @@ abstract class Abstract_Provider
      */
     public function get_icon()
     {
-        if (!empty($this->icon_url)) {
-            return $this->icon_url;
-        }
-
-        // Fallback for providers that don't override this method
-        return plugin_dir_url(AUTHPRESS_PLUGIN_FILE) . 'assets/icons/default-provider.png';
+        $logo = plugin_dir_url(AUTHPRESS_PLUGIN_FILE) . '/assets/images/providers/'.$this->get_key().'-icon.svg';
+        return apply_filters('authpress_provider_logo', $logo, $this->get_key());
     }
 
     /**
@@ -455,9 +445,10 @@ abstract class Abstract_Provider
      * @return boolean
      */
 
-    public function toggle_user_method($user_id, $enabled){
-        error_log("Toggle user method for ".$user_id.", enabled: ".$enabled);
-        if ($enabled){
+    public function toggle_user_method($user_id, $enabled)
+    {
+        error_log("Toggle user method for " . $user_id . ", enabled: " . $enabled);
+        if ($enabled) {
             return $this->enable_user_method($user_id);
         }
         return $this->disable_user_method($user_id);

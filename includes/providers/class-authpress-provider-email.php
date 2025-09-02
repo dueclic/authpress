@@ -324,17 +324,6 @@ class Email_Provider extends Abstract_Provider implements Provider_Otp_Interface
         return !empty($user->user_email);
     }
 
-
-    /**
-     * Get the icon URL for this provider
-     * @return string PNG icon URL
-     */
-    public function get_icon()
-    {
-        $logo = plugin_dir_url(AUTHPRESS_PLUGIN_FILE) . '/assets/images/providers/email-icon.png';
-        return apply_filters('authpress_provider_logo', $logo, 'email');
-    }
-
     public function get_key()
     {
         return 'email';

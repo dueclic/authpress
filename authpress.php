@@ -121,7 +121,7 @@ function authpress_provider_config(
 function authpress_logo()
 {
 
-    $plugin_logo = plugins_url('assets/img/plugin_logo.png', AUTHPRESS_PLUGIN_FILE);
+    $plugin_logo = plugins_url('assets/images/plugin_logo.png', AUTHPRESS_PLUGIN_FILE);
 
     $plugin_logo = apply_filters_deprecated(
         'two_factor_login_telegram_logo',
@@ -131,9 +131,7 @@ function authpress_logo()
         __('two_factor_login_telegram_logo filter is deprecated. Use authpress_logo instead.', 'two-factor-login-telegram')
     );
 
-    $plugin_logo = apply_filters('authpress_logo', $plugin_logo);
-
-    return $plugin_logo;
+    return apply_filters('authpress_logo', $plugin_logo);
 }
 
 function authpress_get_template($template_path, $context = array(), $full_path = false)

@@ -43,7 +43,7 @@ $user_has_active_methods = $user_config['has_2fa'];
 
         <div class="ap-topbar">
             <div class="ap-logo-section">
-                <img src="<?php echo plugins_url("assets/img/plugin_logo.png", AUTHPRESS_PLUGIN_FILE); ?>"
+                <img src="<?php echo authpress_logo(); ?>"
                      alt="AuthPress"
                      class="ap-logo"
                      width="120"
@@ -118,7 +118,7 @@ $user_has_active_methods = $user_config['has_2fa'];
                                          id="provider-<?php echo esc_attr($provider_key); ?>-title">
                                         <?php
                                         $icon_html = apply_filters('authpress_provider_icon_html',
-                                                '<span class="icon-circle" aria-hidden="true">📨</span>',
+                                                '<span class="icon-circle" aria-hidden="true" style="background-image: url('.esc_attr($provider->get_icon()).');"></span>',
                                                 $provider, $provider_key, $category_key
                                         );
                                         echo $icon_html;
@@ -221,7 +221,7 @@ $user_has_active_methods = $user_config['has_2fa'];
                             <?php wp_nonce_field('wp_factor_set_default_provider', 'wp_factor_default_provider_nonce'); ?>
                             <input type="hidden" name="authpress_action" value="set_default_provider">
 
-                            <div class="authpress-provider-options">
+                            <div class="authpress-default-provider-options">
                                 <?php foreach ($available_providers as $available_provider):
 
                                     $provider_key = $available_provider->get_key();
@@ -234,11 +234,6 @@ $user_has_active_methods = $user_config['has_2fa'];
                                         <input type="radio" name="default_provider"
                                                value="<?php echo esc_attr($provider_key); ?>"
                                                 <?php checked($user_default_provider, $provider_key); ?>>
-                                        <span class="provider-icon">
-                                    <img src="<?php echo esc_url($available_provider->get_icon()); ?>"
-                                         alt="<?php echo esc_attr($available_provider->get_name()); ?>"
-                                         style="width: 20px; height: 20px;"/>
-                                </span>
                                         <span class="provider-name"><?php echo esc_html($available_provider->get_name()); ?></span>
                                         <span class="provider-description"><?php echo esc_html($available_provider->get_description()); ?></span>
                                     </label>
