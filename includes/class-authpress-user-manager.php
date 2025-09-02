@@ -144,7 +144,7 @@ final class AuthPress_User_Manager
             return false;
         }
 
-        $totp = AuthPress_Auth_Factory::create(AuthPress_Auth_Factory::METHOD_TOTP);
+        $totp = AuthPress_Provider_Registry::get('authenticator');
         if (!$totp) {
             return false;
         }
@@ -543,38 +543,38 @@ final class AuthPress_User_Manager
 
     /**
      * Migrate legacy user meta fields for a specific user
-     * 
+     *
      * Converts:
      * - tg_wp_factor_chat_id -> authpress_telegram_chat_id
      * - tg_wp_factor_enabled -> authpress_telegram_enabled
-     * 
+     *
      * @param int $user_id User ID to migrate
      * @return bool True if migration occurred, false otherwise
      */
     private static function migrate_legacy_user_meta($user_id)
     {
         $migrated = false;
-        
+
         // Check if user has legacy chat_id but no new one
         $legacy_chat_id = get_user_meta($user_id, 'tg_wp_factor_chat_id', true);
         $new_chat_id = get_user_meta($user_id, 'authpress_telegram_chat_id', true);
-        
+
         if (!empty($legacy_chat_id) && empty($new_chat_id)) {
             update_user_meta($user_id, 'authpress_telegram_chat_id', sanitize_text_field($legacy_chat_id));
             delete_user_meta($user_id, 'tg_wp_factor_chat_id');
             $migrated = true;
         }
-        
+
         // Check if user has legacy enabled status but no new one
         $legacy_enabled = get_user_meta($user_id, 'tg_wp_factor_enabled', true);
         $new_enabled = get_user_meta($user_id, 'authpress_telegram_enabled', true);
-        
+
         if ($legacy_enabled !== '' && empty($new_enabled)) {
             update_user_meta($user_id, 'authpress_telegram_enabled', $legacy_enabled === '1' ? '1' : '0');
             delete_user_meta($user_id, 'tg_wp_factor_enabled');
             $migrated = true;
         }
-        
+
         return $migrated;
     }
 }

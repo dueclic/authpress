@@ -165,4 +165,14 @@ class AuthPress_Provider_Registry
         return self::get($key);
     }
 
+    public static function validate_by_method($code, $user_id, $login_method = 'telegram'): bool
+    {
+        $auth_method = self::get_by_login_method($login_method);
+        if (!$auth_method) {
+            return false;
+        }
+
+        return $auth_method->validate_code($code, $user_id);
+    }
+
 }

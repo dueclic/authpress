@@ -44,7 +44,7 @@ class AuthPress_Authentication_Handler
 
         // Handle built-in providers
         if ($default_method === 'telegram' && $user_config['available_methods']['telegram']) {
-            $telegram_otp = AuthPress_Auth_Factory::create(AuthPress_Auth_Factory::METHOD_TELEGRAM_OTP);
+            $telegram_otp = AuthPress_Provider_Registry::get('telegram');
             $auth_code = $telegram_otp->save_authcode($user);
 
             $result = $this->telegram->send_tg_token($auth_code, $user_config['chat_id'], $user->ID);
@@ -57,7 +57,7 @@ class AuthPress_Authentication_Handler
                 'reason' => 'default_method_telegram'
             ));
         } elseif ($default_method === 'email' && $user_config['available_methods']['email']) {
-            $email_otp = AuthPress_Auth_Factory::create(AuthPress_Auth_Factory::METHOD_EMAIL_OTP);
+            $email_otp = AuthPress_Provider_Registry::get('email');
             $auth_code = $email_otp->save_authcode($user);
 
             $this->logger->log_action('email_code_sent', array(
@@ -158,7 +158,7 @@ class AuthPress_Authentication_Handler
             if (empty($code)) {
                 $error_message = $this->get_empty_code_error_message($login_method);
             } else {
-                $validation_result = AuthPress_Auth_Factory::validateByMethod($code, $user->ID, $login_method);
+                $validation_result = AuthPress_Provider_Registry::validate_by_method($code, $user->ID, $login_method);
 
                 if ($validation_result) {
                     $login_successful = true;
@@ -246,7 +246,7 @@ class AuthPress_Authentication_Handler
 
     private function handle_telegram_failed_validation($user, $code)
     {
-        $telegram_otp = AuthPress_Auth_Factory::create(AuthPress_Auth_Factory::METHOD_TELEGRAM_OTP);
+        $telegram_otp = AuthPress_Provider_Registry::get('telegram');
         $authcode_validation = $telegram_otp->validate_authcode($code, $user->ID);
 
         if (AuthPress_User_Manager::user_has_telegram($user->ID)) {
@@ -270,7 +270,7 @@ class AuthPress_Authentication_Handler
 
     private function handle_email_failed_validation($user, $code)
     {
-        $email_otp = AuthPress_Auth_Factory::create(AuthPress_Auth_Factory::METHOD_EMAIL_OTP);
+        $email_otp = AuthPress_Provider_Registry::get('email');
         $authcode_validation = $email_otp->validate_authcode($code, $user->ID);
 
         if (AuthPress_User_Manager::user_has_email($user->ID)) {

@@ -67,7 +67,6 @@ final class AuthPress_Plugin
         require_once($base_path . "ui/modals/class-authpress-ui-modal-recovery-codes.php");
         // Provider registry and factory
         require_once($base_path . "class-authpress-provider-registry.php");
-        require_once($base_path . "class-authpress-auth-factory.php");
 
         // New refactored classes
         require_once($base_path . "class-authpress-logger.php");

@@ -29,7 +29,7 @@ class AuthPress_AJAX_Handler
             die(json_encode($response));
         }
 
-        $telegram_otp = AuthPress_Auth_Factory::create(AuthPress_Auth_Factory::METHOD_TELEGRAM_OTP);
+        $telegram_otp = AuthPress_Provider_Registry::get('telegram');
         $codes = $telegram_otp->generate_codes(0, ['length' => 5]);
         $auth_code = !empty($codes) ? $codes[0] : '';
 
@@ -137,7 +137,7 @@ class AuthPress_AJAX_Handler
             die(json_encode($response));
         }
 
-        $telegram_otp = AuthPress_Auth_Factory::create(AuthPress_Auth_Factory::METHOD_TELEGRAM_OTP);
+        $telegram_otp = AuthPress_Provider_Registry::get('telegram');
         if (!$telegram_otp->validate_tokencheck_authcode($_POST['token'], $_POST['chat_id'])) {
             $response['msg'] = __('Validation code entered is wrong.', 'two-factor-login-telegram');
         } else {
@@ -183,7 +183,7 @@ class AuthPress_AJAX_Handler
             wp_send_json_error(['message' => __('Invalid request.', 'two-factor-login-telegram')]);
         }
 
-        $totp = AuthPress_Auth_Factory::create(AuthPress_Auth_Factory::METHOD_TOTP);
+        $totp = AuthPress_Provider_Registry::get('authenticator');
         $totp_data = $totp->generate_codes($user_id);
 
         if (empty($totp_data)) {
@@ -215,7 +215,7 @@ class AuthPress_AJAX_Handler
         }
 
         $code = sanitize_text_field($_POST['code']);
-        $totp = AuthPress_Auth_Factory::create(AuthPress_Auth_Factory::METHOD_TOTP);
+        $totp = AuthPress_Provider_Registry::get('authenticator');
 
         if ($totp->verify_setup_code($code, $user_id)) {
             $totp->enable_user_method($user_id);
@@ -249,7 +249,7 @@ class AuthPress_AJAX_Handler
             wp_send_json_error(['message' => __('Invalid request.', 'two-factor-login-telegram')]);
         }
 
-        $totp = AuthPress_Auth_Factory::create(AuthPress_Auth_Factory::METHOD_TOTP);
+        $totp = AuthPress_Provider_Registry::get('authenticator');
 
         if ($totp->disable_user_method($user_id)) {
             $this->logger->log_action('totp_disabled', array(
@@ -280,7 +280,7 @@ class AuthPress_AJAX_Handler
             wp_send_json_error(['message' => __('Telegram is not configured for this user.', 'two-factor-login-telegram')]);
         }
 
-        $telegram_otp = AuthPress_Auth_Factory::create(AuthPress_Auth_Factory::METHOD_TELEGRAM_OTP);
+        $telegram_otp = AuthPress_Provider_Registry::get('telegram');
         $auth_code = $telegram_otp->save_authcode($user);
         $chat_id = AuthPress_User_Manager::get_user_chat_id($user_id);
 
@@ -318,7 +318,7 @@ class AuthPress_AJAX_Handler
             wp_send_json_error(['message' => __('Email is not configured for this user.', 'two-factor-login-telegram')]);
         }
 
-        $email_otp = AuthPress_Auth_Factory::create(AuthPress_Auth_Factory::METHOD_EMAIL_OTP);
+        $email_otp = AuthPress_Provider_Registry::get('email');
         $auth_code = $email_otp->save_authcode($user);
 
         $this->logger->log_action('email_code_sent_on_request', array(
