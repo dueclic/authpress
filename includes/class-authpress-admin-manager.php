@@ -51,10 +51,6 @@ class AuthPress_Admin_Manager
                 $this->handle_setup_telegram();
                 break;
 
-            case 'generate_recovery':
-                $this->handle_generate_recovery($current_user_id);
-                break;
-
             case 'regenerate_recovery':
                 $this->handle_regenerate_recovery($current_user_id);
                 break;
@@ -181,23 +177,10 @@ class AuthPress_Admin_Manager
         }
     }
 
-    private function handle_generate_recovery($user_id)
-    {
-        if (wp_verify_nonce($_POST['wp_factor_recovery_nonce'], 'wp_factor_generate_recovery')) {
-            $recovery = AuthPress_Auth_Factory::create(AuthPress_Auth_Factory::METHOD_RECOVERY_CODES);
-            $codes = $recovery->regenerate_recovery_codes($user_id);
-            if (!empty($codes)) {
-                add_action('admin_notices', function() {
-                    echo '<div class="notice notice-success is-dismissible"><p>' . __('Recovery codes have been generated successfully!', 'two-factor-login-telegram') . '</p></div>';
-                });
-            }
-        }
-    }
-
     private function handle_regenerate_recovery($user_id)
     {
         if (wp_verify_nonce($_POST['wp_factor_recovery_regenerate_nonce'], 'wp_factor_regenerate_recovery')) {
-            $recovery = AuthPress_Auth_Factory::create(AuthPress_Auth_Factory::METHOD_RECOVERY_CODES);
+            $recovery = AuthPress_Provider_Registry::get('recovery_codes');
             $codes = $recovery->regenerate_recovery_codes($user_id);
             if (!empty($codes)) {
                 add_action('admin_notices', function() {

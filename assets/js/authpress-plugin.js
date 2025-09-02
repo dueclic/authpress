@@ -596,14 +596,12 @@ jQuery(function ($) {
 
     $("#regenerate_recovery_codes_btn").on("click", function () {
 
-        if (!confirm('Are you sure? This will invalidate your current recovery codes and generate new ones that you must save immediately.')) {
+        var confirmValue = $(this).data('confirm');
+
+        if (confirmValue === 'yes' && !confirm('Are you sure? This will invalidate your current recovery codes and generate new ones that you must save immediately.')) {
             return;
         }
 
-        generateRecoveryCodes();
-    });
-
-    $("#generate_recovery_codes_btn").on("click", function () {
         generateRecoveryCodes();
     });
 

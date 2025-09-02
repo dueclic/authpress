@@ -278,6 +278,7 @@ $user_has_active_methods = $user_config['has_2fa'];
                     <div class="save-bar">
                         <button type="button" id="regenerate_recovery_codes_btn"
                                 class="ap-button ap-button--primary"
+                                data-confirm="<?php echo( $has_recovery_codes ? 'yes': 'no'); ?>"
                                 data-user-id="<?php echo $current_user_id; ?>"
                         >
                             <?php
