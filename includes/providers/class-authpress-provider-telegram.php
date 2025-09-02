@@ -160,7 +160,8 @@ class Telegram_Provider extends Abstract_Provider implements Provider_Otp_Interf
         global $wpdb;
 
         $table_name = $wpdb->prefix . 'authpress_telegram_auth_codes';
-        $hashed_auth_code = $this->hash_code($authcode);
+        $normalized_auth_code = $this->normalize_code($authcode);
+        $hashed_auth_code = $this->hash_code($normalized_auth_code);
         $current_datetime = current_time('mysql');
 
         // Check if token exists for this user
