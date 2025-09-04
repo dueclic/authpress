@@ -118,6 +118,29 @@ function authpress_provider_config(
     return null;
 }
 
+/**
+ * @param $category
+ * @return bool
+ */
+
+function authpress_category_has_providers(
+    $category,
+    $available_providers
+){
+
+    $has_available_providers = false;
+
+    foreach ($category['providers'] as $provider_key) {
+        $provider = $available_providers[$provider_key] ?? null;
+        if ($provider) {
+            $has_available_providers = true;
+            break;
+        }
+    }
+
+    return apply_filters('authpress_category_has_providers', $has_available_providers, $category, $available_providers);
+}
+
 function authpress_logo()
 {
 

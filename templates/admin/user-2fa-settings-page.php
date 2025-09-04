@@ -75,6 +75,14 @@ $user_has_active_methods = $user_config['has_2fa'];
 
                 <?php foreach ($provider_categories as $category_key => $category): ?>
                     <?php
+
+                    $has_available_providers = authpress_category_has_providers(
+                            $category,
+                            $available_providers
+                    );
+
+                    if (!$has_available_providers) continue;
+
                     $category_title = apply_filters('authpress_provider_category_title', $category['title'], $category_key, $category);
                     $category_description = apply_filters('authpress_provider_category_description', $category['description'], $category_key, $category);
                     ?>
