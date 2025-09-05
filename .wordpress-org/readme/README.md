@@ -1,6 +1,6 @@
 === AuthPress ===
-Contributors: dueclic, yordansoares
-Tags: 2fa, two-factor-authentication, telegram, email, authenticator, totp, security, login, sms, passkey
+Contributors: dueclic
+Tags: 2fa, two-factor-authentication, telegram, email, authenticator, totp, security, login
 Requires at least: 6.0
 Requires PHP: 7.4
 Tested up to: 6.8
@@ -80,12 +80,12 @@ Yes, you can customize the logo using the <code>two_factor_login_telegram_logo</
 
 <code>
 // Custom logo on "AuthPress" login screen:
-function two_factor_login_telegram_custom_logo(){
+function custom_authpress_logo(){
   $image_path = home_url('/images/');
   $image_filename = 'custom-two-factor-telegram.png';
   return $image_path . $image_filename;
 }
-add_filter('two_factor_login_telegram_logo', 'two_factor_login_telegram_custom_logo');
+add_filter('authpress_logo', 'custom_authpress_logo');
 </code>
 
 = What happens if I lose access to all my 2FA methods? =

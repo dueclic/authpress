@@ -1,3 +1,5 @@
+![AuthPress](https://github.com/debba/wp-two-factor-authentication-with-telegram/raw/master/.wordpress-org/assets/banner-772x250.png?raw=true)
+
 # AuthPress - Advanced WordPress 2FA Plugin
 
 **AuthPress** is a comprehensive two-factor authentication plugin for WordPress that started with Telegram support and has evolved into a flexible multi-provider 2FA solution. Secure your WordPress site with multiple authentication methods and extensible provider system.
