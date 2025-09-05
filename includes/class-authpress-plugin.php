@@ -80,18 +80,16 @@ final class AuthPress_Plugin
     private function setup_dependencies()
     {
         // Initialize core dependencies
-        $this->telegram = new WP_Telegram();
         $this->logger = new AuthPress_Logger();
 
         // Initialize handlers with dependencies
-        $this->authentication_handler = new AuthPress_Authentication_Handler($this->telegram, $this->logger);
-        $this->admin_manager = new AuthPress_Admin_Manager($this->telegram, $this->logger);
-        $this->ajax_handler = new AuthPress_AJAX_Handler($this->telegram, $this->logger);
+        $this->authentication_handler = new AuthPress_Authentication_Handler($this->logger);
+        $this->admin_manager = new AuthPress_Admin_Manager($this->logger);
+        $this->ajax_handler = new AuthPress_AJAX_Handler($this->logger);
         $this->hooks_manager = new AuthPress_Hooks_Manager(
             $this->authentication_handler,
             $this->admin_manager,
             $this->ajax_handler,
-            $this->telegram,
             $this->logger
         );
     }

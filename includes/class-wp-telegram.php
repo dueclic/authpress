@@ -190,11 +190,12 @@ class WP_Telegram {
 	 * Send a User failed login notification to Telegram
 	 *
 	 * @param $user_login
+     * @param $error \WP_User
 	 *
 	 * @return bool
 	 */
 
-	public function send_tg_failed_login( $user_login ) {
+	public function send_tg_failed_login( $user_login, $error ) {
 
 		// Get providers settings
         $providers = authpress_providers();

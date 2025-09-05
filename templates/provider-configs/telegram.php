@@ -18,7 +18,7 @@ $telegram_settings = $providers['telegram'] ?? [];
                value="<?php echo esc_attr($telegram_settings['bot_token'] ?? ''); ?>"/>
         <?php if (!empty($telegram_settings['bot_token']) && $this->is_valid_bot_for_providers($telegram_settings['bot_token'])) { ?>
             <div class="ap-notice ap-notice--success mt-8">
-                <span>✔ <?php echo sprintf(__("Bot token is valid (Bot name: @%s)", "two-factor-login-telegram"), $this->telegram->get_me()->username); ?></span>
+                <span>✔ <?php echo sprintf(__("Bot token is valid (Bot name: @%s)", "two-factor-login-telegram"), $provider->telegram->get_me()->username); ?></span>
             </div>
         <?php } elseif (!empty($telegram_settings['bot_token'])) { ?>
             <div class="ap-notice ap-notice--error mt-8">

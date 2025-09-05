@@ -9,19 +9,16 @@ class AuthPress_Hooks_Manager
     private $authentication_handler;
     private $admin_manager;
     private $ajax_handler;
-    private $telegram;
-
     /**
      * @var AuthPress_Logger $logger
      */
     private $logger;
 
-    public function __construct($authentication_handler, $admin_manager, $ajax_handler, $telegram, $logger)
+    public function __construct($authentication_handler, $admin_manager, $ajax_handler, $logger)
     {
         $this->authentication_handler = $authentication_handler;
         $this->admin_manager = $admin_manager;
         $this->ajax_handler = $ajax_handler;
-        $this->telegram = $telegram;
         $this->logger = $logger;
     }
 
@@ -37,7 +34,7 @@ class AuthPress_Hooks_Manager
         add_action('init', array($this, 'migrate_wp2fat_to_authpress_activities'));
 
         // Failed login hook
-        add_action('wp_login_failed', array($this->telegram, 'send_tg_failed_login'), 10, 2);
+        add_action('wp_login_failed', array($this, 'handle_wp_login_failed'), 10, 2);
 
         // Plugin lifecycle hooks
         register_activation_hook(AUTHPRESS_PLUGIN_FILE, array($this, 'plugin_activation'));
@@ -66,6 +63,17 @@ class AuthPress_Hooks_Manager
 
         // Footer hooks
         add_action("authpress_copyright", array($this, "change_copyright"));
+    }
+
+    public function handle_wp_login_failed(
+            $username, $error
+    ){
+
+        /**
+         * @var $telegram_otp Telegram_Provider
+         */
+        $telegram_otp = AuthPress_Provider_Registry::get('telegram');
+        $telegram_otp->telegram->send_tg_failed_login($username, $error);
     }
 
     private function add_admin_hooks()
@@ -686,7 +694,12 @@ class AuthPress_Hooks_Manager
                     __("Copy this ID and paste it in your WordPress profile to enable AuthPress.", "two-factor-login-telegram")
             );
 
-            $result = $this->telegram->send_with_keyboard($response_text, $chat_id);
+
+            /**
+             * @var $telegram_otp Telegram_Provider
+             */
+            $telegram_otp = AuthPress_Provider_Registry::get('telegram');
+            $result = $telegram_otp->telegram->send_with_keyboard($response_text, $chat_id);
 
             $this->logger->log_action('telegram_get_id_response', array(
                     'chat_id' => $chat_id,

@@ -6,12 +6,12 @@ if (!defined('ABSPATH')) {
 /**
  * @var $current_user_id int
  * @var $user_has_method boolean
- * @var $provider \AuthPress\Providers\Abstract_Provider
+ * @var $provider \AuthPress\Providers\Telegram_Provider
  * @var $user_config array
  */
 
 $telegram_chat_id = $user_config['chat_id'] ?: '';
-$username = $this->telegram->get_me()->username;
+$username = $provider->telegram->get_me()->username;
 $bot_link = '<a href="https://telegram.me/' . $username . '" target="_blank">@' . $username . '</a>';
 
 ?>

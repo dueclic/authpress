@@ -7,15 +7,10 @@ use AuthPress\Providers\Telegram_Provider;
 class AuthPress_Authentication_Handler
 {
 
-    /**
-     * @var WP_Telegram $telegram
-     */
-    private $telegram;
     private $logger;
 
-    public function __construct($telegram, $logger)
+    public function __construct($logger)
     {
-        $this->telegram = $telegram;
         $this->logger = $logger;
     }
 

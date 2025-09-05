@@ -4,6 +4,8 @@
  * @var array $providers Legacy providers array for backward compatibility
  */
 
+use Authpress\AuthPress_Provider_Registry;
+
 if (isset($_GET['tab'])) {
     $active_tab = sanitize_text_field($_GET['tab']);
 } else {
@@ -54,6 +56,12 @@ if (isset($_GET['tab'])) {
             include dirname(__FILE__) . '/logs.php';
             break;
         case 'howto':
+
+            /**
+             * @var $telegram_otp \AuthPress\Providers\Telegram_Provider
+             */
+            $telegram_otp = AuthPress_Provider_Registry::get('telegram');
+
             include dirname(__FILE__) . '/howto.php';
             break;
         case 'settings':

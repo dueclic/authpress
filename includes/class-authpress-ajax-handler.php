@@ -7,12 +7,10 @@ use Authpress\Ui\Modals\RecoveryCodesModal;
 
 class AuthPress_AJAX_Handler
 {
-    private $telegram;
     private $logger;
 
-    public function __construct($telegram, $logger)
+    public function __construct($logger)
     {
-        $this->telegram = $telegram;
         $this->logger = $logger;
     }
 

@@ -2,7 +2,9 @@
 /**
  * FAQ tab view - Redesigned with category-based structure
  * @var array $providers
+ * @var \AuthPress\Providers\Telegram_Provider $telegram_otp
  */
+
 ?>
 
 <div class="providers-page howto-page">
@@ -115,9 +117,9 @@
                 <div class="provider-config" id="chat-id-steps" style="display: none;">
                     <?php
                     $bot_username = null;
-                    $is_valid_bot = $this->telegram->get_me() !== false;
+                    $is_valid_bot = $telegram_otp->telegram->get_me() !== false;
                     if ($is_valid_bot) {
-                        $me = $this->telegram->get_me();
+                        $me = $telegram_otp->telegram->get_me();
                         if ($me && isset($me->username)) {
                             $bot_username = $me->username;
                         }

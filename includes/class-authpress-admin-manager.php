@@ -3,21 +3,17 @@
 namespace Authpress;
 
 use AuthPress\Providers\Abstract_Provider;
+use AuthPress\Providers\Telegram_Provider;
 
 class AuthPress_Admin_Manager
 {
-    /**
-     * @var $telegram WP_Telegram
-     */
-    private $telegram;
     /**
      * @var $logger AuthPress_Logger
      */
     private $logger;
 
-    public function __construct($telegram, $logger)
+    public function __construct($logger)
     {
-        $this->telegram = $telegram;
         $this->logger = $logger;
     }
 
@@ -300,12 +296,18 @@ class AuthPress_Admin_Manager
         );
 
         if ($sanitized['telegram']['enabled'] && !empty($sanitized['telegram']['bot_token'])) {
-            $is_valid_bot = $this->telegram->get_me() !== false;
+
+            /**
+             * @var $telegram_otp Telegram_Provider
+             */
+            $telegram_otp = AuthPress_Provider_Registry::get('telegram');
+            $is_valid_bot = $telegram_otp->telegram->get_me() !== false;
+
             set_transient(AUTHPRESS_TG_GETME_TRANSIENT, $is_valid_bot, 60 * 60 * 24);
 
             if ($is_valid_bot) {
                 $webhook_url = rest_url('telegram/v1/webhook');
-                $this->telegram->set_bot_token($sanitized['telegram']['bot_token'])->set_webhook($webhook_url);
+                $telegram_otp->telegram->set_bot_token($sanitized['telegram']['bot_token'])->set_webhook($webhook_url);
             }
         }
 
