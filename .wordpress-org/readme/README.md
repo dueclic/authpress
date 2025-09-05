@@ -98,13 +98,12 @@ Yes, administrators can view user 2FA status, disable 2FA for specific users if 
 1. **Provider Configuration Dashboard** - Central configuration page showing all available 2FA providers: Telegram, Email, Authenticator, and any installed custom providers.
 2. **Telegram Provider Setup** - Configure your Telegram bot token and notification settings. Simple setup process with Bot Token from @BotFather.
 3. **User Profile 2FA Section** - Users can enable and configure multiple 2FA methods directly from their WordPress profile page.
-4. **Authenticator App Setup** - QR code generation for easy setup with Google Authenticator, Authy, and other TOTP apps. Also includes manual secret entry option.
-5. **Email Provider Configuration** - Set token duration, customize email templates, and configure the email-based 2FA system.
+4. **Authenticator App Setup** - QR code generation for easy setup with Google Authenticator, Authy, and other TOTP apps..
+5. **Email Provider Configuration** - Configure the email-based 2FA system.
 6. **2FA Login Interface** - Modern login screen where users choose their preferred authentication method and enter verification codes.
 7. **Recovery Codes Generation** - Emergency backup codes interface for account recovery when primary methods are unavailable.
 8. **Professional Logging System** - Advanced activity monitoring with WP_List_Table implementation, pagination, filtering, and detailed authentication logs.
-9. **Custom Provider Integration** - Example of third-party SMS and Passkey providers seamlessly integrated into the AuthPress interface.
-10. **Admin User Management** - View all users' 2FA status, manage individual configurations, and monitor security across your WordPress site.
+9. **Admin User Management** - View all users' 2FA status, manage individual configurations, and monitor security across your WordPress site.
 
 == Changelog ==
 
