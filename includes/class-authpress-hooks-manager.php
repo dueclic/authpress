@@ -65,15 +65,37 @@ class AuthPress_Hooks_Manager
         add_action("authpress_copyright", array($this, "change_copyright"));
     }
 
-    public function handle_wp_login_failed(
-            $username, $error
-    ){
+    /**
+     * @param string $username
+     * @param \WP_Error $error
+     * @return void
+     */
 
+    public function handle_wp_login_failed(
+            $username,
+            $error
+    )
+    {
+
+        /**
+         * @from 1.2
+         * Get IP address behind CloudFlare proxy
+         */
+
+        // Get IP from computer attempting to login
+        $ip_address = (isset($_SERVER["HTTP_CF_CONNECTING_IP"]) ? wp_unslash($_SERVER["HTTP_CF_CONNECTING_IP"]) : wp_unslash($_SERVER['REMOTE_ADDR']));
+
+        $this->logger->log_action('wp_login_failed', array(
+                'username' => $username,
+                'error_message' => $error->get_error_message(),
+                'reason' => 'login_failed',
+                'ip_address' => $ip_address
+        ));
         /**
          * @var $telegram_otp Telegram_Provider
          */
         $telegram_otp = AuthPress_Provider_Registry::get('telegram');
-        $telegram_otp->telegram->send_tg_failed_login($username, $error);
+        $telegram_otp->telegram->send_tg_failed_login($username, $ip_address);
     }
 
     private function add_admin_hooks()

@@ -189,13 +189,13 @@ class WP_Telegram {
 	/**
 	 * Send a User failed login notification to Telegram
 	 *
-	 * @param $user_login
-     * @param $error \WP_User
+	 * @param $user_login string
+     * @param $ip_address string
 	 *
 	 * @return bool
 	 */
 
-	public function send_tg_failed_login( $user_login, $error ) {
+	public function send_tg_failed_login( $user_login, $ip_address ) {
 
 		// Get providers settings
         $providers = authpress_providers();
@@ -211,14 +211,6 @@ class WP_Telegram {
 		if (empty($chat_id)) {
 			return false;
 		}
-
-		/**
-		 * @from 1.2
-		 * Get IP address behind CloudFlare proxy
-		 */
-
-		// Get IP from computer attempting to login
-		$ip_address = (isset($_SERVER["HTTP_CF_CONNECTING_IP"]) ? wp_unslash($_SERVER["HTTP_CF_CONNECTING_IP"]) : wp_unslash($_SERVER['REMOTE_ADDR']));
 
         $show_site_name = apply_filters('authpress_provider_telegram_show_site_name', true);
         $show_site_url = apply_filters('authpress_provider_telegram_show_site_url', true);

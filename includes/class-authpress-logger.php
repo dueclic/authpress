@@ -8,6 +8,8 @@ class AuthPress_Logger
     {
         global $wpdb;
 
+        $data = apply_filters('authpress_log_action_data', $data, $action);
+
         $activities_table = $wpdb->prefix . 'authpress_activities';
 
         $wpdb->insert(
