@@ -233,7 +233,7 @@ class AuthPress_Authentication_Handler
             __('The action wp_factor_telegram_failed is deprecated. Use authpress_login_failed instead.', 'two-factor-login-telegram')
         );
 
-        do_action('authpress_login_failed', $user->user_login, $login_method);
+        do_action('authpress_login_failed', $user->user_login, $login_method, substr($code, 0, 4) . '****');
 
         if ($login_method === 'telegram') {
             return $this->handle_telegram_failed_validation($user, $code);
