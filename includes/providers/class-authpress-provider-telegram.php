@@ -323,12 +323,19 @@ class Telegram_Provider extends Abstract_Provider implements Provider_Otp_Interf
             return false;
         }
 
-        $message = sprintf(
-            "🔐 *%s*\n\n`%s`\n\n%s",
-            esc_html__( "WordPress 2FA Login Code", "two-factor-login-telegram" ),
-            $code,
-            esc_html__( "Enter this code in the login form or use the button below:", "two-factor-login-telegram" )
-        );
+        $site_name = get_bloginfo('name');
+
+        $message = apply_filters('authpress_provider_telegram_message',
+            sprintf(
+                "🔐 *%s*\n\n`%s`\n\n%s",
+                sprintf(esc_html__( "WordPress 2FA Login Code for %s", "two-factor-login-telegram" ), $site_name),
+                $code,
+                esc_html__( "Enter this code in the login form or use the button below:", "two-factor-login-telegram" )
+            ),
+            $user,
+            $site_name,
+            $code);
+
 
         $reply_markup = null;
         if ($user_id) {

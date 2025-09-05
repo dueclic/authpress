@@ -51,6 +51,7 @@ class Email_Provider extends Abstract_Provider implements Provider_Otp_Interface
             ),
             $user,
             $authcode,
+            $site_name,
             $token_duration_seconds
         );
     }
