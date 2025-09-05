@@ -41,7 +41,7 @@ if (!function_exists('get_auth_token_duration')) {
 
 define('AUTHPRESS_PLUGIN_FILE', __FILE__);
 
-define('WP_FACTOR_TG_GETME_TRANSIENT', 'tg_wp_factor_valid_bot');
+define('AUTHPRESS_TG_GETME_TRANSIENT', 'authpress_provider_telegram_valid_bot');
 
 /**
  *

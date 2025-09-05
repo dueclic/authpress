@@ -458,7 +458,7 @@ class Telegram_Provider extends Abstract_Provider implements Provider_Otp_Interf
 
     public function is_valid_bot()
     {
-        $valid_bot_transient = WP_FACTOR_TG_GETME_TRANSIENT;
+        $valid_bot_transient = AUTHPRESS_TG_GETME_TRANSIENT;
 
         if (($is_valid_bot = get_transient($valid_bot_transient)) === false) {
             $is_valid_bot = $this->telegram->get_me() !== false;

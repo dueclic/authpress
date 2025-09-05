@@ -301,7 +301,7 @@ class AuthPress_Admin_Manager
 
         if ($sanitized['telegram']['enabled'] && !empty($sanitized['telegram']['bot_token'])) {
             $is_valid_bot = $this->telegram->get_me() !== false;
-            set_transient(WP_FACTOR_TG_GETME_TRANSIENT, $is_valid_bot, 60 * 60 * 24);
+            set_transient(AUTHPRESS_TG_GETME_TRANSIENT, $is_valid_bot, 60 * 60 * 24);
 
             if ($is_valid_bot) {
                 $webhook_url = rest_url('telegram/v1/webhook');

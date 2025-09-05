@@ -534,8 +534,8 @@ class AuthPress_Hooks_Manager
 
         $wpdb->query("DELETE FROM $wpdb->options WHERE option_name LIKE '_transient_authpress_telegram_authcode_%'");
         $wpdb->query("DELETE FROM $wpdb->options WHERE option_name LIKE '_transient_timeout_authpress_telegram_authcode_%'");
-        $wpdb->query("DELETE FROM $wpdb->options WHERE option_name LIKE '_transient_" . WP_FACTOR_TG_GETME_TRANSIENT . "%'");
-        $wpdb->query("DELETE FROM $wpdb->options WHERE option_name LIKE '_transient_timeout_" . WP_FACTOR_TG_GETME_TRANSIENT . "%'");
+        $wpdb->query("DELETE FROM $wpdb->options WHERE option_name LIKE '_transient_" . AUTHPRESS_TG_GETME_TRANSIENT . "%'");
+        $wpdb->query("DELETE FROM $wpdb->options WHERE option_name LIKE '_transient_timeout_" . AUTHPRESS_TG_GETME_TRANSIENT . "%'");
     }
 
     // REST API and rewrite methods
