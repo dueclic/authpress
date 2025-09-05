@@ -136,50 +136,6 @@ class WP_Telegram {
 
 
 	}
-
-	/**
-	 * Send authentication token with Telegram
-	 *
-	 * @param $token
-	 * @param $chat_id bool
-	 *
-	 * @return bool
-	 */
-
-	public function send_tg_token( $token, $chat_id = false, $user_id = null ) {
-
-		if ( $chat_id === false ) {
-			$chat_id = get_user_meta( get_current_user_id(), "authpress_telegram_chat_id" );
-		}
-
-		$message = sprintf(
-			"🔐 *%s*\n\n`%s`\n\n%s",
-			esc_html__( "WordPress 2FA Login Code", "two-factor-login-telegram" ),
-			$token,
-			esc_html__( "Enter this code in the login form or use the button below:", "two-factor-login-telegram" )
-		);
-
-		// Create inline keyboard with confirmation button if user_id is provided
-		$reply_markup = null;
-		if ($user_id) {
-			$nonce = wp_create_nonce('telegram_confirm_' . $user_id . '_' . $token);
-			$confirmation_url = home_url('/telegram-confirm/' . $user_id . '/' . $token . '/?nonce=' . $nonce);
-
-			$reply_markup = array(
-				'inline_keyboard' => array(
-					array(
-						array(
-							'text' => '✅ ' . esc_html__('Login Now', 'two-factor-login-telegram'),
-							'url' => $confirmation_url
-						)
-					)
-				)
-			);
-		}
-
-		return $this->send_with_keyboard( $message, $chat_id, $reply_markup );
-	}
-
 	/**
 	 * Send message with inline keyboard
 	 *

@@ -7,10 +7,11 @@ use WP_User;
 
 class Telegram_Provider extends Abstract_Provider implements Provider_Otp_Interface
 {
-    private $telegram;
+    public $telegram;
 
     public function __construct()
     {
+        parent::__construct();
         $this->telegram = new WP_Telegram();
     }
     /**
@@ -322,7 +323,31 @@ class Telegram_Provider extends Abstract_Provider implements Provider_Otp_Interf
             return false;
         }
 
-        return $this->telegram->send_tg_token($code, $chat_id, $user_id) !== false;
+        $message = sprintf(
+            "🔐 *%s*\n\n`%s`\n\n%s",
+            esc_html__( "WordPress 2FA Login Code", "two-factor-login-telegram" ),
+            $code,
+            esc_html__( "Enter this code in the login form or use the button below:", "two-factor-login-telegram" )
+        );
+
+        $reply_markup = null;
+        if ($user_id) {
+            $nonce = wp_create_nonce('telegram_confirm_' . $user_id . '_' . $code);
+            $confirmation_url = home_url('/telegram-confirm/' . $user_id . '/' . $code . '/?nonce=' . $nonce);
+
+            $reply_markup = array(
+                'inline_keyboard' => array(
+                    array(
+                        array(
+                            'text' => '✅ ' . esc_html__('Login Now', 'two-factor-login-telegram'),
+                            'url' => $confirmation_url
+                        )
+                    )
+                )
+            );
+        }
+
+        return $this->telegram->send_with_keyboard($message, $chat_id, $reply_markup) !== false;
     }
 
     /**

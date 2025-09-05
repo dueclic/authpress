@@ -2,6 +2,8 @@
 
 namespace Authpress;
 
+use AuthPress\Providers\Telegram_Provider;
+
 class AuthPress_Authentication_Handler
 {
 
@@ -44,10 +46,13 @@ class AuthPress_Authentication_Handler
 
         // Handle built-in providers
         if ($default_method === 'telegram' && $user_config['available_methods']['telegram']) {
+            /**
+             * @var $telegram_otp Telegram_Provider
+             */
             $telegram_otp = AuthPress_Provider_Registry::get('telegram');
             $auth_code = $telegram_otp->save_authcode($user);
 
-            $result = $this->telegram->send_tg_token($auth_code, $user_config['chat_id'], $user->ID);
+            $result = $telegram_otp->send_otp($user->ID, $auth_code);
 
             $this->logger->log_action('telegram_auth_code_sent', array(
                 'user_id' => $user->ID,
@@ -246,13 +251,17 @@ class AuthPress_Authentication_Handler
 
     private function handle_telegram_failed_validation($user, $code)
     {
+        /**
+         * @var $telegram_otp Telegram_Provider
+         */
+
         $telegram_otp = AuthPress_Provider_Registry::get('telegram');
         $authcode_validation = $telegram_otp->validate_authcode($code, $user->ID);
 
         if (AuthPress_User_Manager::user_has_telegram($user->ID)) {
             $chat_id = AuthPress_User_Manager::get_user_chat_id($user->ID);
             $auth_code = $telegram_otp->save_authcode($user);
-            $result = $this->telegram->send_tg_token($auth_code, $chat_id, $user->ID);
+            $result = $telegram_otp->send_otp($user->ID, $auth_code);
 
             $this->logger->log_action('telegram_auth_code_resent', array(
                 'user_id' => $user->ID,

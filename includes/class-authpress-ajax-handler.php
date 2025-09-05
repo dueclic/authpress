@@ -2,6 +2,7 @@
 
 namespace Authpress;
 
+use AuthPress\Providers\Telegram_Provider;
 use Authpress\Ui\Modals\RecoveryCodesModal;
 
 class AuthPress_AJAX_Handler
@@ -61,16 +62,16 @@ class AuthPress_AJAX_Handler
             );
         }
 
-        $send = $this->telegram->send_with_keyboard($validation_message, $_POST['chat_id'], $reply_markup);
+        $send = $telegram_otp->telegram->send_with_keyboard($validation_message, $_POST['chat_id'], $reply_markup);
 
         $this->logger->log_action('validation_code_sent', array(
             'chat_id' => $_POST['chat_id'],
             'success' => $send !== false,
-            'error' => $send === false ? $this->telegram->lastError : null
+            'error' => $send === false ? $telegram_otp->telegram->lastError : null
         ));
 
         if (!$send) {
-            $response['msg'] = sprintf(__("Error (%s): validation code was not sent, try again!", 'two-factor-login-telegram'), $this->telegram->lastError);
+            $response['msg'] = sprintf(__("Error (%s): validation code was not sent, try again!", 'two-factor-login-telegram'),$telegram_otp->lastError);
         } else {
             $response['type'] = "success";
             $response['msg'] = __("Validation code was successfully sent", 'two-factor-login-telegram');
@@ -93,7 +94,9 @@ class AuthPress_AJAX_Handler
             die(json_encode($response));
         }
 
-        $me = $this->telegram->set_bot_token($_POST['bot_token'])->get_me();
+        $telegram_otp = AuthPress_Provider_Registry::get('telegram');
+
+        $me = $telegram_otp->telegram->set_bot_token($_POST['bot_token'])->get_me();
 
         if ($me === false) {
             $response['msg'] = __('Unable to get Bot infos, please retry.', 'two-factor-login-telegram');
@@ -280,11 +283,15 @@ class AuthPress_AJAX_Handler
             wp_send_json_error(['message' => __('Telegram is not configured for this user.', 'two-factor-login-telegram')]);
         }
 
+        /**
+         * @var $telegram_otp Telegram_Provider
+         */
+
         $telegram_otp = AuthPress_Provider_Registry::get('telegram');
         $auth_code = $telegram_otp->save_authcode($user);
         $chat_id = AuthPress_User_Manager::get_user_chat_id($user_id);
 
-        $result = $this->telegram->send_tg_token($auth_code, $chat_id, $user_id);
+        $result = $telegram_otp->send_otp($user_id, $auth_code);
 
         $this->logger->log_action('auth_code_sent_on_request', array(
             'user_id' => $user_id,
@@ -345,7 +352,7 @@ class AuthPress_AJAX_Handler
         $user_id = intval($_POST['user_id']);
         $nonce = sanitize_text_field($_POST['nonce']);
 
-        if (!wp_verify_nonce($nonce, 'disable_2fa_telegram_' . $user_id)) {
+        if (!wp_verify_nonce($nonce, 'disable_2fa_authpress_' . $user_id)) {
             wp_die(__('Security verification failed', 'two-factor-login-telegram'));
         }
 

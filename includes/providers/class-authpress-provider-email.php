@@ -6,6 +6,55 @@ use WP_User;
 
 class Email_Provider extends Abstract_Provider implements Provider_Otp_Interface
 {
+
+    /**
+     * Email subject getter
+     * @param WP_User $user The user to send the code to
+     * @return string
+     */
+
+    private function get_email_subject(
+        $user
+    )
+    {
+        $site_name = get_bloginfo('name');
+        return apply_filters('authpress_provider_email_subject',
+            sprintf(__('[%s] Two-Factor Authentication Code', 'two-factor-login-telegram'), $site_name),
+            $user,
+            $site_name);
+    }
+
+    /**
+     * Email message getter
+     * @param WP_User $user The user to send the code to
+     * @param string $authcode Authcode
+     * @return string
+     */
+
+    private function get_email_message(
+        $user,
+        $authcode
+    )
+    {
+
+        $site_name = get_bloginfo('name');
+        $token_duration_seconds = get_auth_token_duration();
+
+        return apply_filters('authpress_provider_email_message',
+            sprintf(
+                __("Hello %s,\n\nHere's your verification code for logging into %s:\n\n%s\n\nThis code will expire in %d minutes.\n\nIf you didn't request this code, please ignore this email.\n\nBest regards,\n%s Team", 'two-factor-login-telegram'),
+                $user->display_name,
+                $site_name,
+                $authcode,
+                ceil($token_duration_seconds / 60),
+                $site_name
+            ),
+            $user,
+            $authcode,
+            $token_duration_seconds
+        );
+    }
+
     /**
      * Send authentication code to user via email
      * @param WP_User $user The user to send the code to
@@ -54,19 +103,18 @@ class Email_Provider extends Abstract_Provider implements Provider_Otp_Interface
             return false;
         }
 
-        // Send email
-        $subject = sprintf(__('[%s] Two-Factor Authentication Code', 'two-factor-login-telegram'), get_bloginfo('name'));
-
-        $message = sprintf(
-            __("Hello %s,\n\nHere's your verification code for logging into %s:\n\n%s\n\nThis code will expire in %d minutes.\n\nIf you didn't request this code, please ignore this email.\n\nBest regards,\n%s Team", 'two-factor-login-telegram'),
-            $user->display_name,
-            get_bloginfo('name'),
-            $auth_code,
-            get_auth_token_duration() / 60,
-            get_bloginfo('name')
+        $subject = $this->get_email_subject(
+            $user
         );
 
-        $headers = array('Content-Type: text/plain; charset=UTF-8');
+        $message = $this->get_email_message(
+            $user,
+            $auth_code
+        );
+
+        $headers = apply_filters('authpress_provider_email_headers',
+            array('Content-Type: text/plain; charset=UTF-8')
+        );
 
         $sent = wp_mail($recipient_email, $subject, $message, $headers);
 
@@ -319,7 +367,8 @@ class Email_Provider extends Abstract_Provider implements Provider_Otp_Interface
         return __('Email', 'two-factor-login-telegram');
     }
 
-    public function is_user_configured($user_id){
+    public function is_user_configured($user_id)
+    {
         $user = get_userdata($user_id);
         return !empty($user->user_email);
     }
@@ -339,14 +388,16 @@ class Email_Provider extends Abstract_Provider implements Provider_Otp_Interface
         return __("Receive authentication codes via email messages", "two-factor-login-telegram");
     }
 
-    public function disable_user_method($user_id){
+    public function disable_user_method($user_id)
+    {
         delete_user_meta($user_id, 'authpress_authentication_email');
         delete_user_meta($user_id, 'authpress_email_enabled');
         delete_user_meta($user_id, 'authpress_pending_email');
         delete_user_meta($user_id, 'authpress_pending_email_code');
     }
 
-    public function enable_user_method($user_id){
+    public function enable_user_method($user_id)
+    {
         return \Authpress\AuthPress_User_Manager::enable_user_email($user_id);
     }
 

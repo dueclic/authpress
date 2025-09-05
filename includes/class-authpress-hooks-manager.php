@@ -119,8 +119,8 @@ class AuthPress_Hooks_Manager
 
     private function add_user_list_hooks()
     {
-        add_filter('manage_users_columns', array($this, 'add_2fa_telegram_column'));
-        add_filter('manage_users_custom_column', array($this, 'show_2fa_telegram_column_content'), 10, 3);
+        add_filter('manage_users_columns', array($this, 'add_2fa_column'));
+        add_filter('manage_users_custom_column', array($this, 'show_2fa_column_content'), 10, 3);
     }
 
     public function load_assets()
@@ -699,17 +699,17 @@ class AuthPress_Hooks_Manager
 
 
     // User list table methods
-    public function add_2fa_telegram_column($columns)
+    public function add_2fa_column($columns)
     {
         if (current_user_can('manage_options')) {
-            $columns['tg_2fa_status'] = __('2FA Enabled', 'two-factor-login-telegram');
+            $columns['authpress_2fa_status'] = __('2FA Enabled', 'two-factor-login-telegram');
         }
         return $columns;
     }
 
-    public function show_2fa_telegram_column_content($value, $column_name, $user_id)
+    public function show_2fa_column_content($value, $column_name, $user_id)
     {
-        if ($column_name == 'tg_2fa_status' && current_user_can('manage_options')) {
+        if ($column_name == 'authpress_2fa_status' && current_user_can('manage_options')) {
             $status_text = AuthPress_User_Manager::get_user_2fa_status_text($user_id);
             $has_2fa = AuthPress_User_Manager::user_has_2fa($user_id);
             $has_completed_setup = AuthPress_User_Manager::user_has_completed_setup($user_id);
@@ -717,7 +717,7 @@ class AuthPress_Hooks_Manager
             $output = '';
 
             if ($has_2fa) {
-                $disable_nonce = wp_create_nonce('disable_2fa_telegram_' . $user_id);
+                $disable_nonce = wp_create_nonce('disable_2fa_authpress_' . $user_id);
                 $output = '<span style="color: green;">✅ ' . esc_html($status_text) . '</span><br>' .
                         '<a href="#" class="button button-small disable-2fa-telegram" data-user-id="' . $user_id . '" data-nonce="' . $disable_nonce . '" style="margin-top: 5px;">' .
                         __('Disable All', 'two-factor-login-telegram') . '</a>';
