@@ -233,7 +233,7 @@ For support and assistance:
 
 ## Changelog
 
-### Version 4.0.0 - "AuthPress" (Current)
+### Version 4.0.x - "AuthPress" (Current)
 
 - 🎉 **Rebranded to AuthPress** - reflecting the evolution beyond Telegram
 - 🔧 **Extensible Provider System** - developers can create custom 2FA providers

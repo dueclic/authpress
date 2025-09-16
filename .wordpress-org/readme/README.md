@@ -4,7 +4,7 @@ Tags: 2fa, two-factor-authentication, telegram, email, authenticator, totp, secu
 Requires at least: 6.0
 Requires PHP: 7.4
 Tested up to: 6.8
-Stable tag: 4.0.0
+Stable tag: 4.0.1
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -106,6 +106,9 @@ Yes, administrators can view user 2FA status, disable 2FA for specific users if 
 9. **Admin User Management** - View all users' 2FA status, manage individual configurations, and monitor security across your WordPress site.
 
 == Changelog ==
+
+= 4.0.1 =
+* Bugfix - rely on PHPQrCode instead of using composer installation
 
 = 4.0.0 =
 * 🎉 **Major Release - Rebranded to AuthPress** - Reflecting evolution from Telegram-only to comprehensive 2FA solution
