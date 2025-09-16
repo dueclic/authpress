@@ -70,7 +70,7 @@ AuthPress supports multiple 2FA methods:
 Yes! Users can enable multiple providers for redundancy. For example, they can use both Telegram and Email, so if one method is unavailable, they can use the other.
 
 = How do I create custom 2FA providers? =
-AuthPress features an extensible architecture. Check the developer documentation at `/custom_providers/DEVELOPER-GUIDE-CUSTOM-PROVIDERS.md` in the plugin directory for complete instructions on creating custom providers.
+AuthPress features an extensible architecture. Check the developer documentation at [AuthPress Custom Providers Developer Guide](https://authpress.dev/providers/custom-providers-developer-guide) in the plugin directory for complete instructions on creating custom providers.
 
 = Is AuthPress compatible with my authenticator app? =
 Yes, AuthPress uses the standard TOTP (Time-based One-Time Password) protocol, which is compatible with all major authenticator apps including Google Authenticator, Authy, Microsoft Authenticator, 1Password, Bitwarden, and KeePass.
