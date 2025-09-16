@@ -32,7 +32,6 @@ if (!function_exists('get_auth_token_duration')) {
 }
 
 
-
 /**
  *
  * Full path to the AuthPress File
@@ -49,9 +48,9 @@ define('AUTHPRESS_TG_GETME_TRANSIENT', 'authpress_provider_telegram_valid_bot');
  *
  */
 
-// Load Composer autoloader first
-if (file_exists(dirname(__FILE__) . '/vendor/autoload.php')) {
-    require_once(dirname(__FILE__) . '/vendor/autoload.php');
+// Load PhpQrCode PHP lib
+if (file_exists(dirname(__FILE__) . '/lib/phpqrcode/qrlib.php')) {
+    require_once(dirname(__FILE__) . '/lib/phpqrcode/qrlib.php');
 }
 
 require_once(dirname(__FILE__) . "/includes/class-authpress-plugin.php");

@@ -1,12 +1,6 @@
 <?php
 
 namespace AuthPress\Providers;
-
-use BaconQrCode\Renderer\ImageRenderer;
-use BaconQrCode\Renderer\RendererStyle\RendererStyle;
-use BaconQrCode\Renderer\Image\SvgImageBackEnd;
-use BaconQrCode\Writer;
-
 class TOTP_Provider extends Abstract_Provider
 {
     const SECRET_LENGTH = 32;
@@ -159,17 +153,14 @@ class TOTP_Provider extends Abstract_Provider
             self::TIME_STEP
         );
 
-        // Use bacon-qr-code library for QR generation
+        // Use PHPQrCode library for QR generation
         try {
-            $renderer = new ImageRenderer(
-                new RendererStyle(200),
-                new SvgImageBackEnd()
-            );
+            ob_start();
+            \QRcode::png($otpauth_url, false, QR_ECLEVEL_M, 6, 2);
+            $qr_data = ob_get_contents();
+            ob_end_clean();
 
-            $writer = new Writer($renderer);
-            $svg = $writer->writeString($otpauth_url);
-
-            return 'data:image/svg+xml;base64,' . base64_encode($svg);
+            return 'data:image/png;base64,' . base64_encode($qr_data);
         } catch (\Exception $e) {
             // Fallback to external service
             return 'https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=' . rawurlencode($otpauth_url);
