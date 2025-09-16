@@ -76,7 +76,7 @@ AuthPress features an extensible architecture. Check the developer documentation
 Yes, AuthPress uses the standard TOTP (Time-based One-Time Password) protocol, which is compatible with all major authenticator apps including Google Authenticator, Authy, Microsoft Authenticator, 1Password, Bitwarden, and KeePass.
 
 = Can I customize the logo on the "AuthPress" login screen? =
-Yes, you can customize the logo using the <code>two_factor_login_telegram_logo</code> filter hook. Add this code to your theme's functions.php or a custom plugin:
+Yes, you can customize the logo using the <code>authpress_logo</code> filter hook. Add this code to your theme's functions.php or a custom plugin:
 
 <code>
 // Custom logo on "AuthPress" login screen:
