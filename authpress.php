@@ -4,7 +4,7 @@
  * Plugin Name: AuthPress
  * Plugin URI: https://www.authpress.dev
  * Description: Advanced WordPress 2FA plugin with multiple authentication providers: Telegram, Email, Authenticator Apps, and extensible custom providers.
- * Version: 4.0.1
+ * Version: 4.0.2
  * Requires at least: 6.0
  * Tested up to: 6.8
  * Requires PHP: 7.0
@@ -21,7 +21,7 @@ if (!defined('ABSPATH')) {
     die;
 }
 
-define('AUTHPRESS_PLUGIN_VERSION', '4.0.0');
+define('AUTHPRESS_PLUGIN_VERSION', '4.0.2');
 
 if (!function_exists('get_auth_token_duration')) {
     function get_auth_token_duration() {

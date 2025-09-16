@@ -1,0 +1,1838 @@
+# Copyright (C) 2025 dueclic
+# This file is distributed under the GPLv3.
+msgid ""
+msgstr ""
+"Project-Id-Version: AuthPress 4.0.2\n"
+"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/authpress\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"POT-Creation-Date: 2025-09-16T15:03:54+00:00\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"X-Generator: WP-CLI 2.11.0\n"
+"X-Domain: two-factor-login-telegram\n"
+
+#. Plugin Name of the plugin
+#: authpress.php
+#: includes/class-authpress-admin-manager.php:250
+#: includes/class-authpress-admin-manager.php:251
+msgid "AuthPress"
+msgstr ""
+
+#. Plugin URI of the plugin
+#: authpress.php
+msgid "https://www.authpress.dev"
+msgstr ""
+
+#. Description of the plugin
+#: authpress.php
+msgid "Advanced WordPress 2FA plugin with multiple authentication providers: Telegram, Email, Authenticator Apps, and extensible custom providers."
+msgstr ""
+
+#. Author of the plugin
+#: authpress.php
+msgid "dueclic"
+msgstr ""
+
+#. Author URI of the plugin
+#: authpress.php
+msgid "https://www.dueclic.com"
+msgstr ""
+
+#: authpress.php:64
+msgid "Messaging Providers"
+msgstr ""
+
+#: authpress.php:65
+msgid "Receive authentication codes directly via messaging platforms."
+msgstr ""
+
+#: authpress.php:69
+msgid "Authenticator Apps"
+msgstr ""
+
+#: authpress.php:70
+msgid "Time-based One-Time Password apps that generate codes offline."
+msgstr ""
+
+#: authpress.php:87
+msgid "Other Providers"
+msgstr ""
+
+#: authpress.php:88
+msgid "Additional 2FA methods provided by plugins."
+msgstr ""
+
+#: authpress.php:153
+msgid "two_factor_login_telegram_logo filter is deprecated. Use authpress_logo instead."
+msgstr ""
+
+#: custom_providers/authpress-passkey/templates/provider-login/passkey.php:10
+msgid "Use your passkey (Face ID, Touch ID, Windows Hello, or security key) to authenticate."
+msgstr ""
+
+#: custom_providers/authpress-passkey/templates/provider-login/passkey.php:16
+msgid "Authenticate with Passkey"
+msgstr ""
+
+#: includes/class-authpress-admin-manager.php:141
+msgid "Cannot disable %s because it is set as your default 2FA method. Please change your default method first."
+msgstr ""
+
+#: includes/class-authpress-admin-manager.php:158
+msgid "Telegram 2FA has been configured successfully!"
+msgstr ""
+
+#: includes/class-authpress-admin-manager.php:162
+msgid "Invalid Telegram Chat ID."
+msgstr ""
+
+#: includes/class-authpress-admin-manager.php:183
+msgid "New recovery codes have been generated successfully!"
+msgstr ""
+
+#: includes/class-authpress-admin-manager.php:217
+msgid "Default 2FA method set to %s successfully!"
+msgstr ""
+
+#: includes/class-authpress-admin-manager.php:221
+msgid "Invalid default provider selected."
+msgstr ""
+
+#: includes/class-authpress-admin-manager.php:236
+#: includes/class-authpress-user-manager.php:502
+#: includes/class-authpress-user-manager.php:503
+#: includes/providers/class-authpress-provider-telegram.php:410
+#: includes/providers/class-authpress-provider-telegram.php:420
+#: templates/admin/howto.php:369
+msgid "Telegram"
+msgstr ""
+
+#: includes/class-authpress-admin-manager.php:238
+#: includes/class-authpress-user-manager.php:506
+#: includes/class-authpress-user-manager.php:507
+#: includes/providers/class-authpress-provider-email.php:368
+#: includes/providers/class-authpress-provider-email.php:384
+#: templates/admin/howto.php:370
+msgid "Email"
+msgstr ""
+
+#: includes/class-authpress-admin-manager.php:240
+#: includes/providers/class-authpress-provider-totp.php:281
+#: templates/admin/howto.php:371
+msgid "Authenticator App"
+msgstr ""
+
+#: includes/class-authpress-admin-manager.php:258
+#: includes/class-authpress-admin-manager.php:259
+#: templates/admin/user-2fa-settings-page.php:58
+msgid "My 2FA Settings"
+msgstr ""
+
+#: includes/class-authpress-admin-manager.php:320
+#: templates/admin/configuration.php:44
+msgid "Settings"
+msgstr ""
+
+#: includes/class-authpress-admin-manager.php:369
+#: includes/class-authpress-admin-manager.php:409
+msgid "Provider not found."
+msgstr ""
+
+#: includes/class-authpress-admin-manager.php:379
+msgid "%s 2FA has been disabled successfully."
+msgstr ""
+
+#: includes/class-authpress-admin-manager.php:420
+msgid "%s 2FA has been enabled successfully."
+msgstr ""
+
+#: includes/class-authpress-admin-manager.php:426
+msgid "Failed to enable %s 2FA."
+msgstr ""
+
+#: includes/class-authpress-ajax-handler.php:22
+#: includes/class-authpress-ajax-handler.php:86
+#: includes/class-authpress-ajax-handler.php:122
+msgid "Security check error"
+msgstr ""
+
+#: includes/class-authpress-ajax-handler.php:27
+msgid "Please fill Chat ID field."
+msgstr ""
+
+#: includes/class-authpress-ajax-handler.php:41
+msgid "WordPress 2FA Validation Code"
+msgstr ""
+
+#: includes/class-authpress-ajax-handler.php:43
+msgid "Use this code to complete your 2FA setup in WordPress, or click the button below:"
+msgstr ""
+
+#: includes/class-authpress-ajax-handler.php:55
+msgid "Validate Setup"
+msgstr ""
+
+#: includes/class-authpress-ajax-handler.php:72
+msgid "Error (%s): validation code was not sent, try again!"
+msgstr ""
+
+#: includes/class-authpress-ajax-handler.php:75
+msgid "Validation code was successfully sent"
+msgstr ""
+
+#: includes/class-authpress-ajax-handler.php:91
+msgid "This bot does not exists."
+msgstr ""
+
+#: includes/class-authpress-ajax-handler.php:100
+msgid "Unable to get Bot infos, please retry."
+msgstr ""
+
+#: includes/class-authpress-ajax-handler.php:106
+msgid "This bot exists."
+msgstr ""
+
+#: includes/class-authpress-ajax-handler.php:127
+msgid "The token entered is wrong."
+msgstr ""
+
+#: includes/class-authpress-ajax-handler.php:128
+msgid "Chat ID is wrong."
+msgstr ""
+
+#: includes/class-authpress-ajax-handler.php:143
+msgid "Validation code entered is wrong."
+msgstr ""
+
+#: includes/class-authpress-ajax-handler.php:146
+msgid "Validation code is correct."
+msgstr ""
+
+#: includes/class-authpress-ajax-handler.php:155
+#: includes/class-authpress-ajax-handler.php:178
+#: includes/class-authpress-ajax-handler.php:205
+#: includes/class-authpress-ajax-handler.php:244
+#: includes/class-authpress-ajax-handler.php:398
+#: includes/class-authpress-ajax-handler.php:426
+#: includes/class-authpress-ajax-handler.php:459
+#: includes/class-authpress-ajax-handler.php:487
+#: includes/class-authpress-ajax-handler.php:504
+msgid "Not authorized."
+msgstr ""
+
+#: includes/class-authpress-ajax-handler.php:159
+#: includes/class-authpress-ajax-handler.php:184
+#: includes/class-authpress-ajax-handler.php:211
+#: includes/class-authpress-ajax-handler.php:250
+#: includes/class-authpress-ajax-handler.php:402
+#: includes/class-authpress-ajax-handler.php:432
+#: includes/class-authpress-ajax-handler.php:465
+#: includes/class-authpress-ajax-handler.php:493
+msgid "Invalid request."
+msgstr ""
+
+#: includes/class-authpress-ajax-handler.php:191
+msgid "Failed to generate TOTP secret."
+msgstr ""
+
+#: includes/class-authpress-ajax-handler.php:215
+msgid "Please enter a verification code."
+msgstr ""
+
+#: includes/class-authpress-ajax-handler.php:229
+msgid "Authenticator app enabled successfully!"
+msgstr ""
+
+#: includes/class-authpress-ajax-handler.php:237
+#: includes/class-authpress-authentication-handler.php:317
+msgid "Invalid verification code. Please try again."
+msgstr ""
+
+#: includes/class-authpress-ajax-handler.php:261
+msgid "Authenticator app disabled successfully."
+msgstr ""
+
+#: includes/class-authpress-ajax-handler.php:263
+msgid "Failed to disable authenticator app."
+msgstr ""
+
+#: includes/class-authpress-ajax-handler.php:270
+#: includes/class-authpress-ajax-handler.php:312
+#: includes/class-authpress-ajax-handler.php:354
+msgid "Security verification failed"
+msgstr ""
+
+#: includes/class-authpress-ajax-handler.php:277
+#: includes/class-authpress-ajax-handler.php:319
+msgid "Invalid user."
+msgstr ""
+
+#: includes/class-authpress-ajax-handler.php:281
+msgid "Telegram is not configured for this user."
+msgstr ""
+
+#: includes/class-authpress-ajax-handler.php:303
+msgid "Telegram code sent successfully!"
+msgstr ""
+
+#: includes/class-authpress-ajax-handler.php:305
+msgid "Failed to send Telegram code. Please try again."
+msgstr ""
+
+#: includes/class-authpress-ajax-handler.php:323
+msgid "Email is not configured for this user."
+msgstr ""
+
+#: includes/class-authpress-ajax-handler.php:338
+msgid "Email code sent successfully!"
+msgstr ""
+
+#: includes/class-authpress-ajax-handler.php:340
+msgid "Failed to send email code. Please try again."
+msgstr ""
+
+#: includes/class-authpress-ajax-handler.php:347
+msgid "You do not have sufficient permissions to access this page."
+msgstr ""
+
+#: includes/class-authpress-ajax-handler.php:391
+msgid "2FA has been disabled for this user."
+msgstr ""
+
+#: includes/class-authpress-ajax-handler.php:392
+#: includes/class-authpress-hooks-manager.php:200
+msgid "Inactive"
+msgstr ""
+
+#: includes/class-authpress-ajax-handler.php:410
+msgid "[%s] Test Email from AuthPress"
+msgstr ""
+
+#: includes/class-authpress-ajax-handler.php:411
+msgid ""
+"Hello,\n"
+"\n"
+"This is a test email sent from the AuthPress plugin to confirm that your WordPress mail configuration is working correctly.\n"
+"\n"
+"Regards,\n"
+"The AuthPress Plugin"
+msgstr ""
+
+#: includes/class-authpress-ajax-handler.php:417
+msgid "Test email successfully sent to %s."
+msgstr ""
+
+#: includes/class-authpress-ajax-handler.php:419
+msgid "Failed to send the test email. Please check your WordPress mail configuration or SMTP plugin settings."
+msgstr ""
+
+#: includes/class-authpress-ajax-handler.php:442
+msgid "Verify your new authentication email"
+msgstr ""
+
+#: includes/class-authpress-ajax-handler.php:443
+msgid "Your verification code is: %s"
+msgstr ""
+
+#: includes/class-authpress-ajax-handler.php:447
+msgid "A verification code has been sent to the new email address. Please enter the code to confirm the change."
+msgstr ""
+
+#: includes/class-authpress-ajax-handler.php:449
+msgid "Failed to send the verification email. Please check your WordPress mail configuration."
+msgstr ""
+
+#: includes/class-authpress-ajax-handler.php:452
+msgid "Invalid email address provided."
+msgstr ""
+
+#: includes/class-authpress-ajax-handler.php:478
+msgid "Authentication email address changed successfully."
+msgstr ""
+
+#: includes/class-authpress-ajax-handler.php:480
+msgid "Invalid verification code."
+msgstr ""
+
+#: includes/class-authpress-ajax-handler.php:498
+msgid "Authentication email has been reset to your default WordPress email address."
+msgstr ""
+
+#: includes/class-authpress-ajax-handler.php:512
+msgid "Invalid request or security check failed."
+msgstr ""
+
+#: includes/class-authpress-ajax-handler.php:516
+msgid "You can only change your own settings."
+msgstr ""
+
+#: includes/class-authpress-ajax-handler.php:524
+msgid "Provider does not exists"
+msgstr ""
+
+#: includes/class-authpress-ajax-handler.php:531
+msgid "This method must be configured before it can be enabled."
+msgstr ""
+
+#: includes/class-authpress-ajax-handler.php:544
+msgid "Settings saved."
+msgstr ""
+
+#: includes/class-authpress-ajax-handler.php:546
+msgid "Could not save settings."
+msgstr ""
+
+#: includes/class-authpress-authentication-handler.php:152
+msgid "Authentication failed. Please try again."
+msgstr ""
+
+#: includes/class-authpress-authentication-handler.php:201
+msgid "Please enter a recovery code."
+msgstr ""
+
+#: includes/class-authpress-authentication-handler.php:203
+msgid "Please enter the authenticator code."
+msgstr ""
+
+#: includes/class-authpress-authentication-handler.php:205
+msgid "Please enter the email verification code."
+msgstr ""
+
+#: includes/class-authpress-authentication-handler.php:207
+msgid "Please enter the verification code."
+msgstr ""
+
+#: includes/class-authpress-authentication-handler.php:233
+msgid "The action wp_factor_telegram_failed is deprecated. Use authpress_login_failed instead."
+msgstr ""
+
+#: includes/class-authpress-authentication-handler.php:271
+msgid "The verification code has expired. We just sent you a new code, please try again!"
+msgstr ""
+
+#: includes/class-authpress-authentication-handler.php:272
+msgid "Wrong verification code, we just sent a new code, please try again!"
+msgstr ""
+
+#: includes/class-authpress-authentication-handler.php:293
+msgid "The verification code has expired. We just sent you a new code via email, please check your inbox!"
+msgstr ""
+
+#: includes/class-authpress-authentication-handler.php:294
+msgid "Wrong verification code, we just sent a new code via email, please check your inbox!"
+msgstr ""
+
+#: includes/class-authpress-authentication-handler.php:308
+msgid "Invalid recovery code. Please check and try again."
+msgstr ""
+
+#: includes/class-authpress-authentication-handler.php:311
+msgid "Invalid authenticator code. Please check and try again."
+msgstr ""
+
+#: includes/class-authpress-authentication-handler.php:314
+msgid "Invalid email code. Please check your email and try again."
+msgstr ""
+
+#: includes/class-authpress-authentication-handler.php:361
+msgid "Security check failed. Please try again."
+msgstr ""
+
+#: includes/class-authpress-authentication-handler.php:368
+msgid "Please select a 2FA method."
+msgstr ""
+
+#: includes/class-authpress-authentication-handler.php:404
+msgid "Invalid setup method selected."
+msgstr ""
+
+#: includes/class-authpress-hooks-manager.php:186
+msgid "Ooops! Server failure, try again! "
+msgstr ""
+
+#: includes/class-authpress-hooks-manager.php:192
+msgid "Please enter a valid Chat ID"
+msgstr ""
+
+#: includes/class-authpress-hooks-manager.php:193
+msgid "Please enter the confirmation code"
+msgstr ""
+
+#: includes/class-authpress-hooks-manager.php:194
+msgid "✅ 2FA setup completed successfully!"
+msgstr ""
+
+#: includes/class-authpress-hooks-manager.php:195
+msgid "✅ Code sent! Check your Telegram"
+msgstr ""
+
+#: includes/class-authpress-hooks-manager.php:196
+msgid "⚠️ Modifying 2FA configuration - validation required"
+msgstr ""
+
+#: includes/class-authpress-hooks-manager.php:197
+msgid "Are you sure you want to disable 2FA for user %s?"
+msgstr ""
+
+#: includes/class-authpress-hooks-manager.php:198
+#: includes/class-authpress-hooks-manager.php:339
+msgid "Disabling..."
+msgstr ""
+
+#: includes/class-authpress-hooks-manager.php:199
+#: includes/class-authpress-hooks-manager.php:355
+#: includes/class-authpress-hooks-manager.php:360
+msgid "Disable"
+msgstr ""
+
+#: includes/class-authpress-hooks-manager.php:201
+msgid "2FA successfully disabled for %s"
+msgstr ""
+
+#: includes/class-authpress-hooks-manager.php:202
+msgid "Error during deactivation"
+msgstr ""
+
+#: includes/class-authpress-hooks-manager.php:203
+msgid "Unknown error"
+msgstr ""
+
+#: includes/class-authpress-hooks-manager.php:204
+msgid "Server communication error"
+msgstr ""
+
+#: includes/class-authpress-hooks-manager.php:221
+msgid "❌ Validation failed. Security error: user mismatch."
+msgstr ""
+
+#: includes/class-authpress-hooks-manager.php:225
+msgid "✅ Telegram validation successful! Your 2FA setup is now confirmed and enabled."
+msgstr ""
+
+#: includes/class-authpress-hooks-manager.php:229
+msgid "❌ Validation failed. The token is invalid, has expired, or there was a security error."
+msgstr ""
+
+#: includes/class-authpress-hooks-manager.php:335
+msgid "Are you sure you want to disable 2FA for this user?"
+msgstr ""
+
+#: includes/class-authpress-hooks-manager.php:359
+#: includes/class-authpress-hooks-manager.php:402
+msgid "An error occurred. Please try again."
+msgstr ""
+
+#: includes/class-authpress-hooks-manager.php:372
+msgid "Re-setup"
+msgstr ""
+
+#: includes/class-authpress-hooks-manager.php:375
+msgid "Are you sure you want to force this user to re-configure their 2FA setup?"
+msgstr ""
+
+#: includes/class-authpress-hooks-manager.php:376
+msgid "Are you sure you want to force this user to set up 2FA?"
+msgstr ""
+
+#: includes/class-authpress-hooks-manager.php:382
+msgid "Processing..."
+msgstr ""
+
+#: includes/class-authpress-hooks-manager.php:395
+msgid "Forced"
+msgstr ""
+
+#: includes/class-authpress-hooks-manager.php:398
+#: includes/class-authpress-hooks-manager.php:403
+#: includes/class-authpress-hooks-manager.php:766
+msgid "Force Re-setup"
+msgstr ""
+
+#: includes/class-authpress-hooks-manager.php:398
+#: includes/class-authpress-hooks-manager.php:403
+#: includes/class-authpress-hooks-manager.php:766
+msgid "Force Setup"
+msgstr ""
+
+#: includes/class-authpress-hooks-manager.php:714
+msgid "Your Telegram Chat ID"
+msgstr ""
+
+#: includes/class-authpress-hooks-manager.php:716
+msgid "Copy this ID and paste it in your WordPress profile to enable AuthPress."
+msgstr ""
+
+#: includes/class-authpress-hooks-manager.php:740
+msgid "2FA Enabled"
+msgstr ""
+
+#: includes/class-authpress-hooks-manager.php:758
+msgid "Disable All"
+msgstr ""
+
+#: includes/class-authpress-hooks-manager.php:779
+msgid " | This plugin is powered by"
+msgstr ""
+
+#: includes/class-authpress-hooks-manager.php:790
+msgid "You do not have permission to perform this action."
+msgstr ""
+
+#: includes/class-authpress-hooks-manager.php:797
+msgid "Security check failed."
+msgstr ""
+
+#: includes/class-authpress-hooks-manager.php:802
+msgid "Invalid user or cannot force setup for administrators."
+msgstr ""
+
+#: includes/class-authpress-hooks-manager.php:818
+msgid "User %s will be shown the 2FA setup wizard on their next login."
+msgstr ""
+
+#: includes/class-authpress-hooks-manager.php:823
+msgid "Failed to force setup wizard."
+msgstr ""
+
+#: includes/class-authpress-logs-list-table.php:20
+msgid "Log"
+msgstr ""
+
+#: includes/class-authpress-logs-list-table.php:21
+#: templates/admin/configuration.php:40
+#: templates/admin/logs.php:29
+msgid "Logs"
+msgstr ""
+
+#: includes/class-authpress-logs-list-table.php:30
+msgid "Timestamp"
+msgstr ""
+
+#: includes/class-authpress-logs-list-table.php:31
+msgid "Action"
+msgstr ""
+
+#: includes/class-authpress-logs-list-table.php:32
+msgid "Data"
+msgstr ""
+
+#: includes/class-authpress-logs-list-table.php:47
+#: includes/class-authpress-logs-list-table.php:82
+msgid "Delete"
+msgstr ""
+
+#: includes/class-authpress-logs-list-table.php:81
+msgid "Are you sure you want to delete this log entry?"
+msgstr ""
+
+#: includes/class-authpress-logs-list-table.php:101
+msgid "View details"
+msgstr ""
+
+#: includes/class-authpress-logs-list-table.php:187
+msgid "Deleted %d log entries."
+msgstr ""
+
+#: includes/class-authpress-logs-list-table.php:199
+msgid "Log entry deleted."
+msgstr ""
+
+#: includes/class-authpress-logs-list-table.php:207
+msgid "No logs found."
+msgstr ""
+
+#: includes/class-authpress-plugin.php:40
+msgid "The action wp_factor_telegram_loaded is deprecated. Use authpress_loaded instead."
+msgstr ""
+
+#: includes/class-authpress-plugin.php:127
+msgid "AuthPress: Legacy settings have been automatically migrated to the new provider system. You can now configure additional 2FA methods."
+msgstr ""
+
+#: includes/class-authpress-user-manager.php:491
+#: templates/provider-configs/telegram.php:34
+msgid "Disabled"
+msgstr ""
+
+#: includes/class-authpress-user-manager.php:510
+#: includes/class-authpress-user-manager.php:511
+msgid "Authenticator"
+msgstr ""
+
+#: includes/class-authpress-user-manager.php:527
+msgid "Misconfigured"
+msgstr ""
+
+#: includes/class-authpress-user-manager.php:535
+msgid "Enabled (%s, default: %s)"
+msgstr ""
+
+#: includes/class-authpress-user-manager.php:541
+msgid "Enabled (%s)"
+msgstr ""
+
+#: includes/class-wp-telegram.php:72
+#: includes/class-wp-telegram.php:123
+#: includes/class-wp-telegram.php:175
+msgid "Ooops! Server failure, try again!"
+msgstr ""
+
+#: includes/class-wp-telegram.php:83
+#: includes/class-wp-telegram.php:130
+#: includes/class-wp-telegram.php:185
+msgid "%s (Error code %d)"
+msgstr ""
+
+#: includes/class-wp-telegram.php:230
+#: includes/class-wp-telegram.php:245
+#: includes/class-wp-telegram.php:259
+#: includes/class-wp-telegram.php:270
+msgid "Failed Login Attempt"
+msgstr ""
+
+#: includes/class-wp-telegram.php:231
+#: includes/class-wp-telegram.php:246
+msgid "Site"
+msgstr ""
+
+#: includes/class-wp-telegram.php:232
+#: includes/class-wp-telegram.php:260
+msgid "URL"
+msgstr ""
+
+#: includes/class-wp-telegram.php:233
+#: includes/class-wp-telegram.php:247
+#: includes/class-wp-telegram.php:261
+#: includes/class-wp-telegram.php:271
+msgid "Username"
+msgstr ""
+
+#: includes/class-wp-telegram.php:234
+#: includes/class-wp-telegram.php:248
+#: includes/class-wp-telegram.php:262
+#: includes/class-wp-telegram.php:272
+msgid "IP Address"
+msgstr ""
+
+#: includes/providers/class-authpress-provider-email.php:22
+#: includes/providers/class-authpress-provider-email.php:275
+msgid "[%s] Two-Factor Authentication Code"
+msgstr ""
+
+#: includes/providers/class-authpress-provider-email.php:45
+#: includes/providers/class-authpress-provider-email.php:278
+msgid ""
+"Hello %s,\n"
+"\n"
+"Here's your verification code for logging into %s:\n"
+"\n"
+"%s\n"
+"\n"
+"This code will expire in %d minutes.\n"
+"\n"
+"If you didn't request this code, please ignore this email.\n"
+"\n"
+"Best regards,\n"
+"%s Team"
+msgstr ""
+
+#: includes/providers/class-authpress-provider-email.php:389
+msgid "Receive authentication codes via email messages"
+msgstr ""
+
+#: includes/providers/class-authpress-provider-recovery-codes.php:168
+#: includes/ui/modals/class-authpress-ui-modal-recovery-codes.php:19
+#: templates/admin/user-2fa-settings-page.php:261
+msgid "Recovery Codes"
+msgstr ""
+
+#: includes/providers/class-authpress-provider-recovery-codes.php:173
+msgid "One-time backup codes for emergency access"
+msgstr ""
+
+#: includes/providers/class-authpress-provider-telegram.php:331
+msgid "WordPress 2FA Login Code for %s"
+msgstr ""
+
+#: includes/providers/class-authpress-provider-telegram.php:333
+msgid "Enter this code in the login form or use the button below:"
+msgstr ""
+
+#: includes/providers/class-authpress-provider-telegram.php:349
+msgid "Login Now"
+msgstr ""
+
+#: includes/providers/class-authpress-provider-telegram.php:425
+msgid "Receive authentication codes via Telegram messages"
+msgstr ""
+
+#: includes/providers/class-authpress-provider-totp.php:286
+msgid "Google Authenticator, Authy, Microsoft Authenticator and other TOTP-compatible apps"
+msgstr ""
+
+#: includes/ui/modals/class-authpress-ui-modal-recovery-codes.php:22
+msgid "You have just regenerated Recovery Codes. Save them now: <b>they will only be shown at this moment</b> and cannot be recovered."
+msgstr ""
+
+#: includes/ui/modals/class-authpress-ui-modal-recovery-codes.php:23
+msgid "These codes allow you to log in if you don't have access to Telegram. <b>Save them in a safe place!</b> They will only be shown now and cannot be recovered."
+msgstr ""
+
+#: includes/ui/modals/class-authpress-ui-modal-recovery-codes.php:39
+msgid "Copy all codes"
+msgstr ""
+
+#: includes/ui/modals/class-authpress-ui-modal-recovery-codes.php:46
+msgid "I have saved the codes, continue"
+msgstr ""
+
+#: templates/admin/configuration.php:32
+msgid "Providers"
+msgstr ""
+
+#: templates/admin/configuration.php:36
+#: templates/admin/howto.php:14
+msgid "Setup Guide"
+msgstr ""
+
+#: templates/admin/configuration.php:48
+#: templates/admin/suggestions.php:7
+msgid "Suggestions"
+msgstr ""
+
+#: templates/admin/howto.php:15
+msgid "Complete step-by-step instructions to configure your two-factor authentication"
+msgstr ""
+
+#: templates/admin/howto.php:31
+msgid "Telegram Setup"
+msgstr ""
+
+#: templates/admin/howto.php:32
+msgid "Complete step-by-step guide to configure Telegram bot for 2FA authentication."
+msgstr ""
+
+#: templates/admin/howto.php:40
+msgid "Create Telegram Bot"
+msgstr ""
+
+#: templates/admin/howto.php:45
+msgid "First, create a Telegram bot to handle authentication messages."
+msgstr ""
+
+#: templates/admin/howto.php:49
+msgid "Step-by-step Instructions"
+msgstr ""
+
+#: templates/admin/howto.php:57
+msgid "Open Telegram"
+msgstr ""
+
+#: templates/admin/howto.php:58
+msgid "Start a conversation with %s"
+msgstr ""
+
+#: templates/admin/howto.php:66
+msgid "Create new bot"
+msgstr ""
+
+#: templates/admin/howto.php:67
+msgid "Type command %s to start bot creation"
+msgstr ""
+
+#: templates/admin/howto.php:75
+msgid "Configure bot"
+msgstr ""
+
+#: templates/admin/howto.php:76
+msgid "Follow the prompts to set a name and username for your bot"
+msgstr ""
+
+#: templates/admin/howto.php:83
+msgid "Save Bot Token"
+msgstr ""
+
+#: templates/admin/howto.php:84
+msgid "Copy the Bot Token from BotFather's response - you'll need this for the plugin configuration"
+msgstr ""
+
+#: templates/admin/howto.php:93
+msgid "Bot token example"
+msgstr ""
+
+#: templates/admin/howto.php:105
+msgid "Get Your Chat ID"
+msgstr ""
+
+#: templates/admin/howto.php:110
+msgid "Your Chat ID identifies your Telegram account to the bot."
+msgstr ""
+
+#: templates/admin/howto.php:114
+msgid "Get Chat ID Instructions"
+msgstr ""
+
+#: templates/admin/howto.php:134
+msgid "Contact your bot"
+msgstr ""
+
+#: templates/admin/howto.php:135
+msgid "Open %s and press <strong>Start</strong>"
+msgstr ""
+
+#: templates/admin/howto.php:143
+msgid "Get your ID"
+msgstr ""
+
+#: templates/admin/howto.php:144
+msgid "Type %s to get your Chat ID"
+msgstr ""
+
+#: templates/admin/howto.php:152
+msgid "Copy the ID"
+msgstr ""
+
+#: templates/admin/howto.php:153
+msgid "Copy the Chat ID number from the bot's response"
+msgstr ""
+
+#: templates/admin/howto.php:159
+msgid "Bot not configured yet"
+msgstr ""
+
+#: templates/admin/howto.php:160
+msgid "Configure your bot token in the Providers tab first, then return here for personalized instructions."
+msgstr ""
+
+#: templates/admin/howto.php:164
+msgid "Alternative method"
+msgstr ""
+
+#: templates/admin/howto.php:165
+msgid "Use %s and type %s to get your Chat ID."
+msgstr ""
+
+#: templates/admin/howto.php:179
+msgid "Activate Your Bot"
+msgstr ""
+
+#: templates/admin/howto.php:184
+msgid "Final step to enable message delivery from your bot."
+msgstr ""
+
+#: templates/admin/howto.php:188
+msgid "Open a conversation with your configured bot and press <strong>Start</strong>."
+msgstr ""
+
+#: templates/admin/howto.php:190
+msgid "Important:"
+msgstr ""
+
+#: templates/admin/howto.php:191
+msgid "This step is crucial - without it, the bot cannot send you authentication codes!"
+msgstr ""
+
+#: templates/admin/howto.php:200
+msgid "Email Setup"
+msgstr ""
+
+#: templates/admin/howto.php:201
+msgid "Receive authentication codes directly in your email inbox for secure 2FA."
+msgstr ""
+
+#: templates/admin/howto.php:208
+msgid "Email Configuration"
+msgstr ""
+
+#: templates/admin/howto.php:213
+msgid "Email authentication works automatically with your WordPress account email."
+msgstr ""
+
+#: templates/admin/howto.php:219
+msgid "Automatic Setup"
+msgstr ""
+
+#: templates/admin/howto.php:220
+msgid "No configuration required - uses your account email automatically"
+msgstr ""
+
+#: templates/admin/howto.php:227
+msgid "Fast Delivery"
+msgstr ""
+
+#: templates/admin/howto.php:228
+msgid "Codes are sent instantly via WordPress mail system"
+msgstr ""
+
+#: templates/admin/howto.php:239
+msgid "Email Settings"
+msgstr ""
+
+#: templates/admin/howto.php:244
+msgid "Optional settings to customize email authentication behavior."
+msgstr ""
+
+#: templates/admin/howto.php:248
+msgid "Configuration Options"
+msgstr ""
+
+#: templates/admin/howto.php:256
+msgid "Token Duration"
+msgstr ""
+
+#: templates/admin/howto.php:257
+msgid "Configure how long email codes remain valid (default: 20 minutes)"
+msgstr ""
+
+#: templates/admin/howto.php:264
+msgid "Custom Email Address"
+msgstr ""
+
+#: templates/admin/howto.php:265
+msgid "Optionally set a different email address for 2FA in your profile"
+msgstr ""
+
+#: templates/admin/howto.php:272
+msgid "Test Email Function"
+msgstr ""
+
+#: templates/admin/howto.php:273
+msgid "Use the test email button in Providers tab to verify mail delivery"
+msgstr ""
+
+#: templates/admin/howto.php:283
+msgid "Authenticator App Setup"
+msgstr ""
+
+#: templates/admin/howto.php:284
+msgid "Use TOTP-compatible authenticator apps as an alternative or additional 2FA method."
+msgstr ""
+
+#: templates/admin/howto.php:291
+msgid "Supported Apps"
+msgstr ""
+
+#: templates/admin/howto.php:296
+msgid "Any TOTP-compatible authenticator app works with AuthPress."
+msgstr ""
+
+#: templates/admin/howto.php:301
+msgid "Google Authenticator"
+msgstr ""
+
+#: templates/admin/howto.php:305
+msgid "Microsoft Authenticator"
+msgstr ""
+
+#: templates/admin/howto.php:309
+msgid "Authy"
+msgstr ""
+
+#: templates/admin/howto.php:313
+msgid "Any TOTP app"
+msgstr ""
+
+#: templates/admin/howto.php:323
+msgid "Setup Process"
+msgstr ""
+
+#: templates/admin/howto.php:328
+msgid "Quick 4-step setup process for authenticator apps."
+msgstr ""
+
+#: templates/admin/howto.php:332
+msgid "Setup Instructions"
+msgstr ""
+
+#: templates/admin/howto.php:339
+msgid "Go to your <strong>User Profile</strong> page"
+msgstr ""
+
+#: templates/admin/howto.php:343
+msgid "Enable 2FA and choose <strong>\"Setup Authenticator App\"</strong>"
+msgstr ""
+
+#: templates/admin/howto.php:347
+msgid "Scan the QR code with your authenticator app"
+msgstr ""
+
+#: templates/admin/howto.php:351
+msgid "Enter the 6-digit code to verify and activate"
+msgstr ""
+
+#: templates/admin/howto.php:360
+msgid "Methods Comparison"
+msgstr ""
+
+#: templates/admin/howto.php:361
+msgid "Compare features to decide which authentication method works best for you."
+msgstr ""
+
+#: templates/admin/howto.php:368
+msgid "Feature"
+msgstr ""
+
+#: templates/admin/howto.php:376
+msgid "Internet Required"
+msgstr ""
+
+#: templates/admin/howto.php:377
+#: templates/admin/howto.php:378
+msgid "Yes"
+msgstr ""
+
+#: templates/admin/howto.php:379
+msgid "No (offline)"
+msgstr ""
+
+#: templates/admin/howto.php:382
+msgid "Setup Complexity"
+msgstr ""
+
+#: templates/admin/howto.php:383
+msgid "Bot setup required"
+msgstr ""
+
+#: templates/admin/howto.php:384
+msgid "No setup needed"
+msgstr ""
+
+#: templates/admin/howto.php:385
+msgid "App installation"
+msgstr ""
+
+#: templates/admin/howto.php:388
+msgid "Automatic Delivery"
+msgstr ""
+
+#: templates/admin/howto.php:389
+msgid "Push notifications"
+msgstr ""
+
+#: templates/admin/howto.php:390
+msgid "Email notifications"
+msgstr ""
+
+#: templates/admin/howto.php:391
+msgid "Manual check"
+msgstr ""
+
+#: templates/admin/howto.php:394
+msgid "Device Flexibility"
+msgstr ""
+
+#: templates/admin/howto.php:395
+#: templates/admin/howto.php:396
+msgid "Any device"
+msgstr ""
+
+#: templates/admin/howto.php:397
+msgid "Specific device only"
+msgstr ""
+
+#: templates/admin/howto.php:400
+msgid "Reliability"
+msgstr ""
+
+#: templates/admin/howto.php:401
+msgid "Depends on Telegram"
+msgstr ""
+
+#: templates/admin/howto.php:402
+msgid "Depends on email server"
+msgstr ""
+
+#: templates/admin/howto.php:403
+msgid "Offline capable"
+msgstr ""
+
+#: templates/admin/howto.php:406
+msgid "Security Standard"
+msgstr ""
+
+#: templates/admin/howto.php:407
+msgid "High security"
+msgstr ""
+
+#: templates/admin/howto.php:408
+msgid "Standard security"
+msgstr ""
+
+#: templates/admin/howto.php:409
+msgid "Industry standard"
+msgstr ""
+
+#: templates/admin/howto.php:417
+msgid "Choose Telegram if:"
+msgstr ""
+
+#: templates/admin/howto.php:419
+msgid "You want push notifications"
+msgstr ""
+
+#: templates/admin/howto.php:420
+msgid "You use multiple devices"
+msgstr ""
+
+#: templates/admin/howto.php:421
+msgid "You prefer instant messaging"
+msgstr ""
+
+#: templates/admin/howto.php:425
+msgid "Choose Email if:"
+msgstr ""
+
+#: templates/admin/howto.php:427
+msgid "You want zero configuration"
+msgstr ""
+
+#: templates/admin/howto.php:428
+msgid "You check email regularly"
+msgstr ""
+
+#: templates/admin/howto.php:429
+msgid "You prefer familiar methods"
+msgstr ""
+
+#: templates/admin/howto.php:433
+msgid "Choose Authenticator App if:"
+msgstr ""
+
+#: templates/admin/howto.php:435
+msgid "You need offline access"
+msgstr ""
+
+#: templates/admin/howto.php:436
+msgid "You want industry-standard TOTP"
+msgstr ""
+
+#: templates/admin/howto.php:437
+msgid "You prefer dedicated security apps"
+msgstr ""
+
+#: templates/admin/howto.php:443
+msgid "Pro tip:"
+msgstr ""
+
+#: templates/admin/howto.php:444
+msgid "You can use multiple methods simultaneously for maximum security and redundancy!"
+msgstr ""
+
+#: templates/admin/logs.php:19
+msgid "Logs cleared successfully."
+msgstr ""
+
+#: templates/admin/logs.php:33
+msgid "Clear Logs"
+msgstr ""
+
+#: templates/admin/logs.php:33
+msgid "Are you sure you want to clear all logs?"
+msgstr ""
+
+#: templates/admin/providers.php:23
+msgid "2FA Methods Configuration"
+msgstr ""
+
+#: templates/admin/providers.php:24
+msgid "Manage 2FA methods and configure provider delivery settings."
+msgstr ""
+
+#: templates/admin/providers.php:98
+msgid "Enable %s"
+msgstr ""
+
+#: templates/admin/providers.php:132
+msgid "Features:"
+msgstr ""
+
+#: templates/admin/providers.php:150
+msgid "Configuration"
+msgstr ""
+
+#: templates/admin/providers.php:156
+msgid "Save"
+msgstr ""
+
+#: templates/admin/providers.php:175
+msgid "requires configuration"
+msgstr ""
+
+#: templates/admin/providers.php:203
+msgid "About 2FA Providers"
+msgstr ""
+
+#: templates/admin/providers.php:205
+msgid "You can enable one or both providers. Users will be able to choose which method to use for their 2FA setup."
+msgstr ""
+
+#: templates/admin/providers.php:208
+msgid "Enable both providers to give users flexibility and backup options."
+msgstr ""
+
+#: templates/admin/providers.php:215
+msgid "Recommendation:"
+msgstr ""
+
+#: templates/admin/settings.php:20
+msgid "Settings saved successfully!"
+msgstr ""
+
+#: templates/admin/settings.php:30
+msgid "Data Management"
+msgstr ""
+
+#: templates/admin/settings.php:32
+msgid "Configure how AuthPress handles plugin data."
+msgstr ""
+
+#: templates/admin/settings.php:39
+msgid "Data Cleanup"
+msgstr ""
+
+#: templates/admin/settings.php:44
+msgid "Data cleanup options"
+msgstr ""
+
+#: templates/admin/settings.php:54
+msgid "Delete all plugin data when deactivated"
+msgstr ""
+
+#: templates/admin/settings.php:57
+msgid "Warning:"
+msgstr ""
+
+#: templates/admin/settings.php:58
+msgid "This will permanently remove all settings, user configurations, authentication codes, logs, and database tables when the plugin is deactivated. This action cannot be undone."
+msgstr ""
+
+#: templates/admin/settings.php:63
+msgid "Data that will be deleted:"
+msgstr ""
+
+#: templates/admin/settings.php:66
+msgid "Plugin settings and configuration"
+msgstr ""
+
+#: templates/admin/settings.php:67
+msgid "User 2FA settings (Telegram chat IDs, TOTP secrets, etc.)"
+msgstr ""
+
+#: templates/admin/settings.php:68
+msgid "Authentication codes and recovery codes"
+msgstr ""
+
+#: templates/admin/settings.php:69
+msgid "Activity logs and security logs"
+msgstr ""
+
+#: templates/admin/settings.php:70
+msgid "Database tables created by the plugin"
+msgstr ""
+
+#: templates/admin/settings.php:71
+msgid "All cached data and transients"
+msgstr ""
+
+#: templates/admin/settings.php:81
+msgid "Save Settings"
+msgstr ""
+
+#: templates/admin/suggestions.php:11
+msgid "We would love to hear your feedback and suggestions! You can share them with us in different ways:"
+msgstr ""
+
+#: templates/admin/suggestions.php:15
+msgid "Consult our website <a target=\"_blank\" href=\"%s\">authpress.dev</a>."
+msgstr ""
+
+#: templates/admin/suggestions.php:20
+msgid "Send us an email at <a href=\"mailto:info@dueclic.com\">info@dueclic.com</a>."
+msgstr ""
+
+#: templates/admin/suggestions.php:25
+msgid "Visit the <a href=\"%s\" target=\"_blank\">support section on WordPress.org</a>."
+msgstr ""
+
+#: templates/admin/suggestions.php:32
+msgid "Submit your issues or ideas on our <a href=\"%s\" target=\"_blank\">GitHub project page</a>."
+msgstr ""
+
+#: templates/admin/user-2fa-settings-page.php:72
+msgid "No 2FA providers are currently enabled by the administrator."
+msgstr ""
+
+#: templates/admin/user-2fa-settings-page.php:140
+msgid "Disable %s for your account"
+msgstr ""
+
+#: templates/admin/user-2fa-settings-page.php:140
+msgid "Enable %s for your account"
+msgstr ""
+
+#: templates/admin/user-2fa-settings-page.php:201
+msgid "Ready to use"
+msgstr ""
+
+#: templates/admin/user-2fa-settings-page.php:203
+msgid "Needs setup"
+msgstr ""
+
+#: templates/admin/user-2fa-settings-page.php:223
+msgid "Default 2FA Method"
+msgstr ""
+
+#: templates/admin/user-2fa-settings-page.php:224
+msgid "Choose which 2FA method to use by default when you log in. You can always switch to another method during login."
+msgstr ""
+
+#: templates/admin/user-2fa-settings-page.php:253
+msgid "Save Default Method"
+msgstr ""
+
+#: templates/admin/user-2fa-settings-page.php:267
+msgid "You have recovery codes available. Keep them safe!"
+msgstr ""
+
+#: templates/admin/user-2fa-settings-page.php:271
+msgid "Your recovery codes are hidden for security. Regenerate them to view and save new codes."
+msgstr ""
+
+#: templates/admin/user-2fa-settings-page.php:276
+msgid "You don't have any recovery codes yet. Generate them now!"
+msgstr ""
+
+#: templates/admin/user-2fa-settings-page.php:289
+msgid "Regenerate Recovery Codes"
+msgstr ""
+
+#: templates/admin/user-2fa-settings-page.php:291
+msgid "Generate Recovery Codes"
+msgstr ""
+
+#: templates/error-telegram-expired-token.php:14
+msgid "Verification Code Expired"
+msgstr ""
+
+#: templates/error-telegram-expired-token.php:15
+#: templates/login-form.php:277
+msgid "The verification code has expired. Please request a new code to login."
+msgstr ""
+
+#: templates/error-telegram-expired-token.php:97
+#: templates/error-telegram-invalid-token.php:97
+msgid "← Try Again"
+msgstr ""
+
+#: templates/error-telegram-invalid-token.php:14
+msgid "Invalid Verification Code"
+msgstr ""
+
+#: templates/error-telegram-invalid-token.php:15
+msgid "Invalid verification code. Please request a new code to login."
+msgstr ""
+
+#: templates/error-telegram-security-failed.php:14
+msgid "Security Error"
+msgstr ""
+
+#: templates/error-telegram-security-failed.php:15
+msgid "Security check failed. The link may have expired or been tampered with."
+msgstr ""
+
+#: templates/error-telegram-security-failed.php:96
+msgid "← Back to Login"
+msgstr ""
+
+#: templates/login-form.php:230
+msgid "Enter one of your recovery codes."
+msgstr ""
+
+#: templates/login-form.php:235
+msgid "Recovery code:"
+msgstr ""
+
+#: templates/login-form.php:243
+msgid "Login"
+msgstr ""
+
+#: templates/login-form.php:245
+#: templates/login-form.php:268
+msgid "Use Recovery Code"
+msgstr ""
+
+#: templates/login-form.php:252
+#: templates/setup-wizard.php:274
+msgid "Are you lost?"
+msgstr ""
+
+#: templates/login-form.php:253
+#: templates/setup-wizard.php:275
+msgid "&larr; Back to %s"
+msgstr ""
+
+#: templates/login-form.php:269
+msgid "Back to 2FA"
+msgstr ""
+
+#: templates/login-form.php:270
+msgid "Sending Telegram code..."
+msgstr ""
+
+#: templates/login-form.php:271
+msgid "Telegram code sent! Check your phone."
+msgstr ""
+
+#: templates/login-form.php:272
+msgid "Sending email code..."
+msgstr ""
+
+#: templates/login-form.php:273
+msgid "Email code sent! Check your inbox."
+msgstr ""
+
+#: templates/login-form.php:274
+msgid "Error sending code. Please try again."
+msgstr ""
+
+#: templates/login-form.php:276
+msgid "Passkey authentication not available"
+msgstr ""
+
+#: templates/provider-configs/email.php:13
+msgid "Token duration:"
+msgstr ""
+
+#: templates/provider-configs/email.php:15
+msgid "Default token duration in minutes"
+msgstr ""
+
+#: templates/provider-configs/email.php:28
+msgid "Mail testing"
+msgstr ""
+
+#: templates/provider-configs/email.php:30
+msgid "This provider uses the standard WordPress mail function (wp_mail). You can send a test email to your admin account to ensure it's working correctly."
+msgstr ""
+
+#: templates/provider-configs/email.php:35
+msgid "Send Test Email"
+msgstr ""
+
+#: templates/provider-configs/telegram.php:13
+msgid "Bot Token"
+msgstr ""
+
+#: templates/provider-configs/telegram.php:21
+msgid "Bot token is valid (Bot name: @%s)"
+msgstr ""
+
+#: templates/provider-configs/telegram.php:25
+msgid "Bot token is invalid"
+msgstr ""
+
+#: templates/provider-configs/telegram.php:31
+msgid "Failed Login Reports"
+msgstr ""
+
+#: templates/provider-configs/telegram.php:35
+msgid "Send notifications about failed login attempts"
+msgstr ""
+
+#: templates/provider-configs/telegram.php:45
+msgid "Report Chat ID"
+msgstr ""
+
+#: templates/provider-configs/telegram.php:49
+msgid "Enter your Telegram Chat ID"
+msgstr ""
+
+#: templates/provider-features/authenticator.php:8
+msgid "Works offline"
+msgstr ""
+
+#: templates/provider-features/authenticator.php:9
+msgid "Industry standard TOTP"
+msgstr ""
+
+#: templates/provider-features/authenticator.php:10
+msgid "No internet required"
+msgstr ""
+
+#: templates/provider-features/authenticator.php:11
+msgid "Compatible with all major apps"
+msgstr ""
+
+#: templates/provider-features/email.php:8
+msgid "Universal compatibility"
+msgstr ""
+
+#: templates/provider-features/email.php:9
+#: templates/setup-wizard.php:230
+msgid "Works with any email client"
+msgstr ""
+
+#: templates/provider-features/email.php:10
+msgid "No additional apps required"
+msgstr ""
+
+#: templates/provider-features/email.php:11
+msgid "Automatic availability for all users"
+msgstr ""
+
+#: templates/provider-features/telegram.php:8
+msgid "Automatic code delivery"
+msgstr ""
+
+#: templates/provider-features/telegram.php:9
+msgid "Works on any device"
+msgstr ""
+
+#: templates/provider-features/telegram.php:10
+msgid "Real-time notifications"
+msgstr ""
+
+#: templates/provider-features/telegram.php:11
+msgid "Failed login reports"
+msgstr ""
+
+#: templates/provider-login.php:17
+msgid "Enter the code sent via %s."
+msgstr ""
+
+#: templates/provider-login.php:22
+msgid "%s code:"
+msgstr ""
+
+#: templates/provider-login/authenticator.php:10
+msgid "Enter the 6-digit code from your authenticator app."
+msgstr ""
+
+#: templates/provider-login/authenticator.php:15
+msgid "Authenticator code:"
+msgstr ""
+
+#: templates/provider-login/email.php:12
+msgid "Enter the code sent to your email address."
+msgstr ""
+
+#: templates/provider-login/email.php:17
+msgid "Email code:"
+msgstr ""
+
+#: templates/provider-login/telegram.php:8
+msgid "Enter the code sent to your Telegram account."
+msgstr ""
+
+#: templates/provider-login/telegram.php:13
+msgid "Authentication code:"
+msgstr ""
+
+#: templates/provider-selector.php:9
+msgid "Choose your verification method:"
+msgstr ""
+
+#: templates/provider-templates/authenticator.php:19
+msgid "✅ Authenticator app is configured and active."
+msgstr ""
+
+#: templates/provider-templates/authenticator.php:21
+msgid "Configure your authenticator app to enable this 2FA method."
+msgstr ""
+
+#: templates/provider-templates/authenticator.php:35
+msgid "Generate QR Code"
+msgstr ""
+
+#: templates/provider-templates/authenticator.php:42
+msgid "Verify Setup"
+msgstr ""
+
+#: templates/provider-templates/authenticator.php:43
+msgid "Enter the 6-digit code from your authenticator app to complete setup:"
+msgstr ""
+
+#: templates/provider-templates/authenticator.php:52
+msgid "Verify & Enable"
+msgstr ""
+
+#: templates/provider-templates/email.php:24
+msgid "Current Email:"
+msgstr ""
+
+#: templates/provider-templates/email.php:25
+msgid "You can specify a different email address for receiving authentication codes. If left blank, your primary WordPress email will be used."
+msgstr ""
+
+#: templates/provider-templates/email.php:31
+msgid "Change Authentication Email"
+msgstr ""
+
+#: templates/provider-templates/email.php:37
+msgid "Reset to default mail"
+msgstr ""
+
+#: templates/provider-templates/email.php:45
+msgid "Set Authentication Email"
+msgstr ""
+
+#: templates/provider-templates/email.php:60
+msgid "New Authentication Email"
+msgstr ""
+
+#: templates/provider-templates/email.php:64
+msgid "Enter the email address to receive 2FA codes."
+msgstr ""
+
+#: templates/provider-templates/email.php:70
+msgid "Send Verification Code"
+msgstr ""
+
+#: templates/provider-templates/email.php:73
+#: templates/provider-templates/email.php:99
+#: templates/provider-templates/telegram/setup-steps.php:114
+msgid "Cancel"
+msgstr ""
+
+#: templates/provider-templates/email.php:81
+msgid "Verify New Email Address"
+msgstr ""
+
+#: templates/provider-templates/email.php:87
+msgid "Verification Code"
+msgstr ""
+
+#: templates/provider-templates/email.php:91
+msgid "Enter the verification code you received in your email."
+msgstr ""
+
+#: templates/provider-templates/email.php:97
+msgid "Verify & Save"
+msgstr ""
+
+#: templates/provider-templates/generic-provider.php:25
+msgid "Are you sure you want to disable %s 2FA?"
+msgstr ""
+
+#: templates/provider-templates/generic-provider.php:26
+msgid "Disable %s 2FA"
+msgstr ""
+
+#: templates/provider-templates/generic-provider.php:33
+msgid "Configure %s to enable this 2FA method."
+msgstr ""
+
+#: templates/provider-templates/generic-provider.php:43
+msgid "Enable %s 2FA"
+msgstr ""
+
+#: templates/provider-templates/telegram.php:25
+msgid "Change Settings"
+msgstr ""
+
+#: templates/provider-templates/telegram.php:35
+msgid "Configure Telegram to enable this 2FA method."
+msgstr ""
+
+#: templates/provider-templates/telegram/setup-steps.php:21
+msgid "Open a conversation with %s and make sure it's still active"
+msgstr ""
+
+#: templates/provider-templates/telegram/setup-steps.php:22
+msgid "Open a conversation with %s and press on <strong>Start</strong>"
+msgstr ""
+
+#: templates/provider-templates/telegram/setup-steps.php:25
+msgid "Follow the steps below to change your Telegram Chat ID:"
+msgstr ""
+
+#: templates/provider-templates/telegram/setup-steps.php:27
+msgid "🚀 Setup Steps"
+msgstr ""
+
+#: templates/provider-templates/telegram/setup-steps.php:32
+msgid "Type command %s to get your current Chat ID."
+msgstr ""
+
+#: templates/provider-templates/telegram/setup-steps.php:34
+msgid "The bot will reply with your <strong>Chat ID</strong> number"
+msgstr ""
+
+#: templates/provider-templates/telegram/setup-steps.php:35
+msgid "Copy your Chat ID and paste it below, then press <strong>Submit code</strong>"
+msgstr ""
+
+#: templates/provider-templates/telegram/setup-steps.php:37
+msgid "Copy the new Chat ID and paste it below"
+msgstr ""
+
+#: templates/provider-templates/telegram/setup-steps.php:58
+msgid "Telegram Chat ID"
+msgstr ""
+
+#: templates/provider-templates/telegram/setup-steps.php:59
+msgid "Put your Telegram Chat ID"
+msgstr ""
+
+#: templates/provider-templates/telegram/setup-steps.php:67
+msgid "Submit code"
+msgstr ""
+
+#: templates/provider-templates/telegram/setup-steps.php:73
+msgid "Confirmation code"
+msgstr ""
+
+#: templates/provider-templates/telegram/setup-steps.php:74
+msgid "Please enter the confirmation code you received on Telegram"
+msgstr ""
+
+#: templates/provider-templates/telegram/setup-steps.php:82
+msgid "Validate"
+msgstr ""
+
+#: templates/provider-templates/telegram/setup-steps.php:100
+msgid "Save Telegram Configuration"
+msgstr ""
+
+#: templates/setup-wizard.php:18
+msgid "2FA Setup"
+msgstr ""
+
+#: templates/setup-wizard.php:209
+msgid "Setup AuthPress"
+msgstr ""
+
+#: templates/setup-wizard.php:210
+msgid "Choose a method to secure your account with an additional layer of protection"
+msgstr ""
+
+#: templates/setup-wizard.php:215
+msgid "Two-factor authentication adds an extra layer of security to your account by requiring a second form of verification when you log in."
+msgstr ""
+
+#: templates/setup-wizard.php:229
+msgid "Fast and convenient"
+msgstr ""
+
+#: templates/setup-wizard.php:231
+msgid "Works without internet connection"
+msgstr ""
+
+#: templates/setup-wizard.php:256
+msgid "No 2FA methods are currently enabled. Please contact your administrator."
+msgstr ""
+
+#: templates/setup-wizard.php:264
+msgid "Skip for now"
+msgstr ""
+
+#: templates/setup-wizard.php:267
+msgid "Continue"
+msgstr ""
+
+#: templates/setup-wizard.php:317
+msgid "Please select a 2FA method to continue."
+msgstr ""
