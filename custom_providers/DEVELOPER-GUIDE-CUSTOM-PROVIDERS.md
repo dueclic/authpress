@@ -36,8 +36,7 @@ class My_Provider_Class extends Abstract_Provider
         parent::__construct(
             'my_provider',              // Unique provider key
             'My Provider',              // Display name
-            'Description of provider',   // Description
-            'https://example.com/icon.png' // Icon URL (optional)
+            'Description of provider'   // Description
         );
     }
     
@@ -83,7 +82,7 @@ Base class for all providers with built-in helper methods for external providers
 abstract class Abstract_Provider
 {
     // Constructor for external providers (built-in providers don't use this)
-    public function __construct($key = null, $name = null, $description = null, $icon_url = null);
+    public function __construct($key = null, $name = null, $description = null);
     
     // Helper methods available to all providers
     protected function store_user_codes($user_id, $codes, $options = []);
@@ -105,7 +104,22 @@ abstract class Abstract_Provider
 
 ### Required Methods
 
-Every provider must implement:
+Every provider must implement these **abstract methods**:
+
+```php
+// Check if provider is configured for specific user (REQUIRED ABSTRACT)
+public function is_user_configured($user_id);
+
+// Enable provider for specific user (REQUIRED ABSTRACT)
+public function enable_user_method($user_id);
+
+// Disable provider for specific user (REQUIRED ABSTRACT)
+public function disable_user_method($user_id);
+```
+
+### Optional Override Methods
+
+These methods have default implementations but can be overridden:
 
 ```php
 // Validate user-provided code
@@ -120,33 +134,54 @@ public function has_codes($user_id);
 // Delete all user codes
 public function delete_user_codes($user_id);
 
+// Send code to user
+public function send_code($code, $user_id, $options = []);
+
+// Check if provider is enabled globally
+public function is_enabled();
+
+// Check if provider is configured globally
+public function is_configured();
+```
+
+### Available Helper Methods
+
+These methods are available for use but cannot be overridden:
+
+```php
 // Provider metadata
 public function get_key();
 public function get_name();
 public function get_description();
 public function get_icon();
+
+// Toggle user method (calls enable_user_method or disable_user_method)
+public function toggle_user_method($user_id, $enabled);
+
+// Check if provider is available (enabled AND configured)
+public function is_available();
 ```
 
-## Complete Example: SMS Provider with Aimon
+## Complete Example: SMS Provider
 
 Here's a complete working example of an SMS provider:
 
-### 1. Main Plugin File (`authpress-sms-aimon.php`)
+### 1. Main Plugin File (`authpress-sms.php`)
 
 ```php
 <?php
 /**
- * Plugin Name: AuthPress SMS Provider - Aimon
- * Description: SMS 2FA Provider using Aimon service
+ * Plugin Name: AuthPress SMS Provider
+ * Description: SMS 2FA Provider using SMS service
  * Version: 1.0.0
  */
 
-class AuthPress_SMS_Aimon_Plugin
+class AuthPress_SMS_Plugin
 {
     public function init()
     {
         // Load provider class
-        require_once __DIR__ . '/class-sms-aimon-provider.php';
+        require_once __DIR__ . '/class-sms-provider.php';
         
         // Register provider
         add_filter('authpress_register_providers', [$this, 'register_provider']);
@@ -154,15 +189,15 @@ class AuthPress_SMS_Aimon_Plugin
     
     public function register_provider($providers)
     {
-        $providers['sms_aimon'] = 'MyPlugin\\SMS_Aimon_Provider';
+        $providers['sms'] = 'MyPlugin\\SMS_Provider';
         return $providers;
     }
 }
 
-(new AuthPress_SMS_Aimon_Plugin())->init();
+(new AuthPress_SMS_Plugin())->init();
 ```
 
-### 2. Provider Class (`class-sms-aimon-provider.php`)
+### 2. Provider Class (`class-sms-provider.php`)
 
 ```php
 <?php
@@ -170,24 +205,46 @@ namespace MyPlugin;
 
 use AuthPress\\Providers\\Abstract_Provider;
 
-class SMS_Aimon_Provider extends Abstract_Provider
+class SMS_Provider extends Abstract_Provider
 {
     public function __construct()
     {
         parent::__construct(
-            'sms_aimon',
-            __('SMS via Aimon', 'my-plugin'),
-            __('Receive codes via SMS using Aimon service', 'my-plugin'),
-            plugin_dir_url(__FILE__) . 'assets/sms-icon.png'
+            'sms',
+            __('SMS', 'my-plugin'),
+            __('Receive codes via SMS service', 'my-plugin')
         );
     }
     
     public function is_configured()
     {
         $providers = authpress_providers();
-        $config = $providers['sms_aimon'] ?? [];
-        
+        $config = $providers['sms'] ?? [];
+
         return !empty($config['api_key']) && !empty($config['sender_id']);
+    }
+
+    public function is_user_configured($user_id)
+    {
+        // Check if user has phone number configured
+        $phone = $this->get_user_phone_number($user_id);
+        return !empty($phone) && $this->is_configured();
+    }
+
+    public function enable_user_method($user_id)
+    {
+        // Implementation for enabling SMS for user
+        // This should be called after user provides phone number
+        update_user_meta($user_id, 'authpress_sms_enabled', true);
+        return true;
+    }
+
+    public function disable_user_method($user_id)
+    {
+        // Implementation for disabling SMS for user
+        delete_user_meta($user_id, 'authpress_sms_enabled');
+        delete_user_meta($user_id, 'authpress_sms_phone_number');
+        $this->delete_user_codes($user_id);
     }
     
     public function send_code($code, $user_id, $options = [])
@@ -195,7 +252,7 @@ class SMS_Aimon_Provider extends Abstract_Provider
         $phone = $this->get_user_phone($user_id);
         if (!$phone) return false;
         
-        return $this->send_sms_via_aimon($phone, "Your code: {$code}");
+        return $this->send_sms($phone, "Your code: {$code}");
     }
     
     public function generate_codes($user_id, $options = [])
@@ -213,12 +270,35 @@ class SMS_Aimon_Provider extends Abstract_Provider
         
         return $codes;
     }
-    
-    // ... implement other required methods
+
+    public function is_user_configured($user_id)
+    {
+        $phone = $this->get_user_phone_number($user_id);
+        return !empty($phone) && $this->is_configured();
+    }
+
+    public function enable_user_method($user_id)
+    {
+        update_user_meta($user_id, 'authpress_sms_enabled', true);
+        return true;
+    }
+
+    public function disable_user_method($user_id)
+    {
+        delete_user_meta($user_id, 'authpress_sms_enabled');
+        delete_user_meta($user_id, 'authpress_sms_phone_number');
+        $this->delete_user_codes($user_id);
+    }
+
+    private function get_user_phone_number($user_id)
+    {
+        $settings = $this->get_user_settings($user_id);
+        return $settings['phone_number'] ?? get_user_meta($user_id, 'authpress_sms_phone_number', true);
+    }
 }
 ```
 
-### 3. Template File (`templates/provider-templates/provider-sms_aimon.php`)
+### 3. Template File (`templates/provider-templates/provider-sms.php`)
 
 ```php
 <div class="authpress-section">
@@ -324,13 +404,16 @@ Templates are loaded automatically based on provider key:
 Your template receives these variables:
 
 ```php
-$key            // Provider key
-$data           // Provider data array
-$provider       // Provider instance
+$provider       // Provider instance (Abstract_Provider)
 $user_has_method // Boolean - user has method enabled
-$current_user_id // Current user ID
-$user_config    // User 2FA configuration
+$current_user_id // Current user ID (if available)
+$data           // Provider data array (for generic template compatibility)
 ```
+
+**Note**: The `$data` array is primarily used in the generic template and contains:
+- `$data['name']` - Provider display name
+- `$data['description']` - Provider description
+- `$data['icon']` - Provider icon URL
 
 ### Template Example
 
@@ -484,8 +567,7 @@ public function __construct()
     parent::__construct(
         'my_provider',
         __('My Provider', 'my-textdomain'),
-        __('Description of my provider', 'my-textdomain'),
-        $this->get_icon_url()
+        __('Description of my provider', 'my-textdomain')
     );
 }
 ```
@@ -581,13 +663,13 @@ public function get_debug_info()
 - **AuthPress Documentation**: [Link to main docs]
 - **WordPress Plugin Development**: https://developer.wordpress.org/plugins/
 - **WordPress Hooks Reference**: https://developer.wordpress.org/reference/hooks/
-- **Example Provider Code**: See `/examples/sms-provider-aimon/` directory
+- **Example Provider Code**: See `/examples/sms-provider/` directory
 
 ## Support
 
 For questions about developing custom providers:
 
-1. Check the example implementation in `/examples/sms-provider-aimon/`
+1. Check the example implementation in `/examples/sms-provider/`
 2. Review AuthPress source code for built-in providers
 3. Test with WordPress debug mode enabled
 4. Check WordPress and PHP error logs
